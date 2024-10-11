@@ -1,12 +1,3 @@
----
-name: Bug Report Template
-about: 버그 설명 이슈
-title: "[USER-001] 버그명"
-labels: bug
-assignees: ''
-
----
-
 # 버그 제목
 - 관련 도메인: USER-001
 
