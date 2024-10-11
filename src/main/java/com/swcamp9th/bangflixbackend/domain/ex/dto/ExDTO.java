@@ -1,5 +1,17 @@
 package com.swcamp9th.bangflixbackend.domain.ex.dto;
 
-public class ExDTO {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+public class ExDTO {
+    int a;
+    int b;
 }
