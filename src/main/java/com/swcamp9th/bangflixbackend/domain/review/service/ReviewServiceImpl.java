@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
@@ -58,7 +59,6 @@ public class ReviewServiceImpl implements ReviewService {
         review.setMember(reviewMember);
         review.setActive(true);
         review.setCreatedAt(LocalDateTime.now());
-        log.info("review" + review.toString());
         Review insertReview = reviewRepository.save(review);
 
         // 리뷰 파일 저장
@@ -69,6 +69,48 @@ public class ReviewServiceImpl implements ReviewService {
         reviewMemberRepository.save(reviewMember);
 
     }
+
+    @Override
+    @Transactional
+    public void updateReview(UpdateReviewDTO updateReview, List<MultipartFile> images) {
+        // 기존 리뷰 조회
+        Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
+
+        // DTO에서 null이 아닌 값만 업데이트
+        if (updateReview.getHeadcount() != null) {
+            existingReview.setHeadcount(updateReview.getHeadcount());
+        }
+        if (updateReview.getTakenTime() != null) {
+            existingReview.setTakenTime(updateReview.getTakenTime());
+        }
+        if (updateReview.getTotalScore() != null) {
+            existingReview.setTotalScore(updateReview.getTotalScore());
+        }
+        if (updateReview.getComposition() != null) {
+            existingReview.setComposition(updateReview.getComposition());
+        }
+        if (updateReview.getLevel() != null) {
+            existingReview.setLevel(updateReview.getLevel());
+        }
+        if (updateReview.getHorrorLevel() != null) {
+            existingReview.setHorrorLevel(updateReview.getHorrorLevel());
+        }
+        if (updateReview.getActivity() != null) {
+            existingReview.setActivity(updateReview.getActivity());
+        }
+        if (updateReview.getInterior() != null) {
+            existingReview.setInterior(updateReview.getInterior());
+        }
+        if (updateReview.getProbability() != null) {
+            existingReview.setProbability(updateReview.getProbability());
+        }
+        if (updateReview.getContent() != null) {
+            existingReview.setContent(updateReview.getContent());
+        }
+
+        reviewRepository.save(existingReview);
+    }
+
 
     private void saveReviewFile(List<MultipartFile> images, Review review) throws IOException {
         String uploadsDir = "src/main/resources/static/uploadFiles/reviewFile";
