@@ -104,4 +104,17 @@ public class UserServiceImpl implements UserService {
         // Redis에서 리프레시 토큰 삭제
         redisService.deleteRefreshToken(username);
     }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto findUserInfoById(String id) {
+        Member user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return new UserInfoResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname(),
+                user.getImage()
+        );
+    }
 }

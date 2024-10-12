@@ -7,4 +7,5 @@ public interface UserService {
     SignResponseDto login(SignRequestDto signRequestDto);
     ReissueTokenResponseDto refreshTokens(String refreshToken);
     void logout(String refreshToken);
+    UserInfoResponseDto findUserInfoById(String id);
 }
