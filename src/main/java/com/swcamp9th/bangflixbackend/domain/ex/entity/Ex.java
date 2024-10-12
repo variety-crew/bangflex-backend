@@ -1,4 +1,4 @@
-package com.swcamp9th.bangflixbackend.domain.entity;
+package com.swcamp9th.bangflixbackend.domain.ex.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

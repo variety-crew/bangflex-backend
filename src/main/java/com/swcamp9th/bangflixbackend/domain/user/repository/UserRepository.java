@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.user.repository;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

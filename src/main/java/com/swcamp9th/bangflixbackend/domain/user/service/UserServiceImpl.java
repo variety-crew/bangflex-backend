@@ -1,7 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.user.service;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Member;
-import com.swcamp9th.bangflixbackend.domain.entity.MemberRoleEnum;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.redis.RedisService;
@@ -9,7 +8,6 @@ import com.swcamp9th.bangflixbackend.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

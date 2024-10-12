@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.security.jwt;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;

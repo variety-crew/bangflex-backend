@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.user.dto;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import lombok.Getter;
 
 @Getter

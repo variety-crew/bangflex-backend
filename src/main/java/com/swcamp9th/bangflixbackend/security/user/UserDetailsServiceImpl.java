@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.security.user;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
