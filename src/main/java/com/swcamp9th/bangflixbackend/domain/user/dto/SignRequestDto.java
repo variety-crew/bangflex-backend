@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 public class SignRequestDto {
 
-	@NotBlank(message = "이름을 입력하세요.")
-	private String username;
+	@NotBlank(message = "아이디를 입력하세요.")
+	private String id;
 
 	@NotBlank(message = "비밀번호를 입력하세요.")
 	private String password;

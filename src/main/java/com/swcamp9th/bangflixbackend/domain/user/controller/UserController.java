@@ -27,4 +27,10 @@ public class UserController {
     public ResponseEntity<SignupResponseDto> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.signup(signupRequestDto));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<SignResponseDto> login(@Valid @RequestBody SignRequestDto signRequestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.login(signRequestDto));
+    }
+
 }

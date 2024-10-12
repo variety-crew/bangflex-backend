@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public SignResponseDto login(SignRequestDto signRequestDto) {
-        Member user = userRepository.findById(signRequestDto.getUsername())
+        Member user = userRepository.findById(signRequestDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(signRequestDto.getPassword(), user.getPassword())) {
