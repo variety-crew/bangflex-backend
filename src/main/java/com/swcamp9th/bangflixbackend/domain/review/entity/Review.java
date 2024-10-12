@@ -22,10 +22,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "review")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Review {
 
     @Id
@@ -75,14 +73,14 @@ public class Review {
     @Column(name = "content", length = 1024, nullable = false)
     private String content;
 
-//    // Foreign keys
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_code", nullable = false)
-//    private Member member;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "theme_code", nullable = false)
-//    private Theme theme;
+    // Foreign keys
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_code", nullable = false)
+    private ReviewMember member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theme_code", nullable = false)
+    private ReviewTheme theme;
 
 }
 
