@@ -75,7 +75,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public void updateReview(UpdateReviewDTO updateReview) {
 
-
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
 
