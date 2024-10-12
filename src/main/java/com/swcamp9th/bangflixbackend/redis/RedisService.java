@@ -31,22 +31,22 @@ public class RedisService {
         return result;
     }
 
-    public void saveRefreshToken(String username, String refreshToken) {
+    public void saveRefreshToken(String id, String refreshToken) {
 
-        redisTemplate.opsForValue().set(username, refreshToken, expireTime, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(id, refreshToken, expireTime, TimeUnit.MILLISECONDS);
     }
 
-    public String getRefreshToken(String username) {
-        return (String) redisTemplate.opsForValue().get(username);
+    public String getRefreshToken(String id) {
+        return (String) redisTemplate.opsForValue().get(id);
     }
 
-    public void deleteRefreshToken(String username) {
-        redisTemplate.delete(username);
+    public void deleteRefreshToken(String id) {
+        redisTemplate.delete(id);
     }
 
     // 리프레시 토큰 유효성 검사
-    public boolean isRefreshTokenValid(String username, String refreshToken) {
-        String storedRefreshToken = (String) redisTemplate.opsForValue().get(username);
+    public boolean isRefreshTokenValid(String id, String refreshToken) {
+        String storedRefreshToken = (String) redisTemplate.opsForValue().get(id);
         return refreshToken != null && refreshToken.equals(storedRefreshToken);
     }
 }
