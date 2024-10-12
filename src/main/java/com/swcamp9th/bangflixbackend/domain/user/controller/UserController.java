@@ -1,10 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.user.controller;
 
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignRequestDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignResponseDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignupRequestDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignupResponseDto;
-import com.swcamp9th.bangflixbackend.domain.user.service.UserService;
+import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,4 +29,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.login(signRequestDto));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequestDto logoutRequestDto) {
+        userService.logout(logoutRequestDto.getRefreshToken());
+        return ResponseEntity.noContent().build();
+    }
 }
