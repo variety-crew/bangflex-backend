@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.ex.service;
 
-import com.swcamp9th.bangflixbackend.domain.entity.Ex;
+import com.swcamp9th.bangflixbackend.domain.ex.entity.Ex;
 import com.swcamp9th.bangflixbackend.domain.ex.dto.ExDTO;
 import com.swcamp9th.bangflixbackend.domain.ex.repository.ExRepository;
 import org.modelmapper.ModelMapper;
