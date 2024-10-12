@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
@@ -112,9 +113,22 @@ public class ReviewServiceImpl implements ReviewService {
             }
         }
         else
-            throw new InvalidUserException("리뷰 작성 권한이 없습니다");
+            throw new InvalidUserException("리뷰 수정 권한이 없습니다");
 
         reviewRepository.save(existingReview);
+    }
+
+    @Override
+    public void deleteReview(DeleteReviewDTO deleteReviewDTO) {
+        // 기존 리뷰 조회
+        Review existingReview = reviewRepository.findById(deleteReviewDTO.getReviewCode()).orElse(null);
+
+        if(deleteReviewDTO.getMemberCode().equals(existingReview.getMember().getMemberCode())) {
+            existingReview.setActive(false);
+            reviewRepository.save(existingReview);
+        }
+        else
+            throw new InvalidUserException("리뷰 삭제 권한이 없습니다");
     }
 
 

@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.ex.dto.ExDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +52,15 @@ public class ReviewController {
         reviewService.updateReview(updateReview);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody DeleteReviewDTO deleteReviewDTO)
+        throws IOException {
+
+        reviewService.deleteReview(deleteReviewDTO);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 삭제 성공", null));
     }
 
 }

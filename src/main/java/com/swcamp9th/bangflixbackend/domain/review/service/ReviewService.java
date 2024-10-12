@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import java.io.IOException;
 import java.util.List;
@@ -12,4 +13,5 @@ public interface ReviewService {
 
     void updateReview(UpdateReviewDTO updateReview);
 
+    void deleteReview(DeleteReviewDTO deleteReviewDTO);
 }
