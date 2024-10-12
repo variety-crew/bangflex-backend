@@ -38,5 +38,4 @@ public class CreateReviewDTO {
     private Probability probability;
     private String content;
     private Integer memberCode;
-    private List<MultipartFile> images;
 }

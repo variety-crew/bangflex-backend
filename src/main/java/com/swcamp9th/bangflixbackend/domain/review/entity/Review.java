@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "review")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
