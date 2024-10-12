@@ -2,10 +2,7 @@ package com.swcamp9th.bangflixbackend.domain.user.service;
 
 import com.swcamp9th.bangflixbackend.domain.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.entity.MemberRoleEnum;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignRequestDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignResponseDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignupRequestDto;
-import com.swcamp9th.bangflixbackend.domain.user.dto.SignupResponseDto;
+import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.redis.RedisService;
 import com.swcamp9th.bangflixbackend.security.jwt.JwtUtil;
@@ -73,28 +70,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public SignResponseDto refreshTokens(String refreshToken) {
+    public ReissueTokenResponseDto refreshTokens(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
             throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
         }
 
         Claims claims = jwtUtil.getRefreshTokenClaims(refreshToken);
-        String username = claims.getSubject();
+        String id = claims.getSubject();
 
-        Member user = userRepository.findById(username)
+        Member user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // Redis에서 리프레시 토큰 조회
-        if (!redisService.isRefreshTokenValid(username, refreshToken)) {
+        if (!redisService.isRefreshTokenValid(id, refreshToken)) {
             throw new IllegalArgumentException("리프레시 토큰이 일치하지 않습니다.");
         }
 
         String newAccessToken = jwtUtil.createAccessToken(user);
-        String newRefreshToken = jwtUtil.createRefreshToken(user);
-
-        redisService.saveRefreshToken(username, refreshToken);
-
-        return new SignResponseDto(newAccessToken, newRefreshToken);
+        return new ReissueTokenResponseDto(newAccessToken);
     }
 
     public void logout(String refreshToken) {
