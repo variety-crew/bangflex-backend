@@ -1,7 +1,7 @@
 package com.swcamp9th.bangflixbackend.security.user;
 
-import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
-import com.swcamp9th.bangflixbackend.domain.user.entity.UserRoleEnum;
+import com.swcamp9th.bangflixbackend.domain.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.entity.MemberRoleEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,7 +29,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		UserRoleEnum role = member.getRole();
+		MemberRoleEnum role = member.getRole();
 		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.getAuthority());
 		return Collections.singletonList(authority);
 	}

@@ -1,6 +1,6 @@
 package com.swcamp9th.bangflixbackend.security.user;
 
-import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +15,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private final UserRepository userRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Member user = userRepository.findByUsername(username)
-			.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+	public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+		Member user = userRepository.findById(id)
+			.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id));
 		return new UserDetailsImpl(user);
 	}
 }
