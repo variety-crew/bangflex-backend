@@ -10,6 +10,7 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileReposito
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
+import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -72,41 +73,47 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void updateReview(UpdateReviewDTO updateReview, List<MultipartFile> images) {
+    public void updateReview(UpdateReviewDTO updateReview) {
+
+
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
 
-        // DTO에서 null이 아닌 값만 업데이트
-        if (updateReview.getHeadcount() != null) {
-            existingReview.setHeadcount(updateReview.getHeadcount());
+        if(updateReview.getMemberCode().equals(existingReview.getMember().getMemberCode())){
+            // DTO에서 null이 아닌 값만 업데이트
+            if (updateReview.getHeadcount() != null) {
+                existingReview.setHeadcount(updateReview.getHeadcount());
+            }
+            if (updateReview.getTakenTime() != null) {
+                existingReview.setTakenTime(updateReview.getTakenTime());
+            }
+            if (updateReview.getTotalScore() != null) {
+                existingReview.setTotalScore(updateReview.getTotalScore());
+            }
+            if (updateReview.getComposition() != null) {
+                existingReview.setComposition(updateReview.getComposition());
+            }
+            if (updateReview.getLevel() != null) {
+                existingReview.setLevel(updateReview.getLevel());
+            }
+            if (updateReview.getHorrorLevel() != null) {
+                existingReview.setHorrorLevel(updateReview.getHorrorLevel());
+            }
+            if (updateReview.getActivity() != null) {
+                existingReview.setActivity(updateReview.getActivity());
+            }
+            if (updateReview.getInterior() != null) {
+                existingReview.setInterior(updateReview.getInterior());
+            }
+            if (updateReview.getProbability() != null) {
+                existingReview.setProbability(updateReview.getProbability());
+            }
+            if (updateReview.getContent() != null) {
+                existingReview.setContent(updateReview.getContent());
+            }
         }
-        if (updateReview.getTakenTime() != null) {
-            existingReview.setTakenTime(updateReview.getTakenTime());
-        }
-        if (updateReview.getTotalScore() != null) {
-            existingReview.setTotalScore(updateReview.getTotalScore());
-        }
-        if (updateReview.getComposition() != null) {
-            existingReview.setComposition(updateReview.getComposition());
-        }
-        if (updateReview.getLevel() != null) {
-            existingReview.setLevel(updateReview.getLevel());
-        }
-        if (updateReview.getHorrorLevel() != null) {
-            existingReview.setHorrorLevel(updateReview.getHorrorLevel());
-        }
-        if (updateReview.getActivity() != null) {
-            existingReview.setActivity(updateReview.getActivity());
-        }
-        if (updateReview.getInterior() != null) {
-            existingReview.setInterior(updateReview.getInterior());
-        }
-        if (updateReview.getProbability() != null) {
-            existingReview.setProbability(updateReview.getProbability());
-        }
-        if (updateReview.getContent() != null) {
-            existingReview.setContent(updateReview.getContent());
-        }
+        else
+            throw new InvalidUserException("리뷰 작성 권한이 없습니다");
 
         reviewRepository.save(existingReview);
     }

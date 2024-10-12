@@ -44,12 +44,10 @@ public class ReviewController {
     }
 
     @PutMapping("")
-    public ResponseEntity<ResponseMessage<Object>> updateReview(
-        @RequestPart("review") UpdateReviewDTO updateReview,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images)
+    public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview)
         throws IOException {
         
-        reviewService.updateReview(updateReview, images);
+        reviewService.updateReview(updateReview);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
     }

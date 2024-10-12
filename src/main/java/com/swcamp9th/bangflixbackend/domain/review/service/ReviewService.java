@@ -10,6 +10,6 @@ public interface ReviewService {
 
     void createReview(CreateReviewDTO newReview, List<MultipartFile> images) throws IOException;
 
-    void updateReview(UpdateReviewDTO updateReview, List<MultipartFile> images);
+    void updateReview(UpdateReviewDTO updateReview);
 
 }

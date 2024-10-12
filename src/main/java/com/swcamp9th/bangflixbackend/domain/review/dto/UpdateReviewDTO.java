@@ -16,7 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class UpdateReviewDTO {
-    private Integer ReviewCode;
+    private Integer reviewCode;
     private Integer headcount;
     private Integer takenTime;
     private Integer totalScore;
@@ -27,4 +27,5 @@ public class UpdateReviewDTO {
     private Interior interior;
     private Probability probability;
     private String content;
+    private Integer memberCode;
 }
