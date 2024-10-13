@@ -35,4 +35,16 @@ public class AuthController {
     public ResponseEntity<ResponseMessage<Object>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         return ResponseEntity.ok(new ResponseMessage<>(200, "엑세스 토큰 재발급 성공", userService.refreshTokens(refreshTokenRequestDto.getRefreshToken())));
     }
+
+    @PostMapping("/confirm-id")
+    @Operation(summary = "아이디 중복체크 API")
+    public ResponseEntity<ResponseMessage<Object>> confirmID(String id) {
+        boolean result;
+        if (id.trim().isEmpty()) {
+            result = false;
+        } else {
+            result = userService.findId(id);
+        }
+        return ResponseEntity.ok(new ResponseMessage<>(200, "아이디 중복체크 성공", result));
+    }
 }

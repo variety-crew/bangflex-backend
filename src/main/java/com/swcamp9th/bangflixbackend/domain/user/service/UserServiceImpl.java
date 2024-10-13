@@ -115,4 +115,8 @@ public class UserServiceImpl implements UserService {
                 user.getImage()
         );
     }
+
+    public boolean findId(String id) {
+        return userRepository.existsById(id);
+    }
 }
