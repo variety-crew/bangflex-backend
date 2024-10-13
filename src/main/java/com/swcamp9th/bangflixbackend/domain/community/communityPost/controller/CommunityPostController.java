@@ -22,12 +22,10 @@ import java.util.List;
 public class CommunityPostController {
 
     private final CommunityPostService communityPostService;
-    private final CommunityPostServiceImpl communityPostServiceImpl;
 
     @Autowired
-    public CommunityPostController(CommunityPostService communityPostService, CommunityPostServiceImpl communityPostServiceImpl) {
+    public CommunityPostController(CommunityPostService communityPostService) {
         this.communityPostService = communityPostService;
-        this.communityPostServiceImpl = communityPostServiceImpl;
     }
 
     /* 게시글 등록 */

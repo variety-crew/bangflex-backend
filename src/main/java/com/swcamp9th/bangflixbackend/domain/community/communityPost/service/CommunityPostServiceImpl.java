@@ -63,7 +63,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         CommunityPost createdPost = communityPostRepository.save(postEntity);
 
         // 게시글 파일 저장
-        saveCommunityFiles(images, createdPost);
+        if(images != null) saveCommunityFiles(images, createdPost);
     }
 
     private void saveCommunityFiles(List<MultipartFile> images, CommunityPost createdPost) throws IOException {
@@ -113,7 +113,9 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         foundPost.setTitle(modifiedPost.getTitle());
         foundPost.setContent(modifiedPost.getContent());
-        saveCommunityFiles(images, foundPost);
+//        foundPost.setMember(memberRepository.findById(modifiedPost.getMemberCode())
+//                                            .orElseThrow(IllegalArgumentException::new));
+        if(images != null) saveCommunityFiles(images, foundPost);
     }
 
     @Transactional
