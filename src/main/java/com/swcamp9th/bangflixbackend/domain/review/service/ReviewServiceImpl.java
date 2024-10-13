@@ -320,22 +320,27 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private List<String> findMemberTendencyGenre(Integer memberCode) {
-        ReviewTendency reviewTendency = reviewTendencyRepository.findByMember_MemberCode(memberCode);
 
-        if (reviewTendency == null)
-            return Collections.emptyList();
+//        ReviewTendency reviewTendency = reviewTendencyRepository.findByMember_MemberCode(memberCode);
+//
+//        if (reviewTendency == null)
+//            return Collections.emptyList();
+//
+//        List<ReviewTendencyGenre> reviewTendencyGenres = reviewTendencyGenreRepository
+//            .findByTendency_TendencyCode(reviewTendency.getTendencyCode());
 
-        List<ReviewTendencyGenre> reviewTendencyGenres = reviewTendencyGenreRepository
-            .findByTendency_TendencyCode(reviewTendency.getTendencyCode());
+//        List<String> genres = new ArrayList<>();
 
-        List<String> genres = new ArrayList<>();
+//        for(ReviewTendencyGenre reviewTendencyGenre : reviewTendencyGenres){
+//            ReviewGenre reviewGenre = reviewGenreRepository.findById(reviewTendencyGenre.getGenreCode()).orElse(null);
+//
+//            if(reviewGenre != null)
+//                genres.add(reviewGenre.getName());
+//        }
 
-        for(ReviewTendencyGenre reviewTendencyGenre : reviewTendencyGenres){
-            ReviewGenre reviewGenre = reviewGenreRepository.findById(reviewTendencyGenre.getGenreCode()).orElse(null);
-
-            if(reviewGenre != null)
-                genres.add(reviewGenre.getName());
-        }
+        List<String> genres = reviewTendencyGenreRepository
+            .findMemberGenreByMemberCode(memberCode).stream()
+            .map(reviewTendencyGenre -> reviewTendencyGenre.getGenre().getName()).toList();
 
         return genres;
     }
