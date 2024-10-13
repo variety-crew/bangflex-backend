@@ -8,6 +8,6 @@ public interface UserService {
     ReissueTokenResponseDto refreshTokens(String refreshToken);
     void logout(String refreshToken);
     UserInfoResponseDto findUserInfoById(String id);
-    boolean findId(String id);
-    boolean findNickName(String nickname);
+    DuplicateCheckResponseDto findId(String id);
+    DuplicateCheckResponseDto findNickName(String nickname);
 }

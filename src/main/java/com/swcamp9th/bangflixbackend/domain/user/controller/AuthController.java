@@ -4,7 +4,7 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
 
     private final UserServiceImpl userService;
@@ -39,24 +40,12 @@ public class AuthController {
     @PostMapping("/confirm-id")
     @Operation(summary = "아이디 중복체크 API")
     public ResponseEntity<ResponseMessage<Object>> confirmID(String id) {
-        boolean result;
-        if (id.trim().isEmpty()) {
-            result = false;
-        } else {
-            result = userService.findId(id);
-        }
-        return ResponseEntity.ok(new ResponseMessage<>(200, "아이디 중복체크 성공", result));
+        return ResponseEntity.ok(new ResponseMessage<>(200, "아이디 중복체크 성공", userService.findId(id)));
     }
 
     @PostMapping("/confirm-nickname")
     @Operation(summary = "닉네임 중복체크 API")
     public ResponseEntity<ResponseMessage<Object>> confirmNickname(String nickname) {
-        boolean result;
-        if (nickname.trim().isEmpty()) {
-            result = false;
-        } else {
-            result = userService.findNickName(nickname);
-        }
-        return ResponseEntity.ok(new ResponseMessage<>(200, "닉네임 중복체크 성공", result));
+        return ResponseEntity.ok(new ResponseMessage<>(200, "닉네임 중복체크 성공", userService.findNickName(nickname)));
     }
 }

@@ -116,11 +116,17 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-    public boolean findId(String id) {
-        return userRepository.existsById(id);
+    public DuplicateCheckResponseDto findId(String id) {
+        if (id.trim().isEmpty()) {
+            return new DuplicateCheckResponseDto(false);
+        }
+        return new DuplicateCheckResponseDto(userRepository.existsById(id));
     }
 
-    public boolean findNickName(String nickname) {
-        return userRepository.existsByNickname(nickname);
+    public DuplicateCheckResponseDto findNickName(String nickname) {
+        if (nickname.trim().isEmpty()) {
+            return new DuplicateCheckResponseDto(false);
+        }
+        return new DuplicateCheckResponseDto(userRepository.existsByNickname(nickname));
     }
 }
