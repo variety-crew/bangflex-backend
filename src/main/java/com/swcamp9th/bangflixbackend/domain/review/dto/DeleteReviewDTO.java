@@ -10,6 +10,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class DeleteReviewDTO {
-    Integer reviewCode;
-    Integer memberCode;
+    private Integer reviewCode;
+    private Integer memberCode;
 }

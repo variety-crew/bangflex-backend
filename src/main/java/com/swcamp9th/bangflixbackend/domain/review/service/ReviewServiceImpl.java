@@ -7,6 +7,7 @@ import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
@@ -17,11 +18,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,6 +137,73 @@ public class ReviewServiceImpl implements ReviewService {
         }
         else
             throw new InvalidUserException("리뷰 삭제 권한이 없습니다");
+    }
+
+    @Override
+    public List<Review> findReview(Pageable pageable, Integer themeCode) {
+        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
+            pageable.getPageSize(), Sort.by("createdAt").descending());
+
+        Page<Review> postList = reviewRepository.findAll(pageable);
+        return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
+    }
+
+    public List<Review> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
+        // 테마 코드로 리뷰를 모두 조회
+        List<Review> reviews = reviewRepository.findByThemeCode(themeCode);
+
+        // 필터가 있을 경우 해당 조건에 맞게 정렬
+        if (filter != null) {
+            switch (filter) {
+                case "highLevel":
+                    // 난이도 높은 순 정렬
+                    reviews.sort(Comparator.comparing(Review::getLevel).reversed().thenComparing(Review::getCreatedAt));
+                    break;
+                case "lowLevel":
+                    // 난이도 낮은 순 정렬
+                    reviews.sort(Comparator.comparing(Review::getLevel).thenComparing(Review::getCreatedAt));
+                    break;
+                case "highScore":
+                    // 점수 높은 순 정렬
+                    reviews.sort(Comparator.comparing(Review::getTotalScore).reversed().thenComparing(Review::getCreatedAt));
+                    break;
+                case "lowScore":
+                    // 점수 낮은 순 정렬
+                    reviews.sort(Comparator.comparing(Review::getTotalScore).thenComparing(Review::getCreatedAt));
+                    break;
+                default:
+                    // 필터가 일치하지 않으면 최신순으로 정렬 (기본값)
+                    reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
+                    break;
+            }
+        } else {
+            // 필터가 없으면 최신순으로 정렬 (기본값)
+            reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
+        }
+
+        // lastReviewCode 기준으로 인덱스를 찾음
+        int startIndex = 0;
+        if (lastReviewCode != null) {
+            startIndex = findReviewIndex(reviews, lastReviewCode);
+        }
+
+        // 인덱스가 유효하면 그 이후의 10개 리뷰 반환
+        if (startIndex >= 0 && startIndex < reviews.size()) {
+            return reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
+        }
+
+        // 유효하지 않으면 빈 리스트 반환
+        return Collections.emptyList();
+    }
+
+    // 리뷰 리스트에서 lastReviewCode에 해당하는 리뷰의 인덱스를 찾는 메서드
+    private int findReviewIndex(List<Review> reviews, Integer lastReviewCode) {
+        for (int i = 0; i < reviews.size(); i++) {
+            if (reviews.get(i).getReviewCode().equals(lastReviewCode)) {
+                return i + 1; // 찾은 인덱스 바로 다음부터 시작
+            }
+        }
+        return 0; // 못 찾으면 처음부터
     }
 
 
