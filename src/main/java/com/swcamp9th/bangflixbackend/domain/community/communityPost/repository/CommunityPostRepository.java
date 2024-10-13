@@ -1,6 +1,6 @@
-package com.swcamp9th.bangflixbackend.community.communityPost.repository;
+package com.swcamp9th.bangflixbackend.domain.community.communityPost.repository;
 
-import com.swcamp9th.bangflixbackend.community.entity.CommunityPost;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

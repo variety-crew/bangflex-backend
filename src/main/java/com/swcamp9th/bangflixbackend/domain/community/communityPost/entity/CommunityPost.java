@@ -1,10 +1,12 @@
-package com.swcamp9th.bangflixbackend.community.entity;
+package com.swcamp9th.bangflixbackend.domain.community.communityPost.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "community_post")
@@ -18,7 +20,7 @@ public class CommunityPost {
     @Id
     @Column(name = "community_post_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int communityPostCode;
+    private Integer communityPostCode;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -33,8 +35,11 @@ public class CommunityPost {
     @ColumnDefault("TRUE")
     private Boolean active;
 
-//    @ManyToOne
-//    @JoinColumn(name = "member_code")
-    @Column(name = "member_code")
-    private Integer memberCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_code", nullable = false)
+    private Member member;
+
+    @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<CommunityFile> communityFiles = new ArrayList<>();
+
 }
