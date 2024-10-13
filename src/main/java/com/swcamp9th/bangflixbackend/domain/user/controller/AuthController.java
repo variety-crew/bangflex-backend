@@ -30,13 +30,6 @@ public class AuthController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "로그인 성공", userService.login(signRequestDto)));
     }
 
-    @PostMapping("/logout")
-    @Operation(summary = "로그아웃 API")
-    public ResponseEntity<ResponseMessage<Object>> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
-        userService.logout(refreshTokenRequestDto.getRefreshToken());
-        return ResponseEntity.ok(new ResponseMessage<>(200, "로그아웃 성공", null));
-    }
-
     @PostMapping("/refresh")
     @Operation(summary = "엑세스 토큰 재발급 API")
     public ResponseEntity<ResponseMessage<Object>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {

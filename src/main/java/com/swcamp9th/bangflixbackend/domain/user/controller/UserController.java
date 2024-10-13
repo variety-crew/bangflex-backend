@@ -22,8 +22,15 @@ public class UserController {
 
     private final UserServiceImpl userService;
 
-    @GetMapping("/login-info")
+    @PostMapping("/logout")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "로그아웃 API")
+    public ResponseEntity<ResponseMessage<Object>> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
+        userService.logout(refreshTokenRequestDto.getRefreshToken());
+        return ResponseEntity.ok(new ResponseMessage<>(200, "로그아웃 성공", null));
+    }
+
+    @GetMapping("/login-info")
     @Operation(summary = "회원 정보 조회(아이디, 닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<Object> findUserInfoById() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
