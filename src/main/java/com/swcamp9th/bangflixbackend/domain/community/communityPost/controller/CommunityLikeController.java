@@ -20,11 +20,11 @@ public class CommunityLikeController {
         this.communityLikeService = communityLikeService;
     }
 
-    /* 좋아요 등록 */
+    /* 좋아요 등록 및 취소 */
     @PostMapping("")
     public ResponseEntity<ResponseMessage<CommunityLikeDTO>> addLike(@RequestBody CommunityLikeDTO newLike) {
 
         communityLikeService.addLike(newLike);
-        return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 성공", null));
+        return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 또는 좋아요 취소 성공", null));
     }
 }
