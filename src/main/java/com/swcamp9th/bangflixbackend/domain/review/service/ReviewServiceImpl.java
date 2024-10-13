@@ -6,14 +6,20 @@ import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewGenre;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLikeId;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTendency;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTendencyGenre;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
+import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewGenreRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
+import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyGenreRepository;
+import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
@@ -23,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +52,9 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewThemeRepository reviewThemeRepository;
     private final ReviewMemberRepository reviewMemberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewTendencyRepository reviewTendencyRepository;
+    private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
+    private final ReviewGenreRepository reviewGenreRepository;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
@@ -52,13 +62,19 @@ public class ReviewServiceImpl implements ReviewService {
                            , ReviewFileRepository reviewFileRepository
                            , ReviewThemeRepository reviewThemeRepository
                            , ReviewMemberRepository reviewMemberRepository
-                           , ReviewLikeRepository reviewLikeRepository) {
+                           , ReviewLikeRepository reviewLikeRepository
+                           , ReviewTendencyRepository reviewTendencyRepository
+                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository
+                           , ReviewGenreRepository reviewGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
         this.reviewThemeRepository = reviewThemeRepository;
         this.reviewMemberRepository = reviewMemberRepository;
         this.reviewLikeRepository = reviewLikeRepository;
+        this.reviewTendencyRepository = reviewTendencyRepository;
+        this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
+        this.reviewGenreRepository = reviewGenreRepository;
     }
 
     @Override
@@ -132,6 +148,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public void deleteReview(ReviewCodeDTO reviewCodeDTO) {
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(reviewCodeDTO.getReviewCode()).orElse(null);
@@ -144,7 +161,8 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidUserException("리뷰 삭제 권한이 없습니다");
     }
 
-
+    @Override
+    @Transactional
     public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
 
         // 테마 코드로 리뷰를 모두 조회
@@ -192,6 +210,11 @@ public class ReviewServiceImpl implements ReviewService {
                     reviewDTO.setMemberNickname(review.getMember().getNickname());
                     reviewDTO.setReviewCode(review.getReviewCode());
                     reviewDTO.setMemberCode(review.getMember().getMemberCode());
+                    List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+
+                    if(!genres.isEmpty())
+                        reviewDTO.setGenres(genres);
+
                     return reviewDTO;
                 })
                 .collect(Collectors.toList());
@@ -203,7 +226,10 @@ public class ReviewServiceImpl implements ReviewService {
         return Collections.emptyList();
     }
 
+
+
     @Override
+    @Transactional
     public void likeReview(ReviewCodeDTO reviewCodeDTO) {
 
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
@@ -229,6 +255,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO) {
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
             reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
@@ -290,5 +317,26 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewLike> reviewLikes = reviewLikeRepository.findByReviewCode(reviewCode);
 
         return reviewLikes.size();
+    }
+
+    private List<String> findMemberTendencyGenre(Integer memberCode) {
+        ReviewTendency reviewTendency = reviewTendencyRepository.findByMember_MemberCode(memberCode);
+
+        if (reviewTendency == null)
+            return Collections.emptyList();
+
+        List<ReviewTendencyGenre> reviewTendencyGenres = reviewTendencyGenreRepository
+            .findByTendency_TendencyCode(reviewTendency.getTendencyCode());
+
+        List<String> genres = new ArrayList<>();
+
+        for(ReviewTendencyGenre reviewTendencyGenre : reviewTendencyGenres){
+            ReviewGenre reviewGenre = reviewGenreRepository.findById(reviewTendencyGenre.getGenreCode()).orElse(null);
+
+            if(reviewGenre != null)
+                genres.add(reviewGenre.getName());
+        }
+
+        return genres;
     }
 }
