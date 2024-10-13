@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -156,6 +157,8 @@ public class ReviewServiceImpl implements ReviewService {
         // 테마 코드로 리뷰를 모두 조회
         List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
 
+        List<ReviewDTO> result = new ArrayList<>();
+
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
             switch (filter) {
@@ -193,7 +196,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (startIndex >= 0 && startIndex < reviews.size()) {
             List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
 
-            List<ReviewDTO> result = sublist.stream()
+            result = sublist.stream()
                 .map(review -> {
                     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
 
@@ -210,12 +213,14 @@ public class ReviewServiceImpl implements ReviewService {
 
                     return reviewDTO;
                 }).toList();
-
-            return result;
         }
 
-        // 유효하지 않으면 빈 리스트 반환
-        return Collections.emptyList();
+        if(result.isEmpty())
+            return Collections.emptyList();
+        else {
+            // 리뷰 통계 추가
+            return result;
+        }
     }
 
     @Override
