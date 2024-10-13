@@ -5,4 +5,6 @@ import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Commu
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommunityLikeRepository extends JpaRepository<CommunityLike, CommunityLikeId> {
+
+    boolean existsByMemberCodeAndCommunityPostCode(Integer memberCode, Integer communityPostCode);
 }
