@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
-    @Query("SELECT r FROM Review r JOIN FETCH r.member JOIN FETCH r.theme WHERE r.theme.themeCode = :themeCode AND r.active = true")
+    @Query("SELECT r FROM Review r JOIN FETCH r.member JOIN FETCH r.theme "
+        + "WHERE r.theme.themeCode = :themeCode AND r.active = true")
     List<Review> findByThemeCodeAndActiveTrueWithFetchJoin(@Param("themeCode") Integer themeCode);
+
+
 }

@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.domain.review.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -30,11 +31,11 @@ public class ReviewTendencyGenre {
     @Column(name = "genre_code", nullable = false)
     private Integer genreCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tendency_code", insertable = false, updatable = false)
     private ReviewTendency tendency;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_code", insertable = false, updatable = false)
     private ReviewGenre genre;
 }

@@ -75,11 +75,11 @@ public class Review {
     private String content;
 
     // Foreign keys
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)
     private ReviewMember member;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_code", nullable = false)
     private ReviewTheme theme;
 

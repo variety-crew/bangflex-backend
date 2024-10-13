@@ -42,7 +42,7 @@ public class ReviewTendency {
     private Boolean active;
 
     // Foreign keys
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "member_code", nullable = false)
     private ReviewMember member;
 

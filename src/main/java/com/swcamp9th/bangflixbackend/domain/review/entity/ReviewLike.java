@@ -31,11 +31,11 @@ public class ReviewLike {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", insertable = false, updatable = false)
     private ReviewMember member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_code", insertable = false, updatable = false)
     private Review review;
 }
