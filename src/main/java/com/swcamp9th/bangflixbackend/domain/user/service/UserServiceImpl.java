@@ -119,4 +119,8 @@ public class UserServiceImpl implements UserService {
     public boolean findId(String id) {
         return userRepository.existsById(id);
     }
+
+    public boolean findNickName(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
 }

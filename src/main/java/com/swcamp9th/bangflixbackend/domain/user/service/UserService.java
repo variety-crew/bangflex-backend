@@ -9,4 +9,5 @@ public interface UserService {
     void logout(String refreshToken);
     UserInfoResponseDto findUserInfoById(String id);
     boolean findId(String id);
+    boolean findNickName(String nickname);
 }

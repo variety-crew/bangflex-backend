@@ -47,4 +47,16 @@ public class AuthController {
         }
         return ResponseEntity.ok(new ResponseMessage<>(200, "아이디 중복체크 성공", result));
     }
+
+    @PostMapping("/confirm-nickname")
+    @Operation(summary = "닉네임 중복체크 API")
+    public ResponseEntity<ResponseMessage<Object>> confirmNickname(String nickname) {
+        boolean result;
+        if (nickname.trim().isEmpty()) {
+            result = false;
+        } else {
+            result = userService.findNickName(nickname);
+        }
+        return ResponseEntity.ok(new ResponseMessage<>(200, "닉네임 중복체크 성공", result));
+    }
 }
