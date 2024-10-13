@@ -1,19 +1,23 @@
 package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
-import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLikeId;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
-import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
+import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
+import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
+import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,10 +31,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,18 +44,21 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewFileRepository reviewFileRepository;
     private final ReviewThemeRepository reviewThemeRepository;
     private final ReviewMemberRepository reviewMemberRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
                            , ReviewRepository reviewRepository
                            , ReviewFileRepository reviewFileRepository
                            , ReviewThemeRepository reviewThemeRepository
-                           , ReviewMemberRepository reviewMemberRepository) {
+                           , ReviewMemberRepository reviewMemberRepository
+                           , ReviewLikeRepository reviewLikeRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
         this.reviewThemeRepository = reviewThemeRepository;
         this.reviewMemberRepository = reviewMemberRepository;
+        this.reviewLikeRepository = reviewLikeRepository;
     }
 
     @Override
@@ -128,11 +131,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(DeleteReviewDTO deleteReviewDTO) {
+    public void deleteReview(ReviewCodeDTO reviewCodeDTO) {
         // 기존 리뷰 조회
-        Review existingReview = reviewRepository.findById(deleteReviewDTO.getReviewCode()).orElse(null);
+        Review existingReview = reviewRepository.findById(reviewCodeDTO.getReviewCode()).orElse(null);
 
-        if(deleteReviewDTO.getMemberCode().equals(existingReview.getMember().getMemberCode())) {
+        if(reviewCodeDTO.getMemberCode().equals(existingReview.getMember().getMemberCode())) {
             existingReview.setActive(false);
             reviewRepository.save(existingReview);
         }
@@ -142,10 +145,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
+
         // 테마 코드로 리뷰를 모두 조회
         List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
-
-        log.info("리뷰 코드 : " + reviews.get(0).getReviewCode());
 
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
@@ -174,8 +176,6 @@ public class ReviewServiceImpl implements ReviewService {
             startIndex = findReviewIndex(reviews, lastReviewCode);
         }
 
-        log.info("리뷰 코드 : " + reviews.get(0).getMember());
-
         // 인덱스가 유효하면 그 이후의 10개 리뷰 반환
         if (startIndex >= 0 && startIndex < reviews.size()) {
             List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
@@ -187,6 +187,48 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 유효하지 않으면 빈 리스트 반환
         return Collections.emptyList();
+    }
+
+    @Override
+    public void likeReview(ReviewCodeDTO reviewCodeDTO) {
+
+        ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
+            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+
+        if (reviewLike == null) {
+
+            ReviewLike newReviewLike = new ReviewLike();
+            newReviewLike.setMemberCode(reviewCodeDTO.getMemberCode());
+            newReviewLike.setReviewCode(reviewCodeDTO.getReviewCode());
+            newReviewLike.setCreatedAt(LocalDateTime.now());
+            newReviewLike.setActive(true);
+
+            reviewLikeRepository.save(newReviewLike);
+        } else {
+            if(reviewLike.getActive()) {
+                throw new AlreadyLikedException("이미 좋아요가 존재합니다.");
+            } else{
+                reviewLike.setActive(true);
+                reviewLikeRepository.save(reviewLike);
+            }
+        }
+    }
+
+    @Override
+    public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO) {
+        ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
+            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+
+        if (reviewLike == null) {
+            throw new LikeNotFoundException("좋아요가 존재하지 않습니다.");
+        } else {
+            if(reviewLike.getActive()) {
+                reviewLike.setActive(false);
+                reviewLikeRepository.save(reviewLike);
+            } else{
+                throw new LikeNotFoundException("좋아요가 존재하지 않습니다.");
+            }
+        }
     }
 
     // 리뷰 리스트에서 lastReviewCode에 해당하는 리뷰의 인덱스를 찾는 메서드

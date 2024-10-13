@@ -9,7 +9,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class DeleteReviewDTO {
+public class ReviewCodeDTO {
     private Integer reviewCode;
     private Integer memberCode;
 }

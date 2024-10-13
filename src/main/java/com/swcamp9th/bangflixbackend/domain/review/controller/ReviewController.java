@@ -2,18 +2,14 @@ package com.swcamp9th.bangflixbackend.domain.review.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
-import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
-import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
-import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,9 +56,9 @@ public class ReviewController {
     }
 
     @DeleteMapping("")
-    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody DeleteReviewDTO deleteReviewDTO) {
+    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
 
-        reviewService.deleteReview(deleteReviewDTO);
+        reviewService.deleteReview(reviewCodeDTO);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 삭제 성공", null));
     }
@@ -86,6 +82,22 @@ public class ReviewController {
         List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, lastReviewCode);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
+    }
+
+    @PostMapping("/likes")
+    public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+
+        reviewService.likeReview(reviewCodeDTO);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 성공", null));
+    }
+
+    @DeleteMapping("/likes")
+    public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+
+        reviewService.deleteLikeReview(reviewCodeDTO);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 취소 성공", null));
     }
 
 }
