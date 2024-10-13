@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostRequestDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
@@ -33,75 +34,54 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     private final ModelMapper modelMapper;
     private final CommunityPostRepository communityPostRepository;
-    private final CommunityFileRepository communityFileRepository;
     private final MemberRepository memberRepository;
+    private final CommunityFileService communityFileService;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
-                                    CommunityFileRepository communityFileRepository,
-                                    MemberRepository memberRepository) {
+                                    MemberRepository memberRepository,
+                                    CommunityFileService communityFileService) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
-        this.communityFileRepository = communityFileRepository;
         this.memberRepository = memberRepository;
+        this.communityFileService = communityFileService;
     }
 
     @Transactional
     @Override
-    public void createPost(CommunityPostDTO newPost, List<MultipartFile> images) throws IOException {
-        CommunityPost postEntity = modelMapper.map(newPost, CommunityPost.class);
+    public void createPost(CommunityPostRequestDTO newPost) throws IOException {
+        CommunityPost post = modelMapper.map(newPost, CommunityPost.class);
 
         // 회원이 아니라면 예외 발생
         Member author = memberRepository.findById(newPost.getMemberCode()).orElseThrow(
                 () -> new InvalidUserException("게시글 작성 권한이 없습니다.")
         );
 
-        postEntity.setMember(author);
-        postEntity.setCreatedAt(LocalDateTime.now());
-        postEntity.setActive(true);
-        CommunityPost createdPost = communityPostRepository.save(postEntity);
+        post.setTitle(newPost.getTitle());
+        post.setContent(newPost.getContent());
+        post.setCreatedAt(LocalDateTime.now());
+        post.setActive(true);
+        post.setMember(author);
 
-        // 게시글 파일 저장
-        if(images != null) saveCommunityFiles(images, createdPost);
-    }
+        // 게시글 저장
+        CommunityPost savedPost = communityPostRepository.save(post);
 
-    private void saveCommunityFiles(List<MultipartFile> images, CommunityPost createdPost) throws IOException {
-        for (MultipartFile file : images) {
-            String fileName = file.getOriginalFilename();
+        // 게시글 첨부파일 있으면 업로드 및 url 저장
+        if (newPost.getImages() != null) {
+            List<String> imageUrls = communityFileService.uploadFiles(savedPost.getCommunityPostCode(),
+                                                                        newPost.getImages());
 
-            // 파일이름만 남김
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
-            // UUID 생성
-            String uuid = UUID.randomUUID().toString();
-            // 저장 경로
-            String filePath = "src/main/resources/static/communityFiles" + uuid + fileName;
-            Path path = Paths.get(filePath);
-            // DB 저장명
-            String dbUrl = "/communityFiles" + uuid + fileName;
-
-            //저장
-            Files.copy(file.getInputStream(),
-                    path,
-                    StandardCopyOption.REPLACE_EXISTING     // 이미 파일이 존재하면 덮어쓰기
-            );
-
-            communityFileRepository.save(CommunityFile.builder()
-                    .url(dbUrl)
-                    .createdAt(LocalDateTime.now())
-                    .active(true)
-                    .communityPost(createdPost)
-                    .build()
-            );
+            CommunityPostResponseDTO postResponse = modelMapper.map(savedPost, CommunityPostResponseDTO.class);
+            postResponse.setImageUrls(imageUrls);
+            communityPostRepository.save(modelMapper.map(postResponse, CommunityPost.class));
         }
-
-        communityPostRepository.save(createdPost);
     }
 
     @Transactional
     @Override
     public void modifyPost(Integer communityPostCode,
-                           CommunityPostDTO modifiedPost,
+                           CommunityPostResponseDTO modifiedPost,
                            List<MultipartFile> images) throws IOException {
         CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
                                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
@@ -111,16 +91,16 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             throw new InvalidUserException("게시글 수정 권한이 없습니다.");
         }
 
-        foundPost.setTitle(modifiedPost.getTitle());
-        foundPost.setContent(modifiedPost.getContent());
-//        foundPost.setMember(memberRepository.findById(modifiedPost.getMemberCode())
-//                                            .orElseThrow(IllegalArgumentException::new));
-        if(images != null) saveCommunityFiles(images, foundPost);
+//        foundPost.setTitle(modifiedPost.getTitle());
+//        foundPost.setContent(modifiedPost.getContent());
+////        foundPost.setMember(memberRepository.findById(modifiedPost.getMemberCode())
+////                                            .orElseThrow(IllegalArgumentException::new));
+//        if(images != null) saveCommunityFiles(images, foundPost);
     }
 
     @Transactional
     @Override
-    public void deletePost(Integer communityPostCode, CommunityPostDTO deletedPost) {
+    public void deletePost(Integer communityPostCode, CommunityPostResponseDTO deletedPost) {
         CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
                                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
@@ -135,22 +115,22 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
+    public Page<CommunityPostResponseDTO> findPostList(Pageable pageable) {
         pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
                 pageable.getPageSize(),
                 Sort.by("communityPostCode").descending());
 
         Page<CommunityPost> postList = communityPostRepository.findAll(pageable);
 
-        return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
+        return postList.map(post -> modelMapper.map(post, CommunityPostResponseDTO.class));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public CommunityPostDTO findPostByCode(Integer communityPostCode) {
+    public CommunityPostResponseDTO findPostByCode(Integer communityPostCode) {
         CommunityPost post = communityPostRepository.findById(communityPostCode)
                             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        return modelMapper.map(post, CommunityPostDTO.class);
+        return modelMapper.map(post, CommunityPostResponseDTO.class);
     }
 }

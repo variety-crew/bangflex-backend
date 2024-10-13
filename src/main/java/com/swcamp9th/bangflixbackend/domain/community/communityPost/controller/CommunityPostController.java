@@ -1,9 +1,9 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostRequestDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,19 +30,18 @@ public class CommunityPostController {
 
     /* 게시글 등록 */
     @PostMapping("/post")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> createCommunityPost(
-                            @RequestBody CommunityPostDTO newPost,
-                            @RequestParam(required = false) List<MultipartFile> images) throws IOException {
+    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> createCommunityPost(
+                                            @ModelAttribute CommunityPostRequestDTO newPost) throws IOException {
 
-        communityPostService.createPost(newPost, images);
+        communityPostService.createPost(newPost);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", null));
     }
 
     /* 게시글 수정 */
     @PutMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> modifyCommunityPost(
+    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> modifyCommunityPost(
                             @PathVariable Integer communityPostCode,
-                            @RequestBody CommunityPostDTO modifiedPost,
+                            @RequestBody CommunityPostResponseDTO modifiedPost,
                             @RequestParam(required = false) List<MultipartFile> images) throws IOException {
 
         communityPostService.modifyPost(communityPostCode, modifiedPost, images);
@@ -51,9 +50,9 @@ public class CommunityPostController {
 
     /* 게시글 삭제 */
     @DeleteMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> deleteCommunityPost(
+    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> deleteCommunityPost(
                             @PathVariable Integer communityPostCode,
-                            @RequestBody CommunityPostDTO deletedPost) {
+                            @RequestBody CommunityPostResponseDTO deletedPost) {
 
         communityPostService.deletePost(communityPostCode, deletedPost);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
@@ -61,10 +60,10 @@ public class CommunityPostController {
 
     /* 게시글 목록 조회(페이지네이션) */
     @GetMapping("")
-    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
+    public ResponseEntity<ResponseMessage<Page<CommunityPostResponseDTO>>> findPostList(
                             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
+        Page<CommunityPostResponseDTO> postList = communityPostService.findPostList(pageable);
         if (postList.hasContent()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
         } else {
@@ -74,9 +73,9 @@ public class CommunityPostController {
 
     /* 게시글 상세 조회 */
     @GetMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable Integer communityPostCode) {
+    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> findPost(@PathVariable Integer communityPostCode) {
 
-        CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
+        CommunityPostResponseDTO post = communityPostService.findPostByCode(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
 }
