@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
@@ -18,7 +19,5 @@ public interface ReviewService {
 
     void deleteReview(DeleteReviewDTO deleteReviewDTO);
 
-    List<Review> findReview(Pageable pageable, Integer themeCode);
-
-    List<Review> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode);
+    List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode);
 }

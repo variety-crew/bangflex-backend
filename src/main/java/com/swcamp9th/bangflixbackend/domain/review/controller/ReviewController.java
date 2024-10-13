@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
@@ -67,15 +68,6 @@ public class ReviewController {
     }
 
     @GetMapping("")
-    public ResponseEntity<ResponseMessage<Object>> findReviewList(@PageableDefault(size = 10) Pageable pageable
-    ,@RequestParam Integer themeCode) {
-
-        List<Review> reviews = reviewService.findReview(pageable, themeCode);
-
-        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
-    }
-
-    @GetMapping("/filters")
     public ResponseEntity<ResponseMessage<Object>> findReviewList(
         @RequestParam Integer themeCode,
         @RequestParam Integer lastReviewCode,
@@ -83,15 +75,15 @@ public class ReviewController {
         /*
             필터 값은 필수 X.
             필터 값이 없다면 기본 최신순 리뷰 정렬
-            highLevel, lowLevel, highScore, lowScore 값 중 하나를 string 형태로 주면
-            난이도 별 정렬, 점수 별 정렬. 난이도나 점수가 같다면 날짜 순 정렬
+            highScore, lowScore 값 중 하나를 string 형태로 주면
+            점수 별 정렬. 점수가 같다면 날짜 순 정렬
 
             화면을 참고해보니 더보기 버튼 클릭. 즉, 페이지네이션 X.
             요청 시, 초기에 10개씩 보냄. 이후, lastReviewCode를 주면 전체 정렬 중 그 이후 10개를 보내줌
         */
 
         // 서비스에서 필터를 사용해 조회
-        List<Review> reviews = reviewService.findReviewsWithFilters(themeCode, filter, lastReviewCode);
+        List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, lastReviewCode);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
     }

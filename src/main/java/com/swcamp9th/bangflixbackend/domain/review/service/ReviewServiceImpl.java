@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.DeleteReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
@@ -139,30 +140,16 @@ public class ReviewServiceImpl implements ReviewService {
             throw new InvalidUserException("리뷰 삭제 권한이 없습니다");
     }
 
-    @Override
-    public List<Review> findReview(Pageable pageable, Integer themeCode) {
-        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
-            pageable.getPageSize(), Sort.by("createdAt").descending());
 
-        Page<Review> postList = reviewRepository.findAll(pageable);
-        return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
-    }
-
-    public List<Review> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
+    public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
         // 테마 코드로 리뷰를 모두 조회
-        List<Review> reviews = reviewRepository.findByThemeCode(themeCode);
+        List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
+
+        log.info("리뷰 코드 : " + reviews.get(0).getReviewCode());
 
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
             switch (filter) {
-                case "highLevel":
-                    // 난이도 높은 순 정렬
-                    reviews.sort(Comparator.comparing(Review::getLevel).reversed().thenComparing(Review::getCreatedAt));
-                    break;
-                case "lowLevel":
-                    // 난이도 낮은 순 정렬
-                    reviews.sort(Comparator.comparing(Review::getLevel).thenComparing(Review::getCreatedAt));
-                    break;
                 case "highScore":
                     // 점수 높은 순 정렬
                     reviews.sort(Comparator.comparing(Review::getTotalScore).reversed().thenComparing(Review::getCreatedAt));
@@ -187,9 +174,15 @@ public class ReviewServiceImpl implements ReviewService {
             startIndex = findReviewIndex(reviews, lastReviewCode);
         }
 
+        log.info("리뷰 코드 : " + reviews.get(0).getMember());
+
         // 인덱스가 유효하면 그 이후의 10개 리뷰 반환
         if (startIndex >= 0 && startIndex < reviews.size()) {
-            return reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
+            List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
+
+            return sublist.stream()
+                .map(review -> modelMapper.map(review, ReviewDTO.class))
+                .collect(Collectors.toList());
         }
 
         // 유효하지 않으면 빈 리스트 반환
