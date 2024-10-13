@@ -76,7 +76,8 @@ public class ReviewServiceImpl implements ReviewService {
         Review insertReview = reviewRepository.save(review);
 
         // 리뷰 파일 저장
-        saveReviewFile(images, insertReview);
+        if(images != null)
+            saveReviewFile(images, insertReview);
 
         // 멤버 포인트 올리기
         reviewMember.setPoint(reviewMember.getPoint()+5);
@@ -154,11 +155,13 @@ public class ReviewServiceImpl implements ReviewService {
             switch (filter) {
                 case "highScore":
                     // 점수 높은 순 정렬
-                    reviews.sort(Comparator.comparing(Review::getTotalScore).reversed().thenComparing(Review::getCreatedAt));
+                    reviews.sort(Comparator.comparing(Review::getTotalScore).reversed()
+                        .thenComparing(Comparator.comparing(Review::getCreatedAt).reversed()));
                     break;
                 case "lowScore":
                     // 점수 낮은 순 정렬
-                    reviews.sort(Comparator.comparing(Review::getTotalScore).thenComparing(Review::getCreatedAt));
+                    reviews.sort(Comparator.comparing(Review::getTotalScore)
+                        .thenComparing(Comparator.comparing(Review::getCreatedAt).reversed()));
                     break;
                 default:
                     // 필터가 일치하지 않으면 최신순으로 정렬 (기본값)
@@ -180,9 +183,20 @@ public class ReviewServiceImpl implements ReviewService {
         if (startIndex >= 0 && startIndex < reviews.size()) {
             List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
 
-            return sublist.stream()
-                .map(review -> modelMapper.map(review, ReviewDTO.class))
+            List<ReviewDTO> result = sublist.stream()
+                .map(review -> {
+                    ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+                    // 이미지 경로 추가
+                    reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
+                    reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
+                    reviewDTO.setMemberNickname(review.getMember().getNickname());
+                    reviewDTO.setReviewCode(review.getReviewCode());
+                    reviewDTO.setMemberCode(review.getMember().getMemberCode());
+                    return reviewDTO;
+                })
                 .collect(Collectors.toList());
+
+            return result;
         }
 
         // 유효하지 않으면 빈 리스트 반환
@@ -263,7 +277,18 @@ public class ReviewServiceImpl implements ReviewService {
                                 .url(dbFilePath)
                                 .build());
         }
+    }
 
+    public List<String> findImagePathsByReviewCode(Integer reviewCode) {
+        return reviewFileRepository.findByReview_ReviewCode(reviewCode)
+            .stream()
+            .map(ReviewFile::getUrl) // ReviewFile 엔티티에서 경로 가져오기
+            .collect(Collectors.toList());
+    }
 
+    private Integer findReviewLikesByReviewCode(Integer reviewCode) {
+        List<ReviewLike> reviewLikes = reviewLikeRepository.findByReviewCode(reviewCode);
+
+        return reviewLikes.size();
     }
 }

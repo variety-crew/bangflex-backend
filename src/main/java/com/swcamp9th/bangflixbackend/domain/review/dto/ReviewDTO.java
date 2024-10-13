@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.review.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,4 +30,8 @@ public class ReviewDTO {
     private String content;
     private Integer memberCode;
     private Integer themeCode;
+    private List<String> imagePaths;
+    private Integer Likes;
+    private String memberNickname;
+    private List<String> genres;
 }
