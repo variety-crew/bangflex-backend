@@ -6,20 +6,14 @@ import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewGenre;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLikeId;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTendency;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTendencyGenre;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewGenreRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyGenreRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
@@ -29,12 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewThemeRepository reviewThemeRepository;
     private final ReviewMemberRepository reviewMemberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
-    private final ReviewTendencyRepository reviewTendencyRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
-    private final ReviewGenreRepository reviewGenreRepository;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
@@ -63,18 +53,14 @@ public class ReviewServiceImpl implements ReviewService {
                            , ReviewThemeRepository reviewThemeRepository
                            , ReviewMemberRepository reviewMemberRepository
                            , ReviewLikeRepository reviewLikeRepository
-                           , ReviewTendencyRepository reviewTendencyRepository
-                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository
-                           , ReviewGenreRepository reviewGenreRepository) {
+                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
         this.reviewThemeRepository = reviewThemeRepository;
         this.reviewMemberRepository = reviewMemberRepository;
         this.reviewLikeRepository = reviewLikeRepository;
-        this.reviewTendencyRepository = reviewTendencyRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
-        this.reviewGenreRepository = reviewGenreRepository;
     }
 
     @Override
@@ -109,6 +95,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
 
         if(updateReview.getMemberCode().equals(existingReview.getMember().getMemberCode())){
+
             // DTO에서 null이 아닌 값만 업데이트
             if (updateReview.getHeadcount() != null) {
                 existingReview.setHeadcount(updateReview.getHeadcount());
@@ -150,6 +137,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public void deleteReview(ReviewCodeDTO reviewCodeDTO) {
+
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(reviewCodeDTO.getReviewCode()).orElse(null);
 
@@ -172,21 +160,25 @@ public class ReviewServiceImpl implements ReviewService {
         if (filter != null) {
             switch (filter) {
                 case "highScore":
+
                     // 점수 높은 순 정렬
                     reviews.sort(Comparator.comparing(Review::getTotalScore).reversed()
                         .thenComparing(Comparator.comparing(Review::getCreatedAt).reversed()));
                     break;
                 case "lowScore":
+
                     // 점수 낮은 순 정렬
                     reviews.sort(Comparator.comparing(Review::getTotalScore)
                         .thenComparing(Comparator.comparing(Review::getCreatedAt).reversed()));
                     break;
                 default:
+
                     // 필터가 일치하지 않으면 최신순으로 정렬 (기본값)
                     reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
                     break;
             }
         } else {
+
             // 필터가 없으면 최신순으로 정렬 (기본값)
             reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
         }
@@ -204,6 +196,7 @@ public class ReviewServiceImpl implements ReviewService {
             List<ReviewDTO> result = sublist.stream()
                 .map(review -> {
                     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+
                     // 이미지 경로 추가
                     reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
                     reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
@@ -216,8 +209,7 @@ public class ReviewServiceImpl implements ReviewService {
                         reviewDTO.setGenres(genres);
 
                     return reviewDTO;
-                })
-                .collect(Collectors.toList());
+                }).toList();
 
             return result;
         }
@@ -225,8 +217,6 @@ public class ReviewServiceImpl implements ReviewService {
         // 유효하지 않으면 빈 리스트 반환
         return Collections.emptyList();
     }
-
-
 
     @Override
     @Transactional
@@ -308,40 +298,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     public List<String> findImagePathsByReviewCode(Integer reviewCode) {
         return reviewFileRepository.findByReview_ReviewCode(reviewCode)
-            .stream()
-            .map(ReviewFile::getUrl) // ReviewFile 엔티티에서 경로 가져오기
-            .collect(Collectors.toList());
+            .stream().map(ReviewFile::getUrl).toList();
     }
 
     private Integer findReviewLikesByReviewCode(Integer reviewCode) {
-        List<ReviewLike> reviewLikes = reviewLikeRepository.findByReviewCode(reviewCode);
-
-        return reviewLikes.size();
+        return reviewLikeRepository.findByReviewCode(reviewCode).size();
     }
 
     private List<String> findMemberTendencyGenre(Integer memberCode) {
-
-//        ReviewTendency reviewTendency = reviewTendencyRepository.findByMember_MemberCode(memberCode);
-//
-//        if (reviewTendency == null)
-//            return Collections.emptyList();
-//
-//        List<ReviewTendencyGenre> reviewTendencyGenres = reviewTendencyGenreRepository
-//            .findByTendency_TendencyCode(reviewTendency.getTendencyCode());
-
-//        List<String> genres = new ArrayList<>();
-
-//        for(ReviewTendencyGenre reviewTendencyGenre : reviewTendencyGenres){
-//            ReviewGenre reviewGenre = reviewGenreRepository.findById(reviewTendencyGenre.getGenreCode()).orElse(null);
-//
-//            if(reviewGenre != null)
-//                genres.add(reviewGenre.getName());
-//        }
-
-        List<String> genres = reviewTendencyGenreRepository
+        return reviewTendencyGenreRepository
             .findMemberGenreByMemberCode(memberCode).stream()
             .map(reviewTendencyGenre -> reviewTendencyGenre.getGenre().getName()).toList();
-
-        return genres;
     }
 }
