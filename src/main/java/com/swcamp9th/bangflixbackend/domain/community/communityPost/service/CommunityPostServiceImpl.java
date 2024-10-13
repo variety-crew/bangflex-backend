@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Service
+@Service("communityPostService")
 public class CommunityPostServiceImpl implements CommunityPostService {
 
     private final ModelMapper modelMapper;

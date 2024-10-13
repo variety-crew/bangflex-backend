@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-@RestController
+@RestController("communityPostController")
 @Slf4j
 @RequestMapping("api/v1/community")
 public class CommunityPostController {
@@ -45,7 +45,7 @@ public class CommunityPostController {
     public ResponseEntity<ResponseMessage<CommunityPostDTO>> modifyCommunityPost(
                             @PathVariable Integer communityPostCode,
                             @RequestBody CommunityPostDTO modifiedPost,
-                            @RequestParam(required = false) List<MultipartFile> images) {
+                            @RequestParam(required = false) List<MultipartFile> images) throws IOException {
 
         communityPostService.modifyPost(communityPostCode, modifiedPost, images);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 수정 성공", null));
