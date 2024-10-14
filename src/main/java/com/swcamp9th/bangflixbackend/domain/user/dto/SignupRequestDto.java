@@ -29,6 +29,4 @@ public class SignupRequestDto {
 
 	@NotBlank(message = "관리자 여부는 필수 입력 항목입니다.")
 	private Boolean isAdmin;
-
-	private String image;
 }

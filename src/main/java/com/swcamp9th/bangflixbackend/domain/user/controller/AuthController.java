@@ -4,12 +4,18 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,10 +25,19 @@ public class AuthController {
 
     private final UserServiceImpl userService;
 
-    @PostMapping("/signup")
+
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원가입 API")
-    public ResponseEntity<ResponseMessage<Object>> signup(@Valid @RequestBody SignupRequestDto signupRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "회원 가입 성공", userService.signup(signupRequestDto)));
+    public ResponseEntity<Object> signup(@RequestPart("signupDto") @Valid SignupRequestDto signupRequestDto,
+                                    @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
+        if (imgFile == null) {
+            log.info("AuthController signup - imgFile is null");
+            userService.signupWithoutProfile(signupRequestDto);
+        } else {
+            log.info("AuthController signup - imgFile is NOT null");
+            userService.signup(signupRequestDto, imgFile);
+        }
+        return ResponseEntity.ok(new ResponseMessage<>(200, "회원 가입 성공", null));
     }
 
     @PostMapping("/login")
