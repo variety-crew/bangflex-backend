@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import java.io.IOException;
 import java.util.List;
@@ -21,4 +22,6 @@ public interface ReviewService {
     void likeReview(ReviewCodeDTO reviewCodeDTO);
 
     void deleteLikeReview(ReviewCodeDTO reviewCodeDTO);
+
+    StatisticsReviewDTO findReviewStatistics(Integer themeCode);
 }

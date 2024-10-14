@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
@@ -157,8 +158,6 @@ public class ReviewServiceImpl implements ReviewService {
         // 테마 코드로 리뷰를 모두 조회
         List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
 
-        List<ReviewDTO> result = new ArrayList<>();
-
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
             switch (filter) {
@@ -196,7 +195,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (startIndex >= 0 && startIndex < reviews.size()) {
             List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
 
-            result = sublist.stream()
+            List<ReviewDTO> result = sublist.stream()
                 .map(review -> {
                     ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
 
@@ -213,14 +212,19 @@ public class ReviewServiceImpl implements ReviewService {
 
                     return reviewDTO;
                 }).toList();
-        }
 
-        if(result.isEmpty())
-            return Collections.emptyList();
-        else {
-            // 리뷰 통계 추가
             return result;
         }
+
+        return Collections.emptyList();
+
+
+    }
+
+    @Override
+    @Transactional
+    public StatisticsReviewDTO findReviewStatistics(Integer themeCode) {
+        return reviewRepository.findStatisticsByThemeCode(themeCode);
     }
 
     @Override

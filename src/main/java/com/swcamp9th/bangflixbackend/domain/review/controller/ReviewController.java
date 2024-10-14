@@ -4,6 +4,7 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.io.IOException;
@@ -65,8 +66,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{themeCode}")
-    public ResponseEntity<ResponseMessage<Object>> findReviewList(
-//        @RequestParam Integer themeCode,
+    public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
         @RequestParam Integer lastReviewCode,
         @RequestParam(required = false) String filter) {
@@ -84,6 +84,16 @@ public class ReviewController {
         List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, lastReviewCode);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
+    }
+
+    @GetMapping("/statistics/{themeCode}")
+    public ResponseEntity<ResponseMessage<StatisticsReviewDTO>> findReviewStatistics(
+        @PathVariable("themeCode") Integer themeCode) {
+
+        // 서비스에서 필터를 사용해 조회
+        StatisticsReviewDTO reviewStatistics = reviewService.findReviewStatistics(themeCode);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 통계 조회 성공", reviewStatistics));
     }
 
     @PostMapping("/likes")
