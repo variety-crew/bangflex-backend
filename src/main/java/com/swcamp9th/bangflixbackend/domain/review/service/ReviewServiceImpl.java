@@ -19,7 +19,9 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeReposit
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +34,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,6 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMemberRepository reviewMemberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
+    private ResourceLoader resourceLoader;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
@@ -55,7 +60,8 @@ public class ReviewServiceImpl implements ReviewService {
                            , ReviewThemeRepository reviewThemeRepository
                            , ReviewMemberRepository reviewMemberRepository
                            , ReviewLikeRepository reviewLikeRepository
-                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
+                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository
+                           , ResourceLoader resourceLoader) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
@@ -63,11 +69,13 @@ public class ReviewServiceImpl implements ReviewService {
         this.reviewMemberRepository = reviewMemberRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
+        this.resourceLoader = resourceLoader;
     }
 
     @Override
     @Transactional
-    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images) throws IOException {
+    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images)
+        throws IOException, URISyntaxException {
 
         // 리뷰 저장
         Review review = modelMapper.map(newReview, Review.class);
@@ -289,20 +297,20 @@ public class ReviewServiceImpl implements ReviewService {
         for(MultipartFile file : images) {
             String fileName = UUID.randomUUID().toString().replace("-", "") + "_" + file.getOriginalFilename();
             // 실제 파일이 저장될 경로
-            String filePath = uploadsDir + fileName;
+            String filePath = uploadsDir + "/" + fileName;
             // DB에 저장할 경로 문자열
-            String dbFilePath = "/uploadFiles/reviewFile" + fileName;
+            String dbFilePath = "/uploadFiles/reviewFile/" + fileName;
 
             Path path = Paths.get(filePath); // Path 객체 생성
             Files.createDirectories(path.getParent()); // 디렉토리 생성
             Files.write(path, file.getBytes()); // 디렉토리에 파일 저장
 
             reviewFileRepository.save(ReviewFile.builder()
-                                .review(review)
-                                .active(true)
-                                .createdAt(LocalDateTime.now())
-                                .url(dbFilePath)
-                                .build());
+                .review(review)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .url(dbFilePath)
+                .build());
         }
     }
 

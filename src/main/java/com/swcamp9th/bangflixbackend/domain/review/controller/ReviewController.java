@@ -8,6 +8,7 @@ import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public class ReviewController {
     public ResponseEntity<ResponseMessage<Object>> createReview(
         @RequestPart("review") CreateReviewDTO newReview,
         @RequestPart(value = "images", required = false) List<MultipartFile> images)
-        throws IOException {
+        throws IOException, URISyntaxException {
 
         reviewService.createReview(newReview, images);
 
