@@ -33,7 +33,7 @@ public class RankingController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "Top5 리뷰 생성", null));
     }
 
-    @GetMapping("/{year}")
+    @GetMapping("/reviews/dates/{year}")
     public ResponseEntity<ResponseMessage<ReviewRankingDateDTO>> findReviewRankingDate(
         @PathVariable Integer year) {
 
@@ -42,7 +42,7 @@ public class RankingController {
         return ResponseEntity.ok(new ResponseMessage<>(200, year + "년도 리뷰 랭킹 선정일 조회 성공", reviewRankingDateDTO));
     }
 
-    @GetMapping("/{date}")
+    @GetMapping("reviews/{date}")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewRanking(
         @PathVariable String date) {
 

@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.ranking.service;
 
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewLikeCountDTO;
+import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDateDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.entity.ReviewRanking;
 import com.swcamp9th.bangflixbackend.domain.ranking.repository.ReviewRankingRepository;
@@ -66,7 +67,7 @@ public class RankingServiceImpl implements RankingService {
     @Override
     public List<ReviewDTO> findReviewRanking(String date) {
 
-        List<Review> reviews = reviewRankingRepository.findByCreatedAtDate(date);
+        List<ReviewRankingDTO> reviews = reviewRankingRepository.findByCreatedAtDate(date);
         log.info("리뷰가 조회되는지 확인" + reviews.get(0).getReviewCode());
         return List.of();
     }
