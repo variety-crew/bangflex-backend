@@ -1,8 +1,10 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDeleteDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostRequestDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController("communityPostController")
 @Slf4j
@@ -31,28 +34,29 @@ public class CommunityPostController {
     /* 게시글 등록 */
     @PostMapping("/post")
     public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> createCommunityPost(
-                                            @ModelAttribute CommunityPostRequestDTO newPost) throws IOException {
+                @RequestPart CommunityPostRequestDTO newPost,
+                @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        communityPostService.createPost(newPost);
-        return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", null));
+        CommunityPostResponseDTO postResponse = communityPostService.createPost(newPost, images);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", postResponse));
     }
 
     /* 게시글 수정 */
     @PutMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> modifyCommunityPost(
-                            @PathVariable Integer communityPostCode,
-                            @RequestBody CommunityPostResponseDTO modifiedPost,
-                            @RequestParam(required = false) List<MultipartFile> images) throws IOException {
+    public ResponseEntity<ResponseMessage<Object>> updateCommunityPost(
+                @PathVariable Integer communityPostCode,
+                @RequestPart CommunityPostUpdateDTO modifiedPost,
+                @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        communityPostService.modifyPost(communityPostCode, modifiedPost, images);
+        communityPostService.updatePost(communityPostCode, modifiedPost, images);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 수정 성공", null));
     }
 
     /* 게시글 삭제 */
     @DeleteMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> deleteCommunityPost(
+    public ResponseEntity<ResponseMessage<Object>> deleteCommunityPost(
                             @PathVariable Integer communityPostCode,
-                            @RequestBody CommunityPostResponseDTO deletedPost) {
+                            @RequestBody CommunityPostDeleteDTO deletedPost) {
 
         communityPostService.deletePost(communityPostCode, deletedPost);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
