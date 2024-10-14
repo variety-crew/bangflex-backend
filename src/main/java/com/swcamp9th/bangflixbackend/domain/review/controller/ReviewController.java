@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,9 +64,10 @@ public class ReviewController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 삭제 성공", null));
     }
 
-    @GetMapping("")
+    @GetMapping("/{themeCode}")
     public ResponseEntity<ResponseMessage<Object>> findReviewList(
-        @RequestParam Integer themeCode,
+//        @RequestParam Integer themeCode,
+        @PathVariable("themeCode") Integer themeCode,
         @RequestParam Integer lastReviewCode,
         @RequestParam(required = false) String filter) {
         /*
