@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
 
     // 401: 지정한 리소스에 대한 권한이 없다
     @ExceptionHandler({
-                        InvalidUserException.class
-                        })
+        InvalidUserException.class
+    })
     public ResponseEntity<ResponseMessage<Object>> handleInvalidUserException(Exception e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(new ResponseMessage<>(401, e.getMessage(), null));
