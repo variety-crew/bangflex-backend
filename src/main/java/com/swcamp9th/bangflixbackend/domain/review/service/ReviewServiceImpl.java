@@ -205,6 +205,7 @@ public class ReviewServiceImpl implements ReviewService {
                     reviewDTO.setMemberNickname(review.getMember().getNickname());
                     reviewDTO.setReviewCode(review.getReviewCode());
                     reviewDTO.setMemberCode(review.getMember().getMemberCode());
+                    reviewDTO.setMemberImage(review.getMember().getImage());
                     List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
 
                     if(!genres.isEmpty())

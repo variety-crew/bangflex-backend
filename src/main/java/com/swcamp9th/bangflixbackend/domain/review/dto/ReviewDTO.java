@@ -33,5 +33,6 @@ public class ReviewDTO {
     private List<String> imagePaths;
     private Integer Likes;
     private String memberNickname;
+    private String memberImage;
     private List<String> genres;
 }
