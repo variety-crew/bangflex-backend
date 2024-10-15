@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController("commentController")
 @Slf4j
 @RequestMapping("api/v1/community/post/{communityPostCode}/comments")
 public class CommentController {

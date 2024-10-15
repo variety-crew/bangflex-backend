@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@Service
+@Service("commentService")
 public class CommentServiceImpl implements CommentService {
 
     private final ModelMapper modelMapper;
