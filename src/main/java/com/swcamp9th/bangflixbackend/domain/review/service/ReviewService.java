@@ -30,4 +30,6 @@ public interface ReviewService {
     StatisticsReviewDTO findReviewStatistics(Integer themeCode);
 
     List<ReviewDTO> getReviewDTOS(List<Review> sublist);
+
+    ReviewDTO getReviewDTO(Review review);
 }

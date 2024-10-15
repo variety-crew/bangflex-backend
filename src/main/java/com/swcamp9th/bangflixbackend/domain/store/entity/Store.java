@@ -1,19 +1,17 @@
-package com.swcamp9th.bangflixbackend.domain.review.entity;
+package com.swcamp9th.bangflixbackend.domain.store.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "store")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewStore {
+public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +32,9 @@ public class ReviewStore {
 
     @Column(name = "page_url", length = 255)
     private String pageUrl;
+
+    @Column(name = "image", length = 255)
+    private String image;
 
 }
 

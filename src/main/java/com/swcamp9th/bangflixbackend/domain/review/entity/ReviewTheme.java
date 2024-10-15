@@ -1,12 +1,11 @@
 package com.swcamp9th.bangflixbackend.domain.review.entity;
 
+import com.swcamp9th.bangflixbackend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "theme")
@@ -49,7 +48,7 @@ public class ReviewTheme {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_code", nullable = false)
-    private ReviewStore store;
+    private Store store;
 
 
 }
