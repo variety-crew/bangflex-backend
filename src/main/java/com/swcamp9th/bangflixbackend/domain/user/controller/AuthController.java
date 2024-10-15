@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,12 +23,10 @@ import java.io.IOException;
 public class AuthController {
 
     private final UserServiceImpl userService;
-
-
-    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/signup", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "회원가입 API")
-    public ResponseEntity<Object> signup(@RequestPart("signupDto") @Valid SignupRequestDto signupRequestDto,
-                                    @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
+    public ResponseEntity<Object> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto,
+                                         @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
         if (imgFile == null) {
             log.info("AuthController signup - imgFile is null");
             userService.signupWithoutProfile(signupRequestDto);
