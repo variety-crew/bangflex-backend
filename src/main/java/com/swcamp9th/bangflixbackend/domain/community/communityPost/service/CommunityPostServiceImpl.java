@@ -157,7 +157,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                 pageable.getPageSize(),
                 Sort.by("communityPostCode").descending());
 
-        Page<CommunityPost> postList = communityPostRepository.findAll(pageable);
+        Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
 
         return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
     }

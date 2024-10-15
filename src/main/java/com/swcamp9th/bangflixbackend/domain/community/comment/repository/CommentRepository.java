@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-    List<Comment> findByCommunityPostAndActive(CommunityPost foundPost, Boolean active);
+    List<Comment> findByCommunityPostAndActiveTrue(CommunityPost foundPost);
 }
