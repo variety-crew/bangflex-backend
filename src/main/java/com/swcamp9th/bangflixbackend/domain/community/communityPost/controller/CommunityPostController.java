@@ -1,10 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDeleteDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostRequestDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.*;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 @RestController("communityPostController")
 @Slf4j
