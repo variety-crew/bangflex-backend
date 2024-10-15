@@ -22,4 +22,5 @@ public interface ReviewRankingRepository extends JpaRepository<ReviewRanking, In
         "WHERE FUNCTION('DATE', rr.createdAt) = FUNCTION('STR_TO_DATE', :date, '%Y-%m-%d') AND rr.active = true")
     List<ReviewRanking> findReviewByCreatedAtDate(@Param("date") String date);
 
+
 }

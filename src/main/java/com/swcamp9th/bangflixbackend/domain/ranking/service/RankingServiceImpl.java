@@ -7,9 +7,8 @@ import com.swcamp9th.bangflixbackend.domain.ranking.entity.ReviewRanking;
 import com.swcamp9th.bangflixbackend.domain.ranking.repository.ReviewRankingRepository;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.time.LocalDateTime;
@@ -18,6 +17,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -95,5 +97,20 @@ public class RankingServiceImpl implements RankingService {
             reviewRankingDTO.setRankingDate(finalDate);
             return reviewRankingDTO;
         }).sorted(Comparator.comparingInt(ReviewRankingDTO::getLikes).reversed()).toList();
+    }
+
+    @Override
+    public List<ReviewDTO> findAllReviewRanking(Pageable pageable) {
+
+        Page<ReviewLike> reviewLikes = reviewLikeRepository.findReviewByReviewLikes(pageable);
+
+        List<Review> reviews = reviewLikes.stream()
+            .map(reviewLike -> {
+                    Review review = modelMapper.map(reviewLike.getReview(), Review.class);
+                    return review;
+                }
+            ).toList();
+
+        return reviewService.getReviewDTOS(reviews);
     }
 }

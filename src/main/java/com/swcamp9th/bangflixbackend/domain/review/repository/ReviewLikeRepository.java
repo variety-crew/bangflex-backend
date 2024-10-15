@@ -6,6 +6,8 @@ import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLikeId;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,17 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
         + "WHERE rl.createdAt > :oneWeekAgo AND rl.active = true "
         + "GROUP BY rl.reviewCode ORDER BY COUNT(rl) DESC")
     List<ReviewLikeCountDTO> findTop5ReviewCodes(@Param("oneWeekAgo") LocalDateTime oneWeekAgo);
+
+//    @Query("SELECT rl "
+//        + "FROM ReviewLike rl JOIN FETCH rl.review JOIN FETCH rl.review.member "
+//        + "WHERE rl.active = true "
+//        + "GROUP BY rl.reviewCode ORDER BY COUNT(rl) DESC")
+//    List<ReviewLike> findReviewByReviewLikes();
+
+    @Query("SELECT rl FROM ReviewLike rl "
+        + "JOIN FETCH rl.review JOIN FETCH rl.review.member "
+        + "WHERE rl.active = true "
+        + "GROUP BY rl.reviewCode "
+        + "ORDER BY COUNT(rl) DESC")
+    Page<ReviewLike> findReviewByReviewLikes(Pageable pageable);
 }

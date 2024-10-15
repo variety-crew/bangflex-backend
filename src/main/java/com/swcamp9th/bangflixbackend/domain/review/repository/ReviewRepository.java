@@ -16,6 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findByThemeCodeAndActiveTrueWithFetchJoin(@Param("themeCode") Integer themeCode);
 
 
+
     @Query("SELECT new com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO(" +
         // 평균 점수 계산
         "AVG(r.totalScore), " +
