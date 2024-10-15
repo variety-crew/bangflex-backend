@@ -46,6 +46,12 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
 
+//        String uploadsDir = "src/main/resources/static/uploadFiles/DefaultProfileFile";
+//
+//        String fileName = "default_profile_img.png";
+//        String filePath = uploadsDir + "/" + fileName;
+//        String dbFilePath = "/uploadFiles/DefaultProfileFile/" + fileName;
+
         Member user = Member.builder()
                 .id(signupRequestDto.getId())
                 .password(passwordEncoder.encode(signupRequestDto.getPassword()))
@@ -187,4 +193,53 @@ public class UserServiceImpl implements UserService {
         }
         return new DuplicateCheckResponseDto(userRepository.existsByNickname(nickname));
     }
+
+    @Override
+    @Transactional
+    public void updateUserInfo(String id, UpdateUserInfoRequestDto updateUserInfoRequestDto, MultipartFile imgFile) throws IOException {
+        if (userRepository.existsByNickname(updateUserInfoRequestDto.getNickname())) {
+            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        }
+
+        if (userRepository.existsByEmail(updateUserInfoRequestDto.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+
+        // 수정할 멤버 찾기
+        Member user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // // 프로필 파일이 수정된 경우
+        if (imgFile.getOriginalFilename() != user.getImage().substring(user.getImage().lastIndexOf("/") + 1)) {
+
+            // 이전 프로필 이미지 삭제
+            String oldFileName = user.getImage();
+            if (oldFileName != null && !oldFileName.isEmpty()) {
+                String oldFilePath = "src/main/resources/static" + oldFileName;
+                Path oldPath = Paths.get(oldFilePath);
+                try {
+                    Files.deleteIfExists(oldPath); // 파일이 존재하면 삭제
+                } catch (IOException e) {
+                    throw new IOException("이전 파일 삭제에 실패했습니다.", e);
+                }
+            }
+
+            // 파일 경로 및 이름
+            String uploadsDir = "src/main/resources/static/uploadFiles/profileFile";
+            String newFileName = UUID.randomUUID().toString().replace("-", "") + "_" + imgFile.getOriginalFilename();
+            String filePath = uploadsDir + "/" + newFileName;
+            String dbFilePath = "/uploadFiles/profileFile/" + newFileName;
+
+            Path path = Paths.get(filePath);
+            Files.createDirectories(path.getParent());
+            Files.write(path, imgFile.getBytes());
+            user.setImage(dbFilePath);
+        }
+
+        user.setEmail(updateUserInfoRequestDto.getEmail());
+        user.setNickname(updateUserInfoRequestDto.getNickname());
+
+        userRepository.save(user);
+    }
+
 }

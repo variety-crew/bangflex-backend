@@ -14,4 +14,5 @@ public interface UserService {
     UserInfoResponseDto findUserInfoById(String id);
     DuplicateCheckResponseDto findId(String id);
     DuplicateCheckResponseDto findNickName(String nickname);
+    void updateUserInfo(String id, UpdateUserInfoRequestDto updateUserInfoRequestDto, MultipartFile imgFile) throws IOException;
 }
