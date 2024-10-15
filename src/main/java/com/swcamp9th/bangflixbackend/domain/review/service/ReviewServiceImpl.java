@@ -36,6 +36,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -161,10 +162,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
+    public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable) {
 
         // 테마 코드로 리뷰를 모두 조회
-        List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
+        List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode, pageable);
 
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
@@ -193,41 +194,53 @@ public class ReviewServiceImpl implements ReviewService {
             reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
         }
 
-        // lastReviewCode 기준으로 인덱스를 찾음
-        int startIndex = 0;
-        if (lastReviewCode != null) {
-            startIndex = findReviewIndex(reviews, lastReviewCode);
-        }
+        return getReviewDTOS(reviews);
+    }
 
-        // 인덱스가 유효하면 그 이후의 10개 리뷰 반환
-        if (startIndex >= 0 && startIndex < reviews.size()) {
-            List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
+    @Override
+    @Transactional
+    public List<ReviewDTO> getReviewDTOS(List<Review> sublist) {
+        List<ReviewDTO> result = sublist.stream()
+            .map(review -> {
+                ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
 
-            List<ReviewDTO> result = sublist.stream()
-                .map(review -> {
-                    ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+                // 이미지 경로 추가
+                reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
+                reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
+                reviewDTO.setMemberNickname(review.getMember().getNickname());
+                reviewDTO.setReviewCode(review.getReviewCode());
+                reviewDTO.setMemberCode(review.getMember().getMemberCode());
+                reviewDTO.setMemberImage(review.getMember().getImage());
+                List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
 
-                    // 이미지 경로 추가
-                    reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
-                    reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
-                    reviewDTO.setMemberNickname(review.getMember().getNickname());
-                    reviewDTO.setReviewCode(review.getReviewCode());
-                    reviewDTO.setMemberCode(review.getMember().getMemberCode());
-                    reviewDTO.setMemberImage(review.getMember().getImage());
-                    List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+                if(!genres.isEmpty())
+                    reviewDTO.setGenres(genres);
 
-                    if(!genres.isEmpty())
-                        reviewDTO.setGenres(genres);
+                return reviewDTO;
+            }).toList();
 
-                    return reviewDTO;
-                }).toList();
+        return result;
+    }
 
-            return result;
-        }
+    @Override
+    @Transactional
+    public ReviewDTO getReviewDTO(Review review) {
 
-        return Collections.emptyList();
+        ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
 
+        // 이미지 경로 추가
+        reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
+        reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
+        reviewDTO.setMemberNickname(review.getMember().getNickname());
+        reviewDTO.setReviewCode(review.getReviewCode());
+        reviewDTO.setMemberCode(review.getMember().getMemberCode());
+        reviewDTO.setMemberImage(review.getMember().getImage());
+        List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
 
+        if(!genres.isEmpty())
+            reviewDTO.setGenres(genres);
+
+        return reviewDTO;
     }
 
     @Override
