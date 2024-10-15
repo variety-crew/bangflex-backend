@@ -94,6 +94,6 @@ public class RankingServiceImpl implements RankingService {
             ReviewRankingDTO reviewRankingDTO = modelMapper.map(reviewDTO, ReviewRankingDTO.class);
             reviewRankingDTO.setRankingDate(finalDate);
             return reviewRankingDTO;
-        }).toList();
+        }).sorted(Comparator.comparingInt(ReviewRankingDTO::getLikes).reversed()).toList();
     }
 }

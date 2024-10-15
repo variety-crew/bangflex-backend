@@ -44,7 +44,7 @@ public class RankingController {
         return ResponseEntity.ok(new ResponseMessage<>(200, year + "년도 리뷰 랭킹 선정일 조회 성공", reviewRankingDateDTO));
     }
 
-    @GetMapping("/reviews")
+    @GetMapping("/reviews/date")
     public ResponseEntity<ResponseMessage<List<ReviewRankingDTO>>> findReviewRanking(
         @RequestParam(required = false) String date) {
 
