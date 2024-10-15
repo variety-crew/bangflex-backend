@@ -74,7 +74,6 @@ public class Review {
     @Column(name = "content", length = 1024, nullable = false)
     private String content;
 
-    // Foreign keys
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)
     private ReviewMember member;
