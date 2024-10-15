@@ -29,7 +29,7 @@ public class StoreController {
         // 서비스에서 필터를 사용해 조회
         StoreDTO store = storeService.findStroe(storeCode);
 
-        return ResponseEntity.ok(new ResponseMessage<>(200, "업체 조회 성공", store));
+        return ResponseEntity.ok(new ResponseMessage<>(200, storeCode + "번 업체 조회 성공", store));
     }
 
     @GetMapping("/bestreview/{storeCode}")
@@ -39,6 +39,6 @@ public class StoreController {
         // 서비스에서 필터를 사용해 조회
         ReviewDTO storeBestReview  = storeService.findBestReviewByStroe(storeCode);
 
-        return ResponseEntity.ok(new ResponseMessage<>(200, "업체 조회 성공", storeBestReview));
+        return ResponseEntity.ok(new ResponseMessage<>(200, storeCode + "번 업체 베스트 리뷰 조회 성공", storeBestReview));
     }
 }

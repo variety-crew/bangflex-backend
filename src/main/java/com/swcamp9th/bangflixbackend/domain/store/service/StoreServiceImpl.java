@@ -45,6 +45,10 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public ReviewDTO findBestReviewByStroe(Integer storeCode) {
         List<ReviewLike> reviewLike = reviewLikeRepository.findBestReviewByStoreCode(storeCode);
+
+        if(reviewLike.isEmpty())
+            return null;
+
         Review review = reviewRepository.findById(reviewLike.get(0).getReviewCode()).orElse(null);
 
         return reviewService.getReviewDTO(review);
