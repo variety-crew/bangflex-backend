@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("commentService")
 public class CommentServiceImpl implements CommentService {
@@ -106,5 +108,16 @@ public class CommentServiceImpl implements CommentService {
 
         foundComment.setActive(false);
         commentRepository.save(foundComment);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CommentDTO> getAllCommentsOfPost(Integer communityPostCode) {
+        CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        List<Comment> commentList = commentRepository.findByCommunityPostAndActive(foundPost, true);
+        return commentList.stream().map(comment -> modelMapper.map(comment, CommentDTO.class))
+                            .collect(Collectors.toList());
     }
 }
