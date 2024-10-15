@@ -29,11 +29,11 @@ public class CommunityPostController {
 
     /* 게시글 등록 */
     @PostMapping("/post")
-    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> createCommunityPost(
-                @RequestPart CommunityPostRequestDTO newPost,
+    public ResponseEntity<ResponseMessage<CommunityPostDTO>> createCommunityPost(
+                @RequestPart CommunityPostCreateDTO newPost,
                 @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        CommunityPostResponseDTO postResponse = communityPostService.createPost(newPost, images);
+        CommunityPostDTO postResponse = communityPostService.createPost(newPost, images);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", postResponse));
     }
 
@@ -60,10 +60,10 @@ public class CommunityPostController {
 
     /* 게시글 목록 조회(페이지네이션) */
     @GetMapping("")
-    public ResponseEntity<ResponseMessage<Page<CommunityPostResponseDTO>>> findPostList(
+    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
                             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<CommunityPostResponseDTO> postList = communityPostService.findPostList(pageable);
+        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
         if (postList.hasContent()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
         } else {
@@ -73,9 +73,9 @@ public class CommunityPostController {
 
     /* 게시글 상세 조회 */
     @GetMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostResponseDTO>> findPost(@PathVariable Integer communityPostCode) {
+    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable Integer communityPostCode) {
 
-        CommunityPostResponseDTO post = communityPostService.findPostByCode(communityPostCode);
+        CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
 }
