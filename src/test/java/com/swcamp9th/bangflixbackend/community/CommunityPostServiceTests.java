@@ -1,12 +1,9 @@
 package com.swcamp9th.bangflixbackend.community;
 
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class CommunityPostServiceTests {
