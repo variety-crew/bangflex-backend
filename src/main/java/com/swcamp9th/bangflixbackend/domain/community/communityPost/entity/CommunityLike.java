@@ -7,21 +7,22 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "community_file")
+@Table(name = "community_like")
+@IdClass(CommunityLikeId.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class CommunityFile {
+public class CommunityLike {
 
     @Id
-    @Column(name = "community_file_code")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer communityFileCode;
+    @Column(name = "member_code")
+    private Integer memberCode;
 
-    @Column(name = "url", nullable = false)
-    private String url;
+    @Id
+    @Column(name = "community_post_code")
+    private Integer communityPostCode;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -29,8 +30,4 @@ public class CommunityFile {
     @Column(name = "active", nullable = false)
     @ColumnDefault("TRUE")
     private Boolean active;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "community_post_code", nullable = false)
-    private CommunityPost communityPost;
 }
