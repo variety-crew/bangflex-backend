@@ -45,8 +45,6 @@ public class JwtUtil {
 		Date now = new Date();
 		return BEARER_PREFIX + Jwts.builder()
 			.setSubject(member.getId())
-			.claim("email", member.getEmail())
-			.claim("nickname", member.getNickname())
 			.claim(AUTHORITIES_KEY, member.getRole())
 			.setIssuedAt(now)
 			.setExpiration(new Date(now.getTime() + accessTokenTime))
