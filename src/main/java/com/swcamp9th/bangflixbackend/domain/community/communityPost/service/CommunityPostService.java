@@ -1,6 +1,9 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDeleteDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostRequestDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,13 +13,13 @@ import java.util.List;
 
 public interface CommunityPostService {
 
-    void createPost(CommunityPostDTO newPost, List<MultipartFile> images) throws IOException;
+    CommunityPostResponseDTO createPost(CommunityPostRequestDTO newPost, List<MultipartFile> images) throws IOException;
 
-    void modifyPost(Integer communityPostCode, CommunityPostDTO modifiedPost, List<MultipartFile> images) throws IOException;
+    void updatePost(Integer communityPostCode, CommunityPostUpdateDTO modifiedPost, List<MultipartFile> images);
 
-    void deletePost(Integer communityPostCode, CommunityPostDTO deletedPost);
+    void deletePost(Integer communityPostCode, CommunityPostDeleteDTO deletedPost);
 
-    Page<CommunityPostDTO> findPostList(Pageable pageable);
+    Page<CommunityPostResponseDTO> findPostList(Pageable pageable);
 
-    CommunityPostDTO findPostByCode(Integer communityPostCode);
+    CommunityPostResponseDTO findPostByCode(Integer communityPostCode);
 }

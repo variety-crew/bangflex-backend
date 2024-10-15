@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.entity;
 
+import com.swcamp9th.bangflixbackend.domain.community.comment.entity.Comment;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -39,7 +40,11 @@ public class CommunityPost {
     @JoinColumn(name = "member_code", nullable = false)
     private Member member;
 
+    // 첨부파일과의 관계 설정
     @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<CommunityFile> communityFiles = new ArrayList<>();
 
+    // 댓글과의 관계 설정
+    @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
 }
