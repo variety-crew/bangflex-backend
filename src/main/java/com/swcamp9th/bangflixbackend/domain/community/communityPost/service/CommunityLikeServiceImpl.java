@@ -2,11 +2,9 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityLike;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.MemberRepository;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -19,17 +17,17 @@ public class CommunityLikeServiceImpl implements CommunityLikeService {
 
     private final ModelMapper modelMapper;
     private final CommunityLikeRepository communityLikeRepository;
-    private final MemberRepository memberRepository;
+    private final CommunityMemberRepository communityMemberRepository;
     private final CommunityPostRepository communityPostRepository;
 
     @Autowired
     public CommunityLikeServiceImpl(ModelMapper modelMapper,
                                     CommunityLikeRepository communityLikeRepository,
-                                    MemberRepository memberRepository,
+                                    CommunityMemberRepository communityMemberRepository,
                                     CommunityPostRepository communityPostRepository) {
         this.modelMapper = modelMapper;
         this.communityLikeRepository = communityLikeRepository;
-        this.memberRepository = memberRepository;
+        this.communityMemberRepository = communityMemberRepository;
         this.communityPostRepository = communityPostRepository;
     }
 
@@ -39,7 +37,7 @@ public class CommunityLikeServiceImpl implements CommunityLikeService {
         CommunityLike addedLike = modelMapper.map(newLike, CommunityLike.class);
 
         // 회원이 아니라면 예외 발생
-        if (!memberRepository.existsById(newLike.getMemberCode())) {
+        if (!communityMemberRepository.existsById(newLike.getMemberCode())) {
             throw new InvalidUserException("좋아요 권한이 없습니다.");
         } else if (!communityPostRepository.existsById(newLike.getCommunityPostCode())) {
             throw new EntityNotFoundException("존재하지 않는 게시글입니다.");
