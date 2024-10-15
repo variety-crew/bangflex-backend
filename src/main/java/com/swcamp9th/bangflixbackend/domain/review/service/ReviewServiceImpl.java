@@ -198,6 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
     public List<ReviewDTO> getReviewDTOS(List<Review> sublist) {
         List<ReviewDTO> result = sublist.stream()
             .map(review -> {
@@ -219,6 +220,27 @@ public class ReviewServiceImpl implements ReviewService {
             }).toList();
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public ReviewDTO getReviewDTO(Review review) {
+
+        ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+
+        // 이미지 경로 추가
+        reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
+        reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
+        reviewDTO.setMemberNickname(review.getMember().getNickname());
+        reviewDTO.setReviewCode(review.getReviewCode());
+        reviewDTO.setMemberCode(review.getMember().getMemberCode());
+        reviewDTO.setMemberImage(review.getMember().getImage());
+        List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+
+        if(!genres.isEmpty())
+            reviewDTO.setGenres(genres);
+
+        return reviewDTO;
     }
 
     @Override

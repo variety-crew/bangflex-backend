@@ -24,21 +24,11 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
         + "WHERE r.review.reviewCode = :reviewCode AND r.active = true")
     List<ReviewLike> findByReviewCode(@Param("reviewCode")Integer reviewCode);
 
-//    @Query("SELECT new com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewLikeCountDTO(rl.reviewCode, COUNT(rl)) "
-//        + "FROM ReviewLike rl JOIN FETCH rl.review "
-//        + "WHERE rl.createdAt > :oneWeekAgo AND rl.active = true "
-//        + "GROUP BY rl.reviewCode ORDER BY COUNT(rl) DESC, rl.review.createdAt DESC")
     @Query("SELECT new com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewLikeCountDTO(rl.reviewCode, COUNT(rl)) "
         + "FROM ReviewLike rl "
         + "WHERE rl.createdAt > :oneWeekAgo AND rl.active = true "
         + "GROUP BY rl.reviewCode ORDER BY COUNT(rl) DESC")
     List<ReviewLikeCountDTO> findTop5ReviewCodes(@Param("oneWeekAgo") LocalDateTime oneWeekAgo);
-
-//    @Query("SELECT rl "
-//        + "FROM ReviewLike rl JOIN FETCH rl.review JOIN FETCH rl.review.member "
-//        + "WHERE rl.active = true "
-//        + "GROUP BY rl.reviewCode ORDER BY COUNT(rl) DESC")
-//    List<ReviewLike> findReviewByReviewLikes();
 
     @Query("SELECT rl FROM ReviewLike rl "
         + "JOIN FETCH rl.review JOIN FETCH rl.review.member "
@@ -46,4 +36,11 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
         + "GROUP BY rl.reviewCode "
         + "ORDER BY COUNT(rl) DESC")
     Page<ReviewLike> findReviewByReviewLikes(Pageable pageable);
+
+    @Query("SELECT rl FROM ReviewLike rl "
+        + "JOIN FETCH rl.review JOIN FETCH rl.review.theme JOIN FETCH rl.review.theme.store "
+        + "WHERE rl.active = true AND rl.review.theme.store.storeCode = :storeCode "
+        + "GROUP BY rl.reviewCode "
+        + "ORDER BY COUNT(rl) DESC, rl.review.createdAt DESC")
+    List<ReviewLike> findBestReviewByStoreCode(@Param("storeCode")Integer storeCode);
 }
