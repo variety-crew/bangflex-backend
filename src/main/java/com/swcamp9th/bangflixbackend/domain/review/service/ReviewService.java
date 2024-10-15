@@ -5,6 +5,7 @@ import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -26,4 +27,6 @@ public interface ReviewService {
     void deleteLikeReview(ReviewCodeDTO reviewCodeDTO);
 
     StatisticsReviewDTO findReviewStatistics(Integer themeCode);
+
+    List<ReviewDTO> getReviewDTOS(List<Review> sublist);
 }

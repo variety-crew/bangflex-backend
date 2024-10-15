@@ -203,31 +203,36 @@ public class ReviewServiceImpl implements ReviewService {
         if (startIndex >= 0 && startIndex < reviews.size()) {
             List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
 
-            List<ReviewDTO> result = sublist.stream()
-                .map(review -> {
-                    ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
-
-                    // 이미지 경로 추가
-                    reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
-                    reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
-                    reviewDTO.setMemberNickname(review.getMember().getNickname());
-                    reviewDTO.setReviewCode(review.getReviewCode());
-                    reviewDTO.setMemberCode(review.getMember().getMemberCode());
-                    reviewDTO.setMemberImage(review.getMember().getImage());
-                    List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
-
-                    if(!genres.isEmpty())
-                        reviewDTO.setGenres(genres);
-
-                    return reviewDTO;
-                }).toList();
-
-            return result;
+            return getReviewDTOS(sublist);
         }
 
         return Collections.emptyList();
 
 
+    }
+
+    @Override
+    public List<ReviewDTO> getReviewDTOS(List<Review> sublist) {
+        List<ReviewDTO> result = sublist.stream()
+            .map(review -> {
+                ReviewDTO reviewDTO = modelMapper.map(review, ReviewDTO.class);
+
+                // 이미지 경로 추가
+                reviewDTO.setImagePaths(findImagePathsByReviewCode(review.getReviewCode()));
+                reviewDTO.setLikes(findReviewLikesByReviewCode(review.getReviewCode()));
+                reviewDTO.setMemberNickname(review.getMember().getNickname());
+                reviewDTO.setReviewCode(review.getReviewCode());
+                reviewDTO.setMemberCode(review.getMember().getMemberCode());
+                reviewDTO.setMemberImage(review.getMember().getImage());
+                List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+
+                if(!genres.isEmpty())
+                    reviewDTO.setGenres(genres);
+
+                return reviewDTO;
+            }).toList();
+
+        return result;
     }
 
     @Override

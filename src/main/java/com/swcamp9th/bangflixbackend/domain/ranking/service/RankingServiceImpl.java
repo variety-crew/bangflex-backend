@@ -7,9 +7,13 @@ import com.swcamp9th.bangflixbackend.domain.ranking.entity.ReviewRanking;
 import com.swcamp9th.bangflixbackend.domain.ranking.repository.ReviewRankingRepository;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
+import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
+import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
+import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,16 +29,19 @@ public class RankingServiceImpl implements RankingService {
     private ReviewLikeRepository reviewLikeRepository;
     private ReviewRankingRepository reviewRankingRepository;
     private ModelMapper modelMapper;
+    private ReviewService reviewService;
 
     @Autowired
     public RankingServiceImpl(ReviewRepository reviewRepository
                             , ReviewLikeRepository reviewLikeRepository
                             , ReviewRankingRepository reviewRankingRepository
-                            , ModelMapper modelMapper) {
+                            , ModelMapper modelMapper
+                            , ReviewService reviewService) {
         this.reviewRepository = reviewRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewRankingRepository = reviewRankingRepository;
         this.modelMapper = modelMapper;
+        this.reviewService = reviewService;
     }
 
     @Scheduled(cron = "0 0 1 * * SUN")
@@ -65,10 +72,28 @@ public class RankingServiceImpl implements RankingService {
     }
 
     @Override
-    public List<ReviewDTO> findReviewRanking(String date) {
+    public List<ReviewRankingDTO> findReviewRanking(String date) {
 
-        List<ReviewRankingDTO> reviews = reviewRankingRepository.findByCreatedAtDate(date);
-        log.info("리뷰가 조회되는지 확인" + reviews.get(0).getReviewCode());
-        return List.of();
+        if(date == null)
+            date = findReviewRankingDate(LocalDateTime.now().getYear()).getReviewRankingDates().get(0);
+
+        List<ReviewRanking> reviewRankings = reviewRankingRepository.findReviewByCreatedAtDate(date);
+
+        List<Review> reviews = reviewRankings.stream()
+            .map(rankingReview -> {
+                    Review review = modelMapper.map(rankingReview.getReview(), Review.class);
+                    return review;
+                }
+            ).toList();
+
+        List<ReviewDTO> reviewDTOS = reviewService.getReviewDTOS(reviews);
+
+        String finalDate = date;
+
+        return reviewDTOS.stream().map(reviewDTO -> {
+            ReviewRankingDTO reviewRankingDTO = modelMapper.map(reviewDTO, ReviewRankingDTO.class);
+            reviewRankingDTO.setRankingDate(finalDate);
+            return reviewRankingDTO;
+        }).toList();
     }
 }
