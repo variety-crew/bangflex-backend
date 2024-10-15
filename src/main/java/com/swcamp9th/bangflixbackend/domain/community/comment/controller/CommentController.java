@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController("commentController")
 @Slf4j
 @RequestMapping("api/v1/community/post/{communityPostCode}/comments")
@@ -53,5 +55,14 @@ public class CommentController {
 
         commentService.deleteComment(communityPostCode, commentCode, deletedComment);
         return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 삭제 성공", null));
+    }
+
+    /* 게시글의 댓글 목록 조회 */
+    @GetMapping("")
+    public ResponseEntity<ResponseMessage<List<CommentDTO>>> getAllComments(
+                                            @PathVariable("communityPostCode") Integer communityPostCode) {
+
+        List<CommentDTO> commentsOfPost = commentService.getAllCommentsOfPost(communityPostCode);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 조회 성공", commentsOfPost));
     }
 }
