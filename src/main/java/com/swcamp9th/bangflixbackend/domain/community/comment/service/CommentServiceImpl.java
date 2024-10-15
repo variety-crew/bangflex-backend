@@ -5,9 +5,9 @@ import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentRequest
 import com.swcamp9th.bangflixbackend.domain.community.comment.entity.Comment;
 import com.swcamp9th.bangflixbackend.domain.community.comment.repository.CommentRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.MemberRepository;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -21,17 +21,17 @@ public class CommentServiceImpl implements CommentService {
 
     private final ModelMapper modelMapper;
     private final CommentRepository commentRepository;
-    private final MemberRepository memberRepository;
+    private final CommunityMemberRepository communityMemberRepository;
     private final CommunityPostRepository communityPostRepository;
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository,
                               ModelMapper modelMapper,
-                              MemberRepository memberRepository,
+                              CommunityMemberRepository communityMemberRepository,
                               CommunityPostRepository communityPostRepository) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
-        this.memberRepository = memberRepository;
+        this.communityMemberRepository = communityMemberRepository;
         this.communityPostRepository = communityPostRepository;
     }
 
@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = modelMapper.map(newComment, Comment.class);
 
         // 회원이 아니면 예외 발생
-        Member author = memberRepository.findById(newComment.getMemberCode())
+        CommunityMember author = communityMemberRepository.findById(newComment.getMemberCode())
                 .orElseThrow(() -> new InvalidUserException("댓글 작성 권한이 없습니다."));
 
         CommunityPost post = communityPostRepository.findById(communityPostCode)
@@ -49,14 +49,14 @@ public class CommentServiceImpl implements CommentService {
         comment.setActive(true);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setContent(newComment.getContent());
-        comment.setMember(author);
+        comment.setCommunityMember(author);
         comment.setCommunityPost(post);
 
         // 댓글 저장
         Comment savedComment = commentRepository.save(comment);
 
         CommentDTO commentResponse = modelMapper.map(savedComment, CommentDTO.class);
-        commentResponse.setMemberCode(savedComment.getMember().getMemberCode());
+        commentResponse.setMemberCode(savedComment.getCommunityMember().getMemberCode());
         commentResponse.setCommunityPostCode(savedComment.getCommunityPost().getCommunityPostCode());
 
         return commentResponse;

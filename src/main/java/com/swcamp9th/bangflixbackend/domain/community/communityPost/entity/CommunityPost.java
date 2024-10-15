@@ -38,7 +38,7 @@ public class CommunityPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)
-    private Member member;
+    private CommunityMember communityMember;
 
     // 첨부파일과의 관계 설정
     @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

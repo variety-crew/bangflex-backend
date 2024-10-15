@@ -5,11 +5,11 @@ import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.Communit
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.MemberRepository;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -37,17 +37,17 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     private final ModelMapper modelMapper;
     private final CommunityPostRepository communityPostRepository;
-    private final MemberRepository memberRepository;
+    private final CommunityMemberRepository communityMemberRepository;
     private final CommunityFileRepository communityFileRepository;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
-                                    MemberRepository memberRepository,
+                                    CommunityMemberRepository communityMemberRepository,
                                     CommunityFileRepository communityFileRepository) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
-        this.memberRepository = memberRepository;
+        this.communityMemberRepository = communityMemberRepository;
         this.communityFileRepository = communityFileRepository;
     }
 
@@ -57,7 +57,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         CommunityPost createdPost = modelMapper.map(newPost, CommunityPost.class);
 
         // 회원이 아니라면 예외 발생
-        Member author = memberRepository.findById(newPost.getMemberCode()).orElseThrow(
+        CommunityMember author = communityMemberRepository.findById(newPost.getMemberCode()).orElseThrow(
                 () -> new InvalidUserException("게시글 작성 권한이 없습니다.")
         );
 
@@ -65,13 +65,13 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         createdPost.setContent(newPost.getContent());
         createdPost.setCreatedAt(LocalDateTime.now());
         createdPost.setActive(true);
-        createdPost.setMember(author);
+        createdPost.setCommunityMember(author);
 
         // 게시글 저장
         CommunityPost savedPost = communityPostRepository.save(createdPost);
 
         CommunityPostResponseDTO postResponse = modelMapper.map(savedPost, CommunityPostResponseDTO.class);
-        postResponse.setMemberCode(savedPost.getMember().getMemberCode());
+        postResponse.setMemberCode(savedPost.getCommunityMember().getMemberCode());
 
         // 게시글 첨부파일 있으면 저장
         if (newPost.getImages() != null) {
@@ -124,7 +124,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         // 현재 사용자가 게시글 작성자인지 체크 후 아니라면 예외 발생
-        if (!foundPost.getMember().getMemberCode().equals(modifiedPost.getMemberCode())) {
+        if (!foundPost.getCommunityMember().getMemberCode().equals(modifiedPost.getMemberCode())) {
             throw new InvalidUserException("게시글 수정 권한이 없습니다.");
         }
 
@@ -142,7 +142,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         // 현재 사용자가 게시글 작성자인지 체크 후 아니라면 예외 발생
-        if (!foundPost.getMember().getMemberCode().equals(deletedPost.getMemberCode())) {
+        if (!foundPost.getCommunityMember().getMemberCode().equals(deletedPost.getMemberCode())) {
             throw new InvalidUserException("게시글 삭제 권한이 없습니다.");
         }
 

@@ -32,5 +32,5 @@ public class CommentController {
     }
 
     /* 댓글 수정 */
-    
+//    @PutMapping("/")
 }
