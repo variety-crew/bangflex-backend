@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Member {
+public class CommunityMember {
 
     @Id
     @Column(name = "member_code")
