@@ -36,6 +36,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -161,10 +162,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode) {
+    public List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable) {
 
         // 테마 코드로 리뷰를 모두 조회
-        List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode);
+        List<Review> reviews = reviewRepository.findByThemeCodeAndActiveTrueWithFetchJoin(themeCode, pageable);
 
         // 필터가 있을 경우 해당 조건에 맞게 정렬
         if (filter != null) {
@@ -193,22 +194,7 @@ public class ReviewServiceImpl implements ReviewService {
             reviews.sort(Comparator.comparing(Review::getCreatedAt).reversed());
         }
 
-        // lastReviewCode 기준으로 인덱스를 찾음
-        int startIndex = 0;
-        if (lastReviewCode != null) {
-            startIndex = findReviewIndex(reviews, lastReviewCode);
-        }
-
-        // 인덱스가 유효하면 그 이후의 10개 리뷰 반환
-        if (startIndex >= 0 && startIndex < reviews.size()) {
-            List<Review> sublist = reviews.subList(startIndex, Math.min(startIndex + 10, reviews.size()));
-
-            return getReviewDTOS(sublist);
-        }
-
-        return Collections.emptyList();
-
-
+        return getReviewDTOS(reviews);
     }
 
     @Override

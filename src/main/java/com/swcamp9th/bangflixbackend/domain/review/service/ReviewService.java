@@ -9,6 +9,7 @@ import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ReviewService {
@@ -20,7 +21,7 @@ public interface ReviewService {
 
     void deleteReview(ReviewCodeDTO reviewCodeDTO);
 
-    List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Integer lastReviewCode);
+    List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable);
 
     void likeReview(ReviewCodeDTO reviewCodeDTO);
 

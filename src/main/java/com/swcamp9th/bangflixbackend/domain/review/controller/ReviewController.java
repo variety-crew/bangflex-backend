@@ -12,6 +12,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,7 +71,7 @@ public class ReviewController {
     @GetMapping("/{themeCode}")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
-        @RequestParam Integer lastReviewCode,
+        @PageableDefault Pageable pageable,
         @RequestParam(required = false) String filter) {
         /*
             필터 값은 필수 X.
@@ -82,7 +84,7 @@ public class ReviewController {
         */
 
         // 서비스에서 필터를 사용해 조회
-        List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, lastReviewCode);
+        List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, pageable);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
     }
