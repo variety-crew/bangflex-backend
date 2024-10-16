@@ -9,7 +9,7 @@ import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
@@ -19,23 +19,18 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeReposit
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +47,6 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewMemberRepository reviewMemberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
-    private ResourceLoader resourceLoader;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
@@ -61,8 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
                            , ReviewThemeRepository reviewThemeRepository
                            , ReviewMemberRepository reviewMemberRepository
                            , ReviewLikeRepository reviewLikeRepository
-                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository
-                           , ResourceLoader resourceLoader) {
+                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
@@ -70,7 +63,6 @@ public class ReviewServiceImpl implements ReviewService {
         this.reviewMemberRepository = reviewMemberRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
-        this.resourceLoader = resourceLoader;
     }
 
     @Override
@@ -80,9 +72,9 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 리뷰 저장
         Review review = modelMapper.map(newReview, Review.class);
-        ReviewTheme reviewTheme = reviewThemeRepository.findById(newReview.getThemeCode()).orElse(null);
+        Theme theme = reviewThemeRepository.findById(newReview.getThemeCode()).orElse(null);
         ReviewMember reviewMember = reviewMemberRepository.findById(newReview.getMemberCode()).orElse(null);
-        review.setTheme(reviewTheme);
+        review.setTheme(theme);
         review.setMember(reviewMember);
         review.setActive(true);
         review.setCreatedAt(LocalDateTime.now());

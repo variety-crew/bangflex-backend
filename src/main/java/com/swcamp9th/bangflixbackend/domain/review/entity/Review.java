@@ -6,12 +6,11 @@ import com.swcamp9th.bangflixbackend.domain.review.enums.HorrorLevel;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Interior;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Probability;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.lang.reflect.Member;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -80,7 +79,7 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_code", nullable = false)
-    private ReviewTheme theme;
+    private Theme theme;
 
 }
 
