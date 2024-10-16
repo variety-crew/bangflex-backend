@@ -1,13 +1,12 @@
 package com.swcamp9th.bangflixbackend.domain.theme.service;
 
-import com.swcamp9th.bangflixbackend.domain.theme.dto.CreateThemeReactionDTO;
+import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction.ReactionType;
-import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReactionId;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.GenreRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeReactionRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
@@ -165,18 +164,18 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     @Transactional
-    public void createThemeReaction(String userId, CreateThemeReactionDTO createThemeReactionDTO) {
+    public void createThemeReaction(String userId, ThemeReactionDTO themeReactionDTO) {
         Member member = userRepository.findById(userId).orElseThrow();
-        Theme theme = themeRepository.findById(createThemeReactionDTO.getThemeCode()).orElseThrow();
+        Theme theme = themeRepository.findById(themeReactionDTO.getThemeCode()).orElseThrow();
         ThemeReaction themeReaction = themeReactionRepository.findByIds(
-            createThemeReactionDTO.getThemeCode(), member.getMemberCode());
+            themeReactionDTO.getThemeCode(), member.getMemberCode());
 
         if(themeReaction == null){
             themeReaction = new ThemeReaction();
             themeReaction.setMember(member);
-            if(createThemeReactionDTO.getReaction().equals("Like"))
+            if(themeReactionDTO.getReaction().equals("Like"))
                 themeReaction.setReaction(ReactionType.LIKE);
-            else if (createThemeReactionDTO.getReaction().equals("Scrap"))
+            else if (themeReactionDTO.getReaction().equals("Scrap"))
                 themeReaction.setReaction(ReactionType.SCRAP);
             themeReaction.setCreatedAt(LocalDateTime.now());
             themeReaction.setActive(true);
@@ -186,7 +185,7 @@ public class ThemeServiceImpl implements ThemeService {
             themeReactionRepository.save(themeReaction);
         }
         else {
-            if(createThemeReactionDTO.getReaction().equals("Like")){
+            if(themeReactionDTO.getReaction().equals("Like")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
                     return;
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -194,7 +193,7 @@ public class ThemeServiceImpl implements ThemeService {
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE))
                     return;
             }
-            else if (createThemeReactionDTO.getReaction().equals("Scrap")){
+            else if (themeReactionDTO.getReaction().equals("Scrap")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
                     themeReaction.setReaction(ReactionType.SCRAPLIKE);
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -203,6 +202,35 @@ public class ThemeServiceImpl implements ThemeService {
                     return;
             }
             themeReactionRepository.save(themeReaction);
+        }
+    }
+
+    @Override
+    public void deleteThemeReaction(String loginId, ThemeReactionDTO themeReactionDTO) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        ThemeReaction themeReaction = themeReactionRepository.findByIds(
+            themeReactionDTO.getThemeCode(), member.getMemberCode());
+
+        if(themeReaction != null) {
+            if (themeReactionDTO.getReaction().equals("Like")) {
+                if (themeReaction.getReaction().equals(ReactionType.LIKE))
+                    themeReactionRepository.delete(themeReaction);
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
+                    return;
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE)){
+                    themeReaction.setReaction(ReactionType.SCRAP);
+                    themeReactionRepository.save(themeReaction);
+                }
+            } else if (themeReactionDTO.getReaction().equals("Scrap")) {
+                if (themeReaction.getReaction().equals(ReactionType.LIKE))
+                    return;
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
+                    themeReactionRepository.delete(themeReaction);
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE)){
+                    themeReaction.setReaction(ReactionType.LIKE);
+                    themeReactionRepository.save(themeReaction);
+                }
+            }
         }
     }
 

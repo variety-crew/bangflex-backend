@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CreateThemeReactionDTO {
+public class ThemeReactionDTO {
 
     private Integer themeCode;
     private String reaction;
