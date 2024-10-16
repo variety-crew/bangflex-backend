@@ -26,7 +26,7 @@ public class UserController {
 
     private final UserServiceImpl userService;
 
-    @PostMapping("/logout")
+    @PostMapping("")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "로그아웃 API")
     public ResponseEntity<ResponseMessage<Object>> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
@@ -34,7 +34,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "로그아웃 성공", null));
     }
 
-    @GetMapping("/login-info")
+    @GetMapping("")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 조회(아이디, 닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<Object> findUserInfoById() {
@@ -53,7 +53,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "회원 정보 조회 성공", userInfo));
     }
 
-    @PutMapping(value = "/login-info", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 수정(닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<ResponseMessage<Object>> updateUserInfo(@Valid @RequestPart UpdateUserInfoRequestDto updateUserInfoRequestDto,
