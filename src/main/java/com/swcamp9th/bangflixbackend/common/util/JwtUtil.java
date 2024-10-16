@@ -1,4 +1,4 @@
-package com.swcamp9th.bangflixbackend.security.jwt;
+package com.swcamp9th.bangflixbackend.common.util;
 
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import io.jsonwebtoken.*;
@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,6 +15,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 	public static final String AUTHORIZATION_HEADER = "Authorization";
@@ -67,6 +69,7 @@ public class JwtUtil {
 	}
 
 	public boolean validateAcessToken(String token) {
+		log.debug("token in jwtUtil: {}", token);
 		try {
 			Jwts.parserBuilder().setSigningKey(accessTokenKey).build().parseClaimsJws(token);
 			return true;
@@ -102,10 +105,21 @@ public class JwtUtil {
 
 	public String getTokenFromRequest(HttpServletRequest req) {
 		String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
+		log.debug("bearerToken in getTokenFromRequest: {}", bearerToken);
 		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
 			return bearerToken.substring(7);
 		}
 		return null;
+	}
+
+
+
+	public String getSubjectFromToken(String token) {
+		return Jwts.parser()
+				.setSigningKey(accessTokenSecret)
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject();
 	}
 
 	public String substringToken(String token) {

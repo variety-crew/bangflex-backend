@@ -78,4 +78,17 @@ public class CommunityPostController {
         CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
+
+    /* 게시글 구독 */
+    @GetMapping("/post/subscribe/{communityPostCode}")
+    public ResponseEntity<ResponseMessage<String>> subscribe(
+            @PathVariable Integer communityPostCode,
+            @RequestAttribute("loginId") String loginId
+    ) {
+        log.info("Community post code is {}", communityPostCode);
+        log.info("loginId is {}", loginId);
+        return ResponseEntity.ok(
+                new ResponseMessage<>(200, "구독 완료", "helloworld")
+        );
+    }
 }
