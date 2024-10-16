@@ -12,4 +12,6 @@ public interface ThemeService {
     List<GenreDTO> findGenres();
 
     List<ThemeDTO> findThemeByGenresAndSearchOrderBySort(Pageable pageable, String filter, List<String> genres, String content);
+
+    List<ThemeDTO> findThemeByStoreOrderBySort(Pageable pageable, String filter, Integer storeCode);
 }

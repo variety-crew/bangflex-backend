@@ -41,4 +41,8 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         "WHERE (t.name LIKE %:search% OR :search IS NULL)")
     List<Theme> findThemesBySearch(String search);
 
+    @Query("SELECT t FROM Theme t " +
+        "INNER JOIN Store s ON t.store.storeCode = s.storeCode " +
+        "WHERE s.storeCode = :storeCode")
+    List<Theme> findByStoreCode(Integer storeCode);
 }

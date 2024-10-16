@@ -110,6 +110,47 @@ public class ThemeServiceImpl implements ThemeService {
         return themesDTO.subList(startIndex, lastIndex);
     }
 
+    @Override
+    public List<ThemeDTO> findThemeByStoreOrderBySort(Pageable pageable, String filter,
+        Integer storeCode) {
+        List<Theme> themes = themeRepository.findByStoreCode(storeCode);
+
+        List<ThemeDTO> themesDTO = new ArrayList<>();
+
+        for(Theme theme : themes)
+            themesDTO.add(createThemeDTO(theme));
+
+        if (filter != null) {
+            switch (filter) {
+                case "like":
+                    themesDTO.sort(Comparator.comparing(ThemeDTO::getLikeCount).reversed()
+                        .thenComparing(Comparator.comparing(ThemeDTO::getCreatedAt).reversed()));
+                    break;
+
+                case "scrap":
+                    themesDTO.sort(Comparator.comparing(ThemeDTO::getScrapCount).reversed()
+                        .thenComparing(Comparator.comparing(ThemeDTO::getCreatedAt).reversed()));
+                    break;
+
+                case "review":
+                    themesDTO.sort(Comparator.comparing(ThemeDTO::getReviewCount).reversed()
+                        .thenComparing(Comparator.comparing(ThemeDTO::getCreatedAt).reversed()));
+                    break;
+
+                default:
+                    themesDTO.sort(Comparator.comparing(ThemeDTO::getCreatedAt).reversed()
+                        .thenComparing(Comparator.comparing(ThemeDTO::getCreatedAt).reversed()));
+                    break;
+            }
+        } else
+            themesDTO.sort(Comparator.comparing(ThemeDTO::getCreatedAt).reversed());
+
+
+        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int lastIndex = Math.min((startIndex + pageable.getPageSize()), themes.size());
+        return themesDTO.subList(startIndex, lastIndex);
+    }
+
     private ThemeDTO createThemeDTO(Theme theme) {
         ThemeDTO themeDto = modelMapper.map(theme, ThemeDTO.class);
         themeDto.setStoreCode(theme.getStore().getStoreCode());

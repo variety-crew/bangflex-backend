@@ -61,4 +61,17 @@ public class ThemeController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
 
+    @GetMapping("/stores/{storeCode}")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByStoreOrderBySort(
+        @PathVariable("storeCode") Integer storeCode,
+        @PageableDefault(size = 10) Pageable pageable,
+        @RequestParam(required = false) String filter
+    ) {
+
+        List<ThemeDTO> themes = themeService.findThemeByStoreOrderBySort(pageable, filter, storeCode);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
+    }
+
 }
