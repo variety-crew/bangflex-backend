@@ -3,11 +3,14 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.*;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,42 +31,47 @@ public class CommunityPostController {
     }
 
     /* 게시글 등록 */
-    @PostMapping("/post")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> createCommunityPost(
-                @RequestPart CommunityPostCreateDTO newPost,
-                @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+    @PostMapping(value = "/post", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<Object>> createCommunityPost(
+            @RequestAttribute("loginId") String loginId,
+            @RequestPart CommunityPostCreateDTO newPost,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        CommunityPostDTO postResponse = communityPostService.createPost(newPost, images);
-        return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", postResponse));
+        communityPostService.createPost(loginId, newPost, images);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", null));
     }
 
     /* 게시글 수정 */
-    @PutMapping("/post/{communityPostCode}")
+    @PutMapping(value = "/post/{communityPostCode}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> updateCommunityPost(
-                @PathVariable Integer communityPostCode,
-                @RequestPart CommunityPostUpdateDTO modifiedPost,
-                @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+            @RequestAttribute("loginId") String loginId,
+            @PathVariable int communityPostCode,
+            @Valid @RequestPart CommunityPostUpdateDTO modifiedPost,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        communityPostService.updatePost(communityPostCode, modifiedPost, images);
+        communityPostService.updatePost(loginId, communityPostCode, modifiedPost, images);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 수정 성공", null));
     }
 
     /* 게시글 삭제 */
     @DeleteMapping("/post/{communityPostCode}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> deleteCommunityPost(
-                            @PathVariable Integer communityPostCode,
-                            @RequestBody CommunityPostDeleteDTO deletedPost) {
+            @RequestAttribute("loginId") String loginId,
+            @PathVariable int communityPostCode) {
 
-        communityPostService.deletePost(communityPostCode, deletedPost);
+        communityPostService.deletePost(loginId, communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
     }
 
     /* 게시글 목록 조회(페이지네이션) */
     @GetMapping("")
-    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
+    public ResponseEntity<ResponseMessage<Page<CommunityPostResponseDTO>>> findPostList(
                             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
+        Page<CommunityPostResponseDTO> postList = communityPostService.findPostList(pageable);
         if (postList.hasContent()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
         } else {
@@ -72,8 +80,8 @@ public class CommunityPostController {
     }
 
     /* 게시글 상세 조회 */
-    @PostMapping("/post/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable Integer communityPostCode) {
+    @GetMapping("/post/{communityPostCode}")
+    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable int communityPostCode) {
 
         CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
