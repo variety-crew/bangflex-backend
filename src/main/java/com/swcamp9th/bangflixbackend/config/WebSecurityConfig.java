@@ -1,10 +1,10 @@
 package com.swcamp9th.bangflixbackend.config;
 
+import com.swcamp9th.bangflixbackend.security.config.CorsConfig;
 import com.swcamp9th.bangflixbackend.security.jwt.JwtAuthorizationFilter;
-import com.swcamp9th.bangflixbackend.security.jwt.JwtUtil;
+import com.swcamp9th.bangflixbackend.common.util.JwtUtil;
 import com.swcamp9th.bangflixbackend.security.user.UserDetailsServiceImpl;
 import jakarta.servlet.Filter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,12 +20,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class WebSecurityConfig {
 
 	private final JwtUtil jwtUtil;
 	private final UserDetailsServiceImpl userDetailsService;
 	private final AuthenticationConfiguration authenticationConfiguration;
+	private final CorsConfig corsConfig;
+
+
+	public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration, CorsConfig corsConfig) {
+		this.jwtUtil = jwtUtil;
+		this.userDetailsService = userDetailsService;
+		this.authenticationConfiguration = authenticationConfiguration;
+		this.corsConfig = corsConfig;
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -45,6 +53,9 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable);
+
+		http.cors(corsConfig -> corsConfig.getClass());
+
 		http.formLogin(AbstractHttpConfigurer::disable);
 
 		http.sessionManagement(sessionManagement ->
