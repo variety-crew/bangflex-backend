@@ -81,14 +81,14 @@ public class CommunityPostController {
 
     /* 게시글 구독 */
     @GetMapping("/post/subscribe/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<Void>> subscribe(
+    public ResponseEntity<ResponseMessage<String>> subscribe(
             @PathVariable Integer communityPostCode,
             @RequestAttribute("loginId") String loginId
     ) {
         log.info("Community post code is {}", communityPostCode);
         log.info("loginId is {}", loginId);
         return ResponseEntity.ok(
-                new ResponseMessage<>(200, "구독 완료", null)
+                new ResponseMessage<>(200, "구독 완료", "helloworld")
         );
     }
 }
