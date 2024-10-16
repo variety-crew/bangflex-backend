@@ -1,19 +1,23 @@
 package com.swcamp9th.bangflixbackend.domain.theme.service;
 
-import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
-import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
+import com.swcamp9th.bangflixbackend.domain.theme.dto.CreateThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction.ReactionType;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReactionId;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.GenreRepository;
+import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeReactionRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,18 +27,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ThemeServiceImpl implements ThemeService {
 
-    private static final Logger log = LoggerFactory.getLogger(ThemeServiceImpl.class);
     private final ThemeRepository themeRepository;
     private final ModelMapper modelMapper;
     private final GenreRepository genreRepository;
+    private final ThemeReactionRepository themeReactionRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public ThemeServiceImpl(ThemeRepository themeRepository
                           , ModelMapper modelMapper
-                          , GenreRepository genreRepository) {
+                          , GenreRepository genreRepository
+                          , ThemeReactionRepository themeReactionRepository
+                          , UserRepository userRepository) {
         this.themeRepository = themeRepository;
         this.modelMapper = modelMapper;
         this.genreRepository = genreRepository;
+        this.themeReactionRepository = themeReactionRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -111,6 +120,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @Transactional
     public List<ThemeDTO> findThemeByStoreOrderBySort(Pageable pageable, String filter,
         Integer storeCode) {
         List<Theme> themes = themeRepository.findByStoreCode(storeCode);
@@ -149,6 +159,45 @@ public class ThemeServiceImpl implements ThemeService {
         int startIndex = pageable.getPageNumber() * pageable.getPageSize();
         int lastIndex = Math.min((startIndex + pageable.getPageSize()), themes.size());
         return themesDTO.subList(startIndex, lastIndex);
+    }
+
+    @Override
+    public void createThemeReaction(String userId, CreateThemeReactionDTO createThemeReactionDTO) {
+        Member member = userRepository.findById(userId).orElseThrow();
+        Theme theme = themeRepository.findById(createThemeReactionDTO.getThemeCode()).orElseThrow();
+        ThemeReaction themeReaction = themeReactionRepository.findByIds(
+            createThemeReactionDTO.getThemeCode(), member.getMemberCode());
+
+        if(themeReaction == null){
+            themeReaction.setMember(member);
+            if(createThemeReactionDTO.getReaction().equals("like"))
+                themeReaction.setReaction(ReactionType.LIKE);
+            else
+                themeReaction.setReaction(ReactionType.SCRAP);
+            themeReaction.setCreatedAt(LocalDateTime.now());
+            themeReaction.setActive(true);
+            themeReaction.setTheme(theme);
+        }
+        else {
+            if(createThemeReactionDTO.getReaction().equals("like")){
+                if(themeReaction.getReaction().equals(ReactionType.LIKE))
+                    return;
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
+                    themeReaction.setReaction(ReactionType.SCRAP_AND_LIKE);
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP_AND_LIKE))
+                    return;
+            }
+            else{
+                if(themeReaction.getReaction().equals(ReactionType.LIKE))
+                    themeReaction.setReaction(ReactionType.SCRAP_AND_LIKE);
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
+                    return;
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAP_AND_LIKE))
+                    return;
+            }
+        }
+
+        themeReactionRepository.save(themeReaction);
     }
 
     private ThemeDTO createThemeDTO(Theme theme) {
