@@ -6,10 +6,12 @@ import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentDeleteD
 import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.comment.entity.Comment;
 import com.swcamp9th.bangflixbackend.domain.community.comment.repository.CommentRepository;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.AlarmDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.SubscribeService;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -28,16 +30,19 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommunityMemberRepository communityMemberRepository;
     private final CommunityPostRepository communityPostRepository;
+    private final SubscribeService subscribeService;
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository,
                               ModelMapper modelMapper,
                               CommunityMemberRepository communityMemberRepository,
-                              CommunityPostRepository communityPostRepository) {
+                              CommunityPostRepository communityPostRepository,
+                              SubscribeService subscribeService) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
         this.communityMemberRepository = communityMemberRepository;
         this.communityPostRepository = communityPostRepository;
+        this.subscribeService = subscribeService;
     }
 
     @Transactional
@@ -65,6 +70,14 @@ public class CommentServiceImpl implements CommentService {
         commentResponse.setMemberCode(savedComment.getCommunityMember().getMemberCode());
         commentResponse.setCommunityPostCode(savedComment.getCommunityPost().getCommunityPostCode());
 
+        // 알림 발송
+        AlarmDTO alarmDTO = new AlarmDTO();
+        alarmDTO.setPostId(comment.getCommunityPost().getCommunityPostCode());
+        alarmDTO.setWriter(comment.getCommunityMember().getNickname());
+        alarmDTO.setContent(comment.getContent());
+        alarmDTO.setCreatedAt(comment.getCreatedAt());
+
+        subscribeService.sendToMembersOnPostEvent(alarmDTO);
         return commentResponse;
     }
 

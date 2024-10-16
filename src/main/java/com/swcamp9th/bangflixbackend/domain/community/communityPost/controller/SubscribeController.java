@@ -24,7 +24,7 @@ public class SubscribeController {
     /* 게시글 구독 엔드포인트*/
     @PostMapping("post/{postId}")
     public ResponseEntity<ResponseMessage<Void>> subscribeToPost(
-            @PathVariable Long postId, @RequestAttribute String loginId
+            @PathVariable Integer postId, @RequestAttribute String loginId
     ) {
         subscribeService.subscribe(loginId, postId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "구독 완료", null));
@@ -32,8 +32,8 @@ public class SubscribeController {
 
     /* 사용자별 구독 게시글 리스트 조회 엔드포인트*/
     @GetMapping("/info")
-    public ResponseEntity<ResponseMessage<Map<String, Map<Long, SseEmitter>>>> getAllSubscribes() {
-        Map<String, Map<Long, SseEmitter>> subscription = subscribeService.getAllSubscribesByMember();
+    public ResponseEntity<ResponseMessage<Map<String, Map<Integer, SseEmitter>>>> getAllSubscribes() {
+        Map<String, Map<Integer, SseEmitter>> subscription = subscribeService.getAllSubscribesByMember();
         return ResponseEntity.ok(new ResponseMessage<>(200, "조회 완료", subscription));
     }
 

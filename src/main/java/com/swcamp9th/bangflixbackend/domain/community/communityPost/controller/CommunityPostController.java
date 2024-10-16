@@ -87,7 +87,7 @@ public class CommunityPostController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
 
-    /* 게시글 구독 */
+    /* 게시글 구독 -- 사용X */
     @GetMapping("/post/subscribe/{communityPostCode}")
     public ResponseEntity<ResponseMessage<String>> subscribe(
             @PathVariable Integer communityPostCode,

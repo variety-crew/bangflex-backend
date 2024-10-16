@@ -4,4 +4,5 @@ import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.Commu
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommunityMemberRepository extends JpaRepository<CommunityMember, Integer> {
+
 }

@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.AlarmDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -30,10 +31,10 @@ public class SubscribeService {
      *  }
     *
      */
-    private final Map<String, Map<Long, SseEmitter>> userEmitters = new ConcurrentHashMap<>();
-    private final Map<Long, List<String>> postSubscribers = new ConcurrentHashMap<>();
+    private final Map<String, Map<Integer, SseEmitter>> userEmitters = new ConcurrentHashMap<>();
+    private final Map<Integer, List<String>> postSubscribers = new ConcurrentHashMap<>();
 
-    public SseEmitter subscribe(String loginId, Long postId) {
+    public SseEmitter subscribe(String loginId, Integer postId) {
         SseEmitter emitter = new SseEmitter(10 * 60 * 1000L);
 
         // 사용자 별 구독 저장
@@ -49,9 +50,10 @@ public class SubscribeService {
         return emitter;
     }
 
-    public void sendToMembersOnPostEvent(Long postId) {
+    public void sendToMembersOnPostEvent(AlarmDTO alarmDTO) {
+        Integer postId = alarmDTO.getPostId();
         List<String> subscribers = postSubscribers.get(postId);
-        if(subscribers != null && subscribers.size() > 0) {
+        if(subscribers != null && !subscribers.isEmpty()) {
             subscribers.forEach(loginId -> {
                 SseEmitter emitter = userEmitters.get(loginId).get(postId);
                 if(emitter != null) {
@@ -59,7 +61,7 @@ public class SubscribeService {
                         emitter.send(
                                 SseEmitter.event()
                                         .name("comment-created")
-                                        .data("comment created!")
+                                        .data(alarmDTO)
                         );
                     } catch (IOException e) {
                         emitter.completeWithError(e);
@@ -71,11 +73,11 @@ public class SubscribeService {
 
 
 
-    public Map<String, Map<Long, SseEmitter>> getAllSubscribesByMember() {
+    public Map<String, Map<Integer, SseEmitter>> getAllSubscribesByMember() {
         return new HashMap<>(userEmitters);
     }
 
-    private void removeEmitters(String loginId, Long postId) {
+    private void removeEmitters(String loginId, Integer postId) {
         userEmitters.getOrDefault(loginId, new ConcurrentHashMap<>()).remove(postId);
         postSubscribers.getOrDefault(postId, new ArrayList<>()).remove(loginId);
     }
