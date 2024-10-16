@@ -20,8 +20,8 @@ public class SubscribeService {
     * 설명. map 구조: 사용자 별 구독 게시글 목록
     *  {
     *     loginId: {
-    *
-    *     }
+     *         {postId1: emitter1},
+    *     },
     *  }
     *
      * 설명. map 구조: 게시글 별 사용자 목록
@@ -67,6 +67,12 @@ public class SubscribeService {
                 }
             });
         }
+    }
+
+
+
+    public Map<String, Map<Long, SseEmitter>> getAllSubscribesByMember() {
+        return new HashMap<>(userEmitters);
     }
 
     private void removeEmitters(String loginId, Long postId) {
