@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,7 +40,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public List<GenreDTO> findGenres() {
-        List<Genre> genres = genreRepository.findAll();
+        List<Genre> genres = genreRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
 
         return genres.stream().map(genre -> {
             return modelMapper.map(genre, GenreDTO.class);
