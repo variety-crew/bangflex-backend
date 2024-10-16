@@ -4,6 +4,7 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.store.dto.StoreDTO;
 import com.swcamp9th.bangflixbackend.domain.store.service.StoreService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class StoreController {
     }
 
     @GetMapping("/{storeCode}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<StoreDTO>> findStore(
         @PathVariable("storeCode") Integer storeCode) {
 
@@ -33,6 +35,7 @@ public class StoreController {
     }
 
     @GetMapping("/bestreview/{storeCode}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<ReviewDTO>> findBestReviewByStore(
         @PathVariable("storeCode") Integer storeCode) {
 

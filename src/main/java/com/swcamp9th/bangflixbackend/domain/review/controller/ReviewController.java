@@ -7,6 +7,7 @@ import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -41,6 +42,7 @@ public class ReviewController {
 
 
     @PostMapping("")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> createReview(
         @RequestPart("review") CreateReviewDTO newReview,
         @RequestPart(value = "images", required = false) List<MultipartFile> images)
@@ -52,6 +54,7 @@ public class ReviewController {
     }
 
     @PutMapping("")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview)
         throws IOException {
         
@@ -61,6 +64,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
 
         reviewService.deleteReview(reviewCodeDTO);
@@ -69,6 +73,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{themeCode}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
         @PageableDefault Pageable pageable,
@@ -90,6 +95,7 @@ public class ReviewController {
     }
 
     @GetMapping("/statistics/{themeCode}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<StatisticsReviewDTO>> findReviewStatistics(
         @PathVariable("themeCode") Integer themeCode) {
 
@@ -100,6 +106,7 @@ public class ReviewController {
     }
 
     @PostMapping("/likes")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
 
         reviewService.likeReview(reviewCodeDTO);
@@ -108,6 +115,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/likes")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
 
         reviewService.deleteLikeReview(reviewCodeDTO);

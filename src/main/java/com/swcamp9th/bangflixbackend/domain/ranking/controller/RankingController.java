@@ -5,6 +5,7 @@ import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDateDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.service.RankingService;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class RankingController {
     }
 
     @PostMapping("/test")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> testCreateTop5Review() {
 
         rankingService.createReviewRanking();
@@ -38,6 +40,7 @@ public class RankingController {
     }
 
     @GetMapping("/reviews/dates/{year}")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<ReviewRankingDateDTO>> findReviewRankingDate(
         @PathVariable Integer year) {
 
@@ -47,6 +50,7 @@ public class RankingController {
     }
 
     @GetMapping("/reviews/dates")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ReviewRankingDTO>>> findReviewRanking(
         @RequestParam(required = false) String date) {
 
@@ -56,6 +60,7 @@ public class RankingController {
     }
 
     @GetMapping("/reviews")
+    @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewRanking(
         @PageableDefault(size = 10) Pageable pageable
     ) {
