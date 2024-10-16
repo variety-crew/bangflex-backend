@@ -8,10 +8,13 @@ import com.swcamp9th.bangflixbackend.domain.theme.service.ThemeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -42,6 +45,20 @@ public class ThemeController {
         List<GenreDTO> genres = themeService.findGenres();
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "전체 장르 조회 성공", genres));
+    }
+
+    @GetMapping("")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByGenresAndSearchOrderBySort(
+        @PageableDefault(size = 10) Pageable pageable,
+        @RequestParam(required = false) String filter,
+        @RequestParam(required = false) List<String> genres,
+        @RequestParam(required = false) String content
+    ) {
+
+        List<ThemeDTO> themes = themeService.findThemeByGenresAndSearchOrderBySort(pageable, filter, genres, content);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
 
 }

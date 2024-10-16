@@ -76,7 +76,7 @@ public class ReviewController {
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
-        @PageableDefault Pageable pageable,
+        @PageableDefault(size = 10) Pageable pageable,
         @RequestParam(required = false) String filter) {
         /*
             필터 값은 필수 X.

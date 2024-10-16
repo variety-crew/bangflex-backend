@@ -285,16 +285,6 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    // 리뷰 리스트에서 lastReviewCode에 해당하는 리뷰의 인덱스를 찾는 메서드
-    private int findReviewIndex(List<Review> reviews, Integer lastReviewCode) {
-        for (int i = 0; i < reviews.size(); i++) {
-            if (reviews.get(i).getReviewCode().equals(lastReviewCode)) {
-                return i + 1; // 찾은 인덱스 바로 다음부터 시작
-            }
-        }
-        return 0; // 못 찾으면 처음부터
-    }
-
 
     private void saveReviewFile(List<MultipartFile> images, Review review) throws IOException {
         String uploadsDir = "src/main/resources/static/uploadFiles/reviewFile";
