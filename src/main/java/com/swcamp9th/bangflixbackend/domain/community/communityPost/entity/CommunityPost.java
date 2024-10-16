@@ -44,7 +44,7 @@ public class CommunityPost {
     @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<CommunityFile> communityFiles = new ArrayList<>();
 
-    // 댓글과의 관계 설정
-    @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+//    // 댓글과의 관계 설정
+//    @OneToMany(mappedBy = "communityPost", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+//    private List<Comment> comments = new ArrayList<>();
 }
