@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,21 +32,11 @@ public class NoticePostController {
     @PostMapping(value = "/post", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> createNoticePost(
+            @RequestAttribute("loginId") String loginId,
             @Valid @RequestPart NoticePostCreateDTO newNotice,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String userId;
-
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            userId = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-        } else {
-            // principal이 UserDetails가 아닌 경우 (ex: 익명 사용자)
-            return ResponseEntity.ok(new ResponseMessage<>(401, "인증되지 않은 사용자입니다.", null));
-        }
-
-        noticePostService.createNoticePost(newNotice, images, userId);
+        noticePostService.createNoticePost(newNotice, images, loginId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 등록 성공", null));
     }
 
@@ -55,42 +44,22 @@ public class NoticePostController {
     @PutMapping(value = "/post/{noticePostCode}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> updateNoticePost(
+            @RequestAttribute("loginId") String loginId,
             @PathVariable int noticePostCode,
             @Valid @RequestPart NoticePostUpdateDTO updatedNotice,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String userId;
-
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            userId = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-        } else {
-            // principal이 UserDetails가 아닌 경우 (ex: 익명 사용자)
-            return ResponseEntity.ok(new ResponseMessage<>(401, "인증되지 않은 사용자입니다.", null));
-        }
-
-        noticePostService.updateNoticePost(noticePostCode, updatedNotice, images, userId);
+        noticePostService.updateNoticePost(noticePostCode, updatedNotice, images, loginId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 수정 성공", null));
     }
 
     /* 공지사항 게시글 삭제 */
     @DeleteMapping("/post/{noticePostCode}")
     @SecurityRequirement(name = "Authorization")
-    public ResponseEntity<ResponseMessage<Object>> deleteNoticePost(@PathVariable int noticePostCode) {
+    public ResponseEntity<ResponseMessage<Object>> deleteNoticePost(@PathVariable int noticePostCode,
+                                                                    @RequestAttribute("loginId") String loginId) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String userId;
-
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            userId = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-        } else {
-            // principal이 UserDetails가 아닌 경우 (ex: 익명 사용자)
-            return ResponseEntity.ok(new ResponseMessage<>(401, "인증되지 않은 사용자입니다.", null));
-        }
-
-        noticePostService.deleteNoticePost(noticePostCode, userId);
+        noticePostService.deleteNoticePost(noticePostCode, loginId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
     }
 }
