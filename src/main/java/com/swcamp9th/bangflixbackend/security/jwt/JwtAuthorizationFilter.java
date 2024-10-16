@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.security.jwt;
 
+import com.swcamp9th.bangflixbackend.common.util.JwtUtil;
 import com.swcamp9th.bangflixbackend.security.user.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;

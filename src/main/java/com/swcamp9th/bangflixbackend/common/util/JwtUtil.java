@@ -1,4 +1,4 @@
-package com.swcamp9th.bangflixbackend.security.jwt;
+package com.swcamp9th.bangflixbackend.common.util;
 
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import io.jsonwebtoken.*;
@@ -106,6 +106,16 @@ public class JwtUtil {
 			return bearerToken.substring(7);
 		}
 		return null;
+	}
+
+
+
+	public String getSubjectFromToken(String token) {
+		return Jwts.parser()
+				.setSigningKey(accessTokenSecret)
+				.parseClaimsJws(token)
+				.getBody()
+				.getSubject();
 	}
 
 	public String substringToken(String token) {
