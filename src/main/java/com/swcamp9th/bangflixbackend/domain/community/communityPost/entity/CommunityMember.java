@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class CommunityMember {
+public class CommunityMember {      // 시큐리티 적용 후 삭제 예정
 
     @Id
     @Column(name = "member_code")
