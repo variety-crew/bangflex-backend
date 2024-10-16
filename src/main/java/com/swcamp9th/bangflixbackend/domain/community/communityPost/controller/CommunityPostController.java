@@ -72,7 +72,7 @@ public class CommunityPostController {
     }
 
     /* 게시글 상세 조회 */
-    @GetMapping("/post/{communityPostCode}")
+    @PostMapping("/post/{communityPostCode}")
     public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable Integer communityPostCode) {
 
         CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
