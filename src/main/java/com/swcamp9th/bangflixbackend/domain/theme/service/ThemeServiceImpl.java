@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeRepository themeRepository;
@@ -162,6 +164,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @Transactional
     public void createThemeReaction(String userId, CreateThemeReactionDTO createThemeReactionDTO) {
         Member member = userRepository.findById(userId).orElseThrow();
         Theme theme = themeRepository.findById(createThemeReactionDTO.getThemeCode()).orElseThrow();
@@ -169,35 +172,38 @@ public class ThemeServiceImpl implements ThemeService {
             createThemeReactionDTO.getThemeCode(), member.getMemberCode());
 
         if(themeReaction == null){
+            themeReaction = new ThemeReaction();
             themeReaction.setMember(member);
-            if(createThemeReactionDTO.getReaction().equals("like"))
+            if(createThemeReactionDTO.getReaction().equals("Like"))
                 themeReaction.setReaction(ReactionType.LIKE);
-            else
+            else if (createThemeReactionDTO.getReaction().equals("Scrap"))
                 themeReaction.setReaction(ReactionType.SCRAP);
             themeReaction.setCreatedAt(LocalDateTime.now());
             themeReaction.setActive(true);
             themeReaction.setTheme(theme);
+            themeReaction.setThemeCode(theme.getThemeCode());
+            themeReaction.setMemberCode(member.getMemberCode());
+            themeReactionRepository.save(themeReaction);
         }
         else {
-            if(createThemeReactionDTO.getReaction().equals("like")){
+            if(createThemeReactionDTO.getReaction().equals("Like")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
                     return;
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
-                    themeReaction.setReaction(ReactionType.SCRAP_AND_LIKE);
-                else if (themeReaction.getReaction().equals(ReactionType.SCRAP_AND_LIKE))
+                    themeReaction.setReaction(ReactionType.SCRAPLIKE);
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE))
                     return;
             }
-            else{
+            else if (createThemeReactionDTO.getReaction().equals("Scrap")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
-                    themeReaction.setReaction(ReactionType.SCRAP_AND_LIKE);
+                    themeReaction.setReaction(ReactionType.SCRAPLIKE);
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
                     return;
-                else if (themeReaction.getReaction().equals(ReactionType.SCRAP_AND_LIKE))
+                else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE))
                     return;
             }
+            themeReactionRepository.save(themeReaction);
         }
-
-        themeReactionRepository.save(themeReaction);
     }
 
     private ThemeDTO createThemeDTO(Theme theme) {

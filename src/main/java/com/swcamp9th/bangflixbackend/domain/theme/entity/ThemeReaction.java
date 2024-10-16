@@ -56,23 +56,9 @@ public class ThemeReaction {
 
     // ReactionType enum
     public enum ReactionType {
-        LIKE("like"),
-        SCRAP("scrap"),
-        SCRAP_AND_LIKE("scrap&like");
+        LIKE,
+        SCRAP,
+        SCRAPLIKE;
 
-        private final String value;
-
-        ReactionType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
     }
 }
