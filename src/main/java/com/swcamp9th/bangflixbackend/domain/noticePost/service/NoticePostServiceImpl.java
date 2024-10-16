@@ -60,6 +60,7 @@ public class NoticePostServiceImpl implements NoticePostService {
         createdNotice.setContent(newNotice.getContent());
         createdNotice.setMember(admin);
 
+        // 게시글 저장
         noticePostRepository.save(createdNotice);
 
         // 첨부파일 있으면 저장
@@ -86,10 +87,6 @@ public class NoticePostServiceImpl implements NoticePostService {
             String dbUrl = "/noticeFiles/" + uuid + fileName;
 
             //저장
-//            Files.copy(file.getInputStream(),
-//                    path,
-//                    StandardCopyOption.REPLACE_EXISTING     // 이미 파일이 존재하면 덮어쓰기
-//            );
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
 
@@ -127,6 +124,7 @@ public class NoticePostServiceImpl implements NoticePostService {
         foundNotice.setTitle(updatedNotice.getTitle());
         foundNotice.setContent(updatedNotice.getContent());
 
+        // 수정된 게시글 저장
         noticePostRepository.save(foundNotice);
     }
 
