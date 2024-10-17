@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.theme.service;
 
+import com.swcamp9th.bangflixbackend.domain.theme.dto.FindThemeByReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
@@ -19,4 +20,6 @@ public interface ThemeService {
     void createThemeReaction(String userId, ThemeReactionDTO themeReactionDTO);
 
     void deleteThemeReaction(String loginId, ThemeReactionDTO themeReactionDTO);
+
+    List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction);
 }

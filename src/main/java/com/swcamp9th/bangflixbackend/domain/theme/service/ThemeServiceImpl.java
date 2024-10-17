@@ -1,12 +1,13 @@
 package com.swcamp9th.bangflixbackend.domain.theme.service;
 
+import com.swcamp9th.bangflixbackend.domain.theme.dto.FindThemeByReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.ReactionType;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction;
-import com.swcamp9th.bangflixbackend.domain.theme.entity.ThemeReaction.ReactionType;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.GenreRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeReactionRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
@@ -232,6 +233,29 @@ public class ThemeServiceImpl implements ThemeService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        List<ThemeReaction> themeReactions = new ArrayList<>();
+
+        if(reaction.equals("Like"))
+            themeReactions = themeReactionRepository.findThemeByMemberLike(
+                pageable, member.getMemberCode());
+
+        else if(reaction.equals("Scrap"))
+            themeReactions = themeReactionRepository.findThemeByMemberScrap(
+                pageable, member.getMemberCode());
+
+        else
+            throw new RuntimeException();
+
+        log.info("테마 리액션" + themeReactions.isEmpty() + "memberCode" + member.getMemberCode());
+
+        return themeReactions.stream().map(themeReaction -> {
+            return modelMapper.map(themeReaction.getTheme(), FindThemeByReactionDTO.class);
+        }).toList();
     }
 
     private ThemeDTO createThemeDTO(Theme theme) {

@@ -1,10 +1,13 @@
 package com.swcamp9th.bangflixbackend.domain.theme.repository;
 
+import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -47,4 +50,6 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         "INNER JOIN Store s ON t.store.storeCode = s.storeCode " +
         "WHERE s.storeCode = :storeCode AND t.active = true")
     List<Theme> findByStoreCode(int storeCode);
+
+
 }

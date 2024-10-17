@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.theme.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
+import com.swcamp9th.bangflixbackend.domain.theme.dto.FindThemeByReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
@@ -102,6 +103,20 @@ public class ThemeController {
 
         return ResponseEntity.ok(new ResponseMessage<>(200,
             "테마 " + themeReactionDTO.getReaction() + " 삭제 성공", null));
+    }
+
+    @GetMapping("/reaction/member")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<Object>> findThemeByMemberReaction(
+        @RequestParam String reaction,
+        @PageableDefault(size = 10) Pageable pageable,
+        @RequestAttribute("loginId") String loginId
+    ) {
+
+        List<FindThemeByReactionDTO> themes = themeService.findThemeByMemberReaction(pageable, loginId, reaction);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200,
+            "유저 별 " + reaction + " 테마 조회 성공", themes));
     }
 
 }

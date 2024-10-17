@@ -54,11 +54,5 @@ public class ThemeReaction {
     @JoinColumn(name = "member_code", insertable = false, updatable = false)
     private Member member;
 
-    // ReactionType enum
-    public enum ReactionType {
-        LIKE,
-        SCRAP,
-        SCRAPLIKE;
 
-    }
 }
