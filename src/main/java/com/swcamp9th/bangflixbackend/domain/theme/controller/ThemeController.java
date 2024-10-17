@@ -8,6 +8,7 @@ import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.service.ThemeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/themes")
+@Slf4j
 public class ThemeController {
 
     private final ThemeService themeService;
@@ -66,14 +68,13 @@ public class ThemeController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
 
-    @GetMapping("/store/{storeCode}")
+    @GetMapping("/stores/{storeCode}")
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByStoreOrderBySort(
         @PathVariable("storeCode") Integer storeCode,
         @PageableDefault(size = 10) Pageable pageable,
         @RequestParam(required = false) String filter
     ) {
-
         List<ThemeDTO> themes = themeService.findThemeByStoreOrderBySort(pageable, filter, storeCode);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));

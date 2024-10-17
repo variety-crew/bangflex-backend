@@ -48,18 +48,18 @@ public class ReviewTendency {
     private Member member;
 
     public enum BeSkilled {
-        children,
-        beginners,
-        intermediate,
-        advanced
+        CHILDREN,
+        BEGINNERS,
+        INTERMEDIATE,
+        ADVANCED
     }
 
     public enum Situation {
-        single,
-        friend,
-        couple,
-        stranger,
-        challenger
+        SINGLE,
+        FRIEND,
+        COUPLE,
+        STRANGER,
+        CHALLENGER
     }
 
 }
