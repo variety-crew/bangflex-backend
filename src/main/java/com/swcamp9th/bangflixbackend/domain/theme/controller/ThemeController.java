@@ -68,7 +68,7 @@ public class ThemeController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
 
-    @GetMapping("/stores/{storeCode}")
+    @GetMapping("/store/{storeCode}")
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByStoreOrderBySort(
         @PathVariable("storeCode") Integer storeCode,
@@ -106,7 +106,7 @@ public class ThemeController {
             "테마 " + themeReactionDTO.getReaction() + " 삭제 성공", null));
     }
 
-    @GetMapping("/reaction/member")
+    @GetMapping("/reactions/member")
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> findThemeByMemberReaction(
         @RequestParam String reaction,

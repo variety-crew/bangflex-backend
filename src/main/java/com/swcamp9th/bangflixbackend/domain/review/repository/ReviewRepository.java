@@ -87,6 +87,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
         "ORDER BY COUNT(g) DESC")
     List<String> findTopGenresByMemberCode(@Param("memberCode") int memberCode, Pageable pageable);
 
-    @Query("SELECT r FROM Review r JOIN FETCH r.member WHERE r.member.memberCode = :memberCode")
+    @Query("SELECT r FROM Review r JOIN FETCH r.member WHERE r.member.memberCode = :memberCode "
+        + "ORDER BY r.createdAt DESC ")
     List<Review> findByMemberCode(@Param("memberCode") Integer memberCode, Pageable pageable);
 }
