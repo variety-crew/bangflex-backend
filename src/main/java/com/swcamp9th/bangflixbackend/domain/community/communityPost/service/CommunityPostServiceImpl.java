@@ -176,7 +176,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         List<CommunityPostDTO> postList = allPosts.stream()
                 .map(communityPost -> {
                     CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
+
+                    List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+                    List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
                     postDTO.setMemberCode(communityPost.getMember().getMemberCode());
+                    postDTO.setImageUrls(urls);
                     return postDTO;
                 }).toList();
 
@@ -191,6 +196,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
         selectedPost.setMemberCode(post.getMember().getMemberCode());
+
+        List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
+        List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+        selectedPost.setImageUrls(urls);
 
         return selectedPost;
     }
