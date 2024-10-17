@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.*;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityPostService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class CommunityPostController {
     /* 게시글 등록 */
     @PostMapping(value = "/post", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "커뮤니티 게시글 등록 API")
     public ResponseEntity<ResponseMessage<Object>> createCommunityPost(
             @RequestAttribute("loginId") String loginId,
             @RequestPart CommunityPostCreateDTO newPost,
@@ -45,6 +47,7 @@ public class CommunityPostController {
     /* 게시글 수정 */
     @PutMapping(value = "/post/{communityPostCode}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "커뮤니티 게시글 수정 API")
     public ResponseEntity<ResponseMessage<Object>> updateCommunityPost(
             @RequestAttribute("loginId") String loginId,
             @PathVariable int communityPostCode,
@@ -58,6 +61,7 @@ public class CommunityPostController {
     /* 게시글 삭제 */
     @DeleteMapping("/post/{communityPostCode}")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "커뮤니티 게시글 삭제 API")
     public ResponseEntity<ResponseMessage<Object>> deleteCommunityPost(
             @RequestAttribute("loginId") String loginId,
             @PathVariable int communityPostCode) {
@@ -81,6 +85,7 @@ public class CommunityPostController {
 
     /* 게시글 목록 조회 */
     @GetMapping("")
+    @Operation(summary = "커뮤니티 게시글 목록 조회 API")
     public ResponseEntity<ResponseMessage<List<CommunityPostDTO>>> getAllPosts() {
         List<CommunityPostDTO> posts = communityPostService.getAllPosts();
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", posts));
@@ -88,6 +93,7 @@ public class CommunityPostController {
 
     /* 게시글 상세 조회 */
     @GetMapping("/post/{communityPostCode}")
+    @Operation(summary = "커뮤니티 게시글 상세 조회 API")
     public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable int communityPostCode) {
 
         CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
