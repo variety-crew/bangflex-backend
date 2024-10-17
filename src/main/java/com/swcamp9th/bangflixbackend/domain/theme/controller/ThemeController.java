@@ -6,6 +6,7 @@ import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.service.ThemeService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class ThemeController {
 
     @GetMapping("/{themeCode}")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "특정 테마를 조회하는 API.")
     public ResponseEntity<ResponseMessage<ThemeDTO>> findTheme(
         @PathVariable("themeCode") Integer themeCode) {
 
@@ -47,6 +49,7 @@ public class ThemeController {
 
     @GetMapping("/genres")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "현재 DB에 존재하는 모든 장르를 조회하는 API.")
     public ResponseEntity<ResponseMessage<List<GenreDTO>>> findGenres() {
 
         List<GenreDTO> genres = themeService.findGenres();
@@ -56,8 +59,11 @@ public class ThemeController {
 
     @GetMapping("")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 필터링 & 검색해서 조회하는 API. filter 값 (like : 좋아요 수가 많은 테마, scrap : 스크랩 수가 많은 순, review: 리뷰 수가 많은 순, 값 안넣으면 테마 생성 순)"
+        + ", genre 여러 개 선택 시, or 문으로 조합해서 선택한 장르에 해당하는 테마를 선택해 보여줌 "
+        + "content를 작성하면 테마 이름에 content가 포함된 테마 반환")
     public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByGenresAndSearchOrderBySort(
-        @PageableDefault(size = 10) Pageable pageable,
+        @PageableDefault(size = 10, page = 0) Pageable pageable,
         @RequestParam(required = false) String filter,
         @RequestParam(required = false) List<String> genres,
         @RequestParam(required = false) String content
@@ -70,6 +76,7 @@ public class ThemeController {
 
     @GetMapping("/store/{storeCode}")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "업체 별 테마 조회 API. filter 값 : (like, scrap, review, 값이 없다면 최신 순) ")
     public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByStoreOrderBySort(
         @PathVariable("storeCode") Integer storeCode,
         @PageableDefault(size = 10) Pageable pageable,
@@ -82,6 +89,7 @@ public class ThemeController {
 
     @PostMapping("/reaction")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 별로 스크랩이나 좋아요를 할 수 있는 API. 해당 API로 좋아요, 스크랩을 동시에 지원합니다. reaction 값으로는 String으로 like or scrap 입력해주시면 됩니다. ")
     public ResponseEntity<ResponseMessage<Object>> createThemeReaction(
         @RequestBody ThemeReactionDTO themeReactionDTO,
         @RequestAttribute("loginId") String loginId
@@ -95,6 +103,7 @@ public class ThemeController {
 
     @DeleteMapping("/reaction")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 별로 유저가 한 스크랩이나 좋아요를 취소 할 수 있는 API. 해당 API로 좋아요 취소, 스크랩 취소 동시에 지원합니다. reaction 값으로는 String으로 like or scrap 입력해주시면 됩니다. ")
     public ResponseEntity<ResponseMessage<Object>> deleteThemeReaction(
         @RequestBody ThemeReactionDTO themeReactionDTO,
         @RequestAttribute("loginId") String loginId
@@ -108,6 +117,7 @@ public class ThemeController {
 
     @GetMapping("/reactions/member")
     @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "유저 별로 스크랩이나 좋아요한 테마 조회 API. 해당 API로 좋아요, 스크랩을 동시에 지원합니다. reaction 값으로는 String으로 like or scrap 입력해주시면 됩니다. ")
     public ResponseEntity<ResponseMessage<Object>> findThemeByMemberReaction(
         @RequestParam String reaction,
         @PageableDefault(size = 10) Pageable pageable,

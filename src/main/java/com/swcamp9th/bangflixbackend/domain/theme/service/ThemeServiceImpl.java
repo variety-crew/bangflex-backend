@@ -174,9 +174,9 @@ public class ThemeServiceImpl implements ThemeService {
         if(themeReaction == null){
             themeReaction = new ThemeReaction();
             themeReaction.setMember(member);
-            if(themeReactionDTO.getReaction().equals("Like"))
+            if(themeReactionDTO.getReaction().equals("like"))
                 themeReaction.setReaction(ReactionType.LIKE);
-            else if (themeReactionDTO.getReaction().equals("Scrap"))
+            else if (themeReactionDTO.getReaction().equals("scrap"))
                 themeReaction.setReaction(ReactionType.SCRAP);
             themeReaction.setCreatedAt(LocalDateTime.now());
             themeReaction.setActive(true);
@@ -186,7 +186,7 @@ public class ThemeServiceImpl implements ThemeService {
             themeReactionRepository.save(themeReaction);
         }
         else {
-            if(themeReactionDTO.getReaction().equals("Like")){
+            if(themeReactionDTO.getReaction().equals("like")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
                     return;
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -194,7 +194,7 @@ public class ThemeServiceImpl implements ThemeService {
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAPLIKE))
                     return;
             }
-            else if (themeReactionDTO.getReaction().equals("Scrap")){
+            else if (themeReactionDTO.getReaction().equals("scrap")){
                 if(themeReaction.getReaction().equals(ReactionType.LIKE))
                     themeReaction.setReaction(ReactionType.SCRAPLIKE);
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -214,7 +214,7 @@ public class ThemeServiceImpl implements ThemeService {
             themeReactionDTO.getThemeCode(), member.getMemberCode());
 
         if(themeReaction != null) {
-            if (themeReactionDTO.getReaction().equals("Like")) {
+            if (themeReactionDTO.getReaction().equals("like")) {
                 if (themeReaction.getReaction().equals(ReactionType.LIKE))
                     themeReactionRepository.delete(themeReaction);
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -223,7 +223,7 @@ public class ThemeServiceImpl implements ThemeService {
                     themeReaction.setReaction(ReactionType.SCRAP);
                     themeReactionRepository.save(themeReaction);
                 }
-            } else if (themeReactionDTO.getReaction().equals("Scrap")) {
+            } else if (themeReactionDTO.getReaction().equals("scrap")) {
                 if (themeReaction.getReaction().equals(ReactionType.LIKE))
                     return;
                 else if (themeReaction.getReaction().equals(ReactionType.SCRAP))
@@ -242,11 +242,11 @@ public class ThemeServiceImpl implements ThemeService {
         Member member = userRepository.findById(loginId).orElseThrow();
         List<ThemeReaction> themeReactions = new ArrayList<>();
 
-        if(reaction.equals("Like"))
+        if(reaction.equals("like"))
             themeReactions = themeReactionRepository.findThemeByMemberLike(
                 pageable, member.getMemberCode());
 
-        else if(reaction.equals("Scrap"))
+        else if(reaction.equals("scrap"))
             themeReactions = themeReactionRepository.findThemeByMemberScrap(
                 pageable, member.getMemberCode());
 
