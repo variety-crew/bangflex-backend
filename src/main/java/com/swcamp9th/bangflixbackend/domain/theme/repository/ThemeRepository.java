@@ -18,9 +18,8 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         "INNER JOIN Genre g ON tg.genreCode = g.genreCode " +
         "WHERE g.name IN :genres " + // 장르 필터
         "AND (t.name LIKE %:search% OR :search IS NULL) AND t.active = true " + // 검색 필터
-        "GROUP BY t.themeCode " +
-        "HAVING COUNT(DISTINCT g.name) = :genreCount") // 모든 장르가 일치하는지 확인
-    List<Theme> findThemesByAllGenresAndSearch(List<String> genres, String search, int genreCount);
+        "GROUP BY t.themeCode ")
+    List<Theme> findThemesByAllGenresAndSearch(List<String> genres, String search);
 
     // 추가적인 쿼리 메소드로 리뷰 개수, 좋아요 개수, 스크랩 개수를 구하는 메소드
     @Query("SELECT COUNT(r) FROM Review r WHERE r.theme.themeCode = :themeCode AND r.active = true")
@@ -38,9 +37,8 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         "INNER JOIN ThemeGenre tg ON t.themeCode = tg.theme.themeCode " +
         "INNER JOIN Genre g ON tg.genreCode = g.genreCode " +
         "WHERE g.name IN :genres AND t.active = true " + // 장르 필터
-        "GROUP BY t.themeCode " +
-        "HAVING COUNT(DISTINCT g.name) = :genreCount") // 모든 장르가 일치하는지 확인
-    List<Theme> findThemesByAllGenres(List<String> genres, int genreCount);
+        "GROUP BY t.themeCode ")
+    List<Theme> findThemesByAllGenres(List<String> genres);
 
     @Query("SELECT t FROM Theme t " +
         "WHERE (t.name LIKE %:search% OR :search IS NULL) AND t.active = true")

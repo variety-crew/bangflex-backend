@@ -4,6 +4,7 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewReportDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
@@ -129,4 +130,28 @@ public class ReviewController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 취소 성공", null));
     }
 
+    @GetMapping("/user/report")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<ReviewReportDTO>> findReviewReport(
+        @RequestAttribute("loginId") String loginId
+    ) {
+
+        // 서비스에서 필터를 사용해 조회
+        ReviewReportDTO reviewReportDTO = reviewService.findReviewReposrt(loginId);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "유저 리뷰 report 조회 성공", reviewReportDTO));
+    }
+
+    @GetMapping("/user")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewByMember(
+        @RequestAttribute("loginId") String loginId,
+        @PageableDefault(size = 10) Pageable pageable
+    ) {
+
+        // 서비스에서 필터를 사용해 조회
+        List<ReviewDTO> reviews = reviewService.findReviewByMember(loginId, pageable);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "유저가 작성한 리뷰 조회 성공", reviews));
+    }
 }

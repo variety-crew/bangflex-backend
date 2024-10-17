@@ -75,9 +75,9 @@ public class ThemeServiceImpl implements ThemeService {
 
         if(!genres.isEmpty()){
             if(content != null)
-                themes = themeRepository.findThemesByAllGenresAndSearch(genres, content, genres.size());
+                themes = themeRepository.findThemesByAllGenresAndSearch(genres, content);
             else
-                themes = themeRepository.findThemesByAllGenres(genres, genres.size());
+                themes = themeRepository.findThemesByAllGenres(genres);
         } else {
             if(content != null)
                 themes = themeRepository.findThemesBySearch(content);
