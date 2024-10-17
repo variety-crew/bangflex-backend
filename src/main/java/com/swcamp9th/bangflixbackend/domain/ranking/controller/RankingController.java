@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.ranking.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
+import com.swcamp9th.bangflixbackend.domain.ranking.dto.MemberRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDateDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.service.RankingService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,5 +70,16 @@ public class RankingController {
         List<ReviewDTO> reviews = rankingService.findAllReviewRanking(pageable);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "실시간 리뷰 랭킹 조회 성공", reviews));
+    }
+
+    @GetMapping("/members")
+    @SecurityRequirement(name = "Authorization")
+    public ResponseEntity<ResponseMessage<List<MemberRankingDTO>>> findMemberRanking(
+        @PageableDefault(size = 100) Pageable pageable
+    ) {
+
+        List<MemberRankingDTO> members = rankingService.findAllMemberRanking(pageable);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "실시간 멤버 랭킹 조회 성공", members));
     }
 }
