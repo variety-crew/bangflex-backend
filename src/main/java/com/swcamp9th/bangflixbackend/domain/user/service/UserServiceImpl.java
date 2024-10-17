@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.user.service;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
+import com.swcamp9th.bangflixbackend.exception.DuplicateException;
 import com.swcamp9th.bangflixbackend.redis.RedisService;
 import com.swcamp9th.bangflixbackend.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -33,15 +34,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignupResponseDto signupWithoutProfile(SignupRequestDto signupRequestDto) {
         if (userRepository.existsById(signupRequestDto.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다.");
+            throw new DuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.existsByNickname(signupRequestDto.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateException("이미 존재하는 닉네임입니다.");
         }
 
         if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateException("이미 존재하는 이메일입니다.");
         }
 
 //        String uploadsDir = "src/main/resources/static/uploadFiles/DefaultProfileFile";
@@ -68,15 +69,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignupResponseDto signup(SignupRequestDto signupRequestDto, MultipartFile imgFile) throws IOException {
         if (userRepository.existsById(signupRequestDto.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다.");
+            throw new DuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.existsByNickname(signupRequestDto.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateException("이미 존재하는 닉네임입니다.");
         }
 
         if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateException("이미 존재하는 이메일입니다.");
         }
 
         String uploadsDir = "src/main/resources/static/uploadFiles/profileFile";
@@ -180,11 +181,7 @@ public class UserServiceImpl implements UserService {
         if (id.trim().isEmpty()) {
             return new DuplicateCheckResponseDto(false);
         }
-        log.info("*** UserServiceImpl - id: {}", id);
-        boolean result = userRepository.existsById(id);
-        log.info("*** UserServiceImpl - result: {}", result);
-
-        return new DuplicateCheckResponseDto(result);
+        return new DuplicateCheckResponseDto(userRepository.existsById(id));
     }
 
     @Override
