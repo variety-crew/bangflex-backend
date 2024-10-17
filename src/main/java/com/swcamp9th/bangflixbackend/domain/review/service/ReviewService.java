@@ -14,18 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ReviewService {
 
-    void createReview(CreateReviewDTO newReview, List<MultipartFile> images)
+    void createReview(CreateReviewDTO newReview, List<MultipartFile> images, String loginId)
         throws IOException, URISyntaxException;
 
-    void updateReview(UpdateReviewDTO updateReview);
+    void updateReview(UpdateReviewDTO updateReview, String loginId);
 
-    void deleteReview(ReviewCodeDTO reviewCodeDTO);
+    void deleteReview(ReviewCodeDTO reviewCodeDTO, String loginId);
 
     List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable);
 
-    void likeReview(ReviewCodeDTO reviewCodeDTO);
+    void likeReview(ReviewCodeDTO reviewCodeDTO, String loginId);
 
-    void deleteLikeReview(ReviewCodeDTO reviewCodeDTO);
+    void deleteLikeReview(ReviewCodeDTO reviewCodeDTO, String loginId);
 
     StatisticsReviewDTO findReviewStatistics(Integer themeCode);
 

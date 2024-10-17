@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,29 +46,32 @@ public class ReviewController {
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<Object>> createReview(
         @RequestPart("review") CreateReviewDTO newReview,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images)
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        @RequestAttribute("loginId") String loginId)
         throws IOException, URISyntaxException {
 
-        reviewService.createReview(newReview, images);
+        reviewService.createReview(newReview, images, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 작성 성공", null));
     }
 
     @PutMapping("")
     @SecurityRequirement(name = "Authorization")
-    public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview)
+    public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview,
+        @RequestAttribute("loginId") String loginId)
         throws IOException {
         
-        reviewService.updateReview(updateReview);
+        reviewService.updateReview(updateReview, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
     }
 
     @DeleteMapping("")
     @SecurityRequirement(name = "Authorization")
-    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.deleteReview(reviewCodeDTO);
+        reviewService.deleteReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 삭제 성공", null));
     }
@@ -107,18 +111,20 @@ public class ReviewController {
 
     @PostMapping("/likes")
     @SecurityRequirement(name = "Authorization")
-    public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.likeReview(reviewCodeDTO);
+        reviewService.likeReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 성공", null));
     }
 
     @DeleteMapping("/likes")
     @SecurityRequirement(name = "Authorization")
-    public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.deleteLikeReview(reviewCodeDTO);
+        reviewService.deleteLikeReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 취소 성공", null));
     }

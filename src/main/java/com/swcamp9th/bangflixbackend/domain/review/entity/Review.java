@@ -7,6 +7,7 @@ import com.swcamp9th.bangflixbackend.domain.review.enums.Interior;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Probability;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -75,7 +76,7 @@ public class Review {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)
-    private ReviewMember member;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_code", nullable = false)

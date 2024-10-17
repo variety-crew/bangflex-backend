@@ -16,6 +16,8 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberReposi
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyGenreRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
@@ -44,7 +46,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewFileRepository reviewFileRepository;
     private final ReviewThemeRepository reviewThemeRepository;
-    private final ReviewMemberRepository reviewMemberRepository;
+    private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
 
@@ -53,29 +55,29 @@ public class ReviewServiceImpl implements ReviewService {
                            , ReviewRepository reviewRepository
                            , ReviewFileRepository reviewFileRepository
                            , ReviewThemeRepository reviewThemeRepository
-                           , ReviewMemberRepository reviewMemberRepository
+                           , UserRepository userRepository
                            , ReviewLikeRepository reviewLikeRepository
                            , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
         this.reviewThemeRepository = reviewThemeRepository;
-        this.reviewMemberRepository = reviewMemberRepository;
+        this.userRepository = userRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
     }
 
     @Override
     @Transactional
-    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images)
+    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images, String loginId)
         throws IOException, URISyntaxException {
 
         // 리뷰 저장
         Review review = modelMapper.map(newReview, Review.class);
         Theme theme = reviewThemeRepository.findById(newReview.getThemeCode()).orElse(null);
-        ReviewMember reviewMember = reviewMemberRepository.findById(newReview.getMemberCode()).orElse(null);
+        Member member = userRepository.findById(loginId).orElse(null);
         review.setTheme(theme);
-        review.setMember(reviewMember);
+        review.setMember(member);
         review.setActive(true);
         review.setCreatedAt(LocalDateTime.now());
         Review insertReview = reviewRepository.save(review);
@@ -85,19 +87,22 @@ public class ReviewServiceImpl implements ReviewService {
             saveReviewFile(images, insertReview);
 
         // 멤버 포인트 올리기
-        reviewMember.setPoint(reviewMember.getPoint()+5);
-        reviewMemberRepository.save(reviewMember);
+        member.setPoint(member.getPoint()+5);
+        userRepository.save(member);
 
     }
 
     @Override
     @Transactional
-    public void updateReview(UpdateReviewDTO updateReview) {
+    public void updateReview(UpdateReviewDTO updateReview, String loginId) {
 
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
 
-        if(updateReview.getMemberCode().equals(existingReview.getMember().getMemberCode())){
+        if(existingReview == null)
+            throw new RuntimeException("Review not found");
+
+        if(loginId.equals(existingReview.getMember().getId())){
 
             // DTO에서 null이 아닌 값만 업데이트
             if (updateReview.getHeadcount() != null) {
@@ -139,12 +144,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void deleteReview(ReviewCodeDTO reviewCodeDTO) {
+    public void deleteReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
 
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(reviewCodeDTO.getReviewCode()).orElse(null);
 
-        if(reviewCodeDTO.getMemberCode().equals(existingReview.getMember().getMemberCode())) {
+        if(existingReview == null)
+            throw new RuntimeException("Review not found");
+
+        if(loginId.equals(existingReview.getMember().getId())) {
             existingReview.setActive(false);
             reviewRepository.save(existingReview);
         }
@@ -243,15 +251,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void likeReview(ReviewCodeDTO reviewCodeDTO) {
-
+    public void likeReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
-            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+            member.getMemberCode(), reviewCodeDTO.getReviewCode());
 
         if (reviewLike == null) {
 
             ReviewLike newReviewLike = new ReviewLike();
-            newReviewLike.setMemberCode(reviewCodeDTO.getMemberCode());
+            newReviewLike.setMemberCode(member.getMemberCode());
             newReviewLike.setReviewCode(reviewCodeDTO.getReviewCode());
             newReviewLike.setCreatedAt(LocalDateTime.now());
             newReviewLike.setActive(true);
@@ -269,9 +277,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO) {
+    public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
-            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+            member.getMemberCode(), reviewCodeDTO.getReviewCode());
 
         if (reviewLike == null) {
             throw new LikeNotFoundException("좋아요가 존재하지 않습니다.");

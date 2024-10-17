@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.review.entity;
 
 
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,7 +45,7 @@ public class ReviewTendency {
     // Foreign keys
     @OneToOne
     @JoinColumn(name = "member_code", nullable = false)
-    private ReviewMember member;
+    private Member member;
 
     public enum BeSkilled {
         children,
