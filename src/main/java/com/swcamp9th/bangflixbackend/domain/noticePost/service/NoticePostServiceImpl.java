@@ -1,6 +1,8 @@
 package com.swcamp9th.bangflixbackend.domain.noticePost.service;
 
+import com.swcamp9th.bangflixbackend.common.NoticePageResponse;
 import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostDTO;
 import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.noticePost.entity.NoticeFile;
 import com.swcamp9th.bangflixbackend.domain.noticePost.entity.NoticePost;
@@ -12,6 +14,10 @@ import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,12 +54,12 @@ public class NoticePostServiceImpl implements NoticePostService {
     @Transactional
     @Override
     public void createNoticePost(NoticePostCreateDTO newNotice, List<MultipartFile> images, String userId) throws IOException {
-        NoticePost createdNotice = modelMapper.map(newNotice, NoticePost.class);
 
         // 관리자 회원이 아니라면 예외 발생
         Member admin = userRepository.findByIdAndIsAdminTrue(userId)
                 .orElseThrow(() -> new InvalidUserException("관리자 회원만 접근 가능합니다."));
 
+        NoticePost createdNotice = new NoticePost();
         createdNotice.setActive(true);
         createdNotice.setCreatedAt(LocalDateTime.now());
         createdNotice.setTitle(newNotice.getTitle());
@@ -146,5 +152,51 @@ public class NoticePostServiceImpl implements NoticePostService {
         foundNotice.setActive(false);
 
         noticePostRepository.save(foundNotice);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public NoticePageResponse getAllNotices(Pageable pageable) {
+        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending());
+
+        Page<NoticePost> noticeList = noticePostRepository.findByActiveTrue(pageable);
+
+        List<NoticePostDTO> noticePosts = noticeList.getContent().stream()
+                .map(noticePost -> {
+                    NoticePostDTO noticeDTO = modelMapper.map(noticePost, NoticePostDTO.class);
+
+                    List<NoticeFile> images = noticeFileRepository.findByNoticePost(noticePost).stream().toList();
+                    List<String> urls = images.stream().map(NoticeFile::getUrl).toList();
+
+                    noticeDTO.setMemberCode(noticePost.getMember().getMemberCode());
+                    noticeDTO.setImageUrls(urls);
+                    return noticeDTO;
+                }).toList();
+
+        NoticePageResponse response = new NoticePageResponse();
+        response.setNoticePosts(noticePosts);
+        response.setCurrentPage(noticeList.getNumber() + 1);    // 페이지 번호가 1부터 시작
+        response.setTotalPages(noticeList.getTotalPages());
+        response.setTotalElements(noticeList.getTotalElements());
+
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public NoticePostDTO findNoticeByCode(int noticePostCode) {
+        NoticePost foundNotice = noticePostRepository.findById(noticePostCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        NoticePostDTO selectedNotice = modelMapper.map(foundNotice, NoticePostDTO.class);
+        selectedNotice.setMemberCode(foundNotice.getMember().getMemberCode());
+
+        List<NoticeFile> images = noticeFileRepository.findByNoticePost(foundNotice).stream().toList();
+        List<String> urls = images.stream().map(NoticeFile::getUrl).toList();
+        selectedNotice.setImageUrls(urls);
+
+        return selectedNotice;
     }
 }

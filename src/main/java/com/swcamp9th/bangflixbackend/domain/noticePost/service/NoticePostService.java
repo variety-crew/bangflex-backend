@@ -1,7 +1,10 @@
 package com.swcamp9th.bangflixbackend.domain.noticePost.service;
 
+import com.swcamp9th.bangflixbackend.common.NoticePageResponse;
 import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostDTO;
 import com.swcamp9th.bangflixbackend.domain.noticePost.dto.NoticePostUpdateDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,4 +19,7 @@ public interface NoticePostService {
 
     void deleteNoticePost(int noticePostCode, String userId);
 
+    NoticePageResponse getAllNotices(Pageable pageable);
+
+    NoticePostDTO findNoticeByCode(int noticePostCode);
 }
