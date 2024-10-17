@@ -13,7 +13,7 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileReposito
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyGenreRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
+import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
@@ -43,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ModelMapper modelMapper;
     private final ReviewRepository reviewRepository;
     private final ReviewFileRepository reviewFileRepository;
-    private final ReviewThemeRepository reviewThemeRepository;
+    private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
@@ -52,14 +52,14 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewServiceImpl(ModelMapper modelMapper
                            , ReviewRepository reviewRepository
                            , ReviewFileRepository reviewFileRepository
-                           , ReviewThemeRepository reviewThemeRepository
+                           , ThemeRepository themeRepository
                            , UserRepository userRepository
                            , ReviewLikeRepository reviewLikeRepository
                            , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
-        this.reviewThemeRepository = reviewThemeRepository;
+        this.themeRepository = themeRepository;
         this.userRepository = userRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
@@ -72,7 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 리뷰 저장
         Review review = modelMapper.map(newReview, Review.class);
-        Theme theme = reviewThemeRepository.findById(newReview.getThemeCode()).orElse(null);
+        Theme theme = themeRepository.findById(newReview.getThemeCode()).orElse(null);
         Member member = userRepository.findById(loginId).orElse(null);
         review.setTheme(theme);
         review.setMember(member);

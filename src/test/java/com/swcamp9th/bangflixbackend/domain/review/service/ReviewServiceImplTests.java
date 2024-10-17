@@ -11,8 +11,8 @@ import com.swcamp9th.bangflixbackend.domain.review.enums.Interior;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
 import com.swcamp9th.bangflixbackend.domain.review.enums.Probability;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
+import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -33,26 +33,26 @@ import org.springframework.web.multipart.MultipartFile;
 @SpringBootTest
 public class ReviewServiceImplTests {
 
-    @Autowired
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public ReviewServiceImplTests(ReviewService reviewService, PasswordEncoder passwordEncoder) {
+        this.reviewService = reviewService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @MockBean
     private ReviewRepository reviewRepository;
 
     @MockBean
-    private ReviewThemeRepository reviewThemeRepository;
+    private ThemeRepository themeRepository;
 
     @MockBean
     private UserRepository userRepository;
 
     @MockBean
     private ModelMapper modelMapper;
-
-    @MockBean
-    private MultipartFile multipartFile;
 
     @Test
     @Transactional
@@ -86,7 +86,7 @@ public class ReviewServiceImplTests {
         List<MultipartFile> images = null;
 
         Mockito.when(modelMapper.map(newReviewDTO, Review.class)).thenReturn(mockReview);
-        Mockito.when(reviewThemeRepository.findById(1000)).thenReturn(Optional.of(mockTheme));
+        Mockito.when(themeRepository.findById(1000)).thenReturn(Optional.of(mockTheme));
         Mockito.when(userRepository.findById(id)).thenReturn(Optional.of(mockMember));
         Mockito.when(reviewRepository.save(mockReview)).thenReturn(mockReview);
 

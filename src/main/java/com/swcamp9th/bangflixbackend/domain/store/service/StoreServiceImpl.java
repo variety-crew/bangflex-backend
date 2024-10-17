@@ -7,6 +7,7 @@ import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeReposito
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import com.swcamp9th.bangflixbackend.domain.store.dto.StoreDTO;
+import com.swcamp9th.bangflixbackend.domain.store.entity.Store;
 import com.swcamp9th.bangflixbackend.domain.store.repository.StoreRepository;
 import java.util.List;
 import org.modelmapper.ModelMapper;
@@ -38,13 +39,14 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public StoreDTO findStroe(Integer storeCode) {
-        return modelMapper.map(storeRepository.findById(storeCode), StoreDTO.class);
+    public StoreDTO findStore(Integer storeCode) {
+        Store store = storeRepository.findById(storeCode).orElseThrow();
+        return modelMapper.map(store, StoreDTO.class);
     }
 
     @Override
     @Transactional
-    public ReviewDTO findBestReviewByStroe(Integer storeCode) {
+    public ReviewDTO findBestReviewByStore(Integer storeCode) {
         List<ReviewLike> reviewLike = reviewLikeRepository.findBestReviewByStoreCode(storeCode);
 
         if(reviewLike.isEmpty())

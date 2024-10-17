@@ -1,7 +1,5 @@
 package com.swcamp9th.bangflixbackend.domain.theme.entity;
 
-import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
