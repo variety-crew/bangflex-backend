@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 조회(아이디, 닉네임, 이메일, 프로필 이미지) API")
-    public ResponseEntity<Object> findUserInfoById() {
+    public ResponseEntity<ResponseMessage<UserInfoResponseDto>> findUserInfoById() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         String userId;
