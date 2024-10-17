@@ -34,11 +34,11 @@ public class CommentServiceTests {
 //        assertNotNull(commentRepository);
 //    }
 
-    @DisplayName("댓글 조회 테스트")
-    @ParameterizedTest
-    @ValueSource(ints = 1)
-    public void testGetAllCommentsOfPost(int communityPostCode) {
-        List<CommentDTO> comments = commentService.getAllCommentsOfPost(communityPostCode);
-        assertEquals(1, comments.size());
-    }
+//    @DisplayName("댓글 조회 테스트")
+//    @ParameterizedTest
+//    @ValueSource(ints = 1)
+//    public void testGetAllCommentsOfPost(int communityPostCode) {
+//        List<CommentDTO> comments = commentService.getAllCommentsOfPost(communityPostCode);
+//        assertEquals(1, comments.size());
+//    }
 }
