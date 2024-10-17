@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.email.service;
 
+import com.swcamp9th.bangflixbackend.redis.RedisService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Random;
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
+    private final RedisService redisService;
 
     @Value("${mail.username}")
     private static String senderEmail;
@@ -48,8 +50,6 @@ public class EmailService {
         body += "<h1>" + number + "</h1>";
         body += "<h3>감사합니다.</h3>";
         message.setText(body, "UTF-8", "html");
-        log.info("*** EmailService createMail - message.getSubject(): {}", message.getSubject());
-        log.info("*** EmailService createMail - senderEmail: {}", senderEmail);
 
         return message;
     }
@@ -65,6 +65,9 @@ public class EmailService {
             e.printStackTrace();
             throw new IllegalArgumentException("메일 발송 중 오류가 발생했습니다.");
         }
+
+        // 레디스에 저장
+        redisService.saveEmailCode(sendEmail, number);
 
         return number; // 생성된 인증번호 반환
     }

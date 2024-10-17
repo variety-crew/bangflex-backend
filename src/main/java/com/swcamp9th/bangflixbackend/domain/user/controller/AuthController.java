@@ -3,7 +3,9 @@ package com.swcamp9th.bangflixbackend.domain.user.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
+import com.swcamp9th.bangflixbackend.email.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.mail.MessagingException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ import java.io.IOException;
 public class AuthController {
 
     private final UserServiceImpl userService;
+    private final EmailService emailService;
     @PostMapping(value = "/signup", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "회원가입 API")
     public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto,
@@ -59,5 +63,13 @@ public class AuthController {
     @Operation(summary = "닉네임 중복체크 API")
     public ResponseEntity<ResponseMessage<DuplicateCheckResponseDto>> confirmNickname(@RequestBody String nickname) {
         return ResponseEntity.ok(new ResponseMessage<>(200, "닉네임 중복체크 성공", userService.findNickName(nickname)));
+    }
+
+
+    @PostMapping("/confirm-email")
+    @Operation(summary = "이메일 인증 API")
+    public String confirmEmail (@RequestBody String email) throws MessagingException, UnsupportedEncodingException {
+        String authCode = emailService.sendSimpleMessage(email);
+        return authCode;
     }
 }
