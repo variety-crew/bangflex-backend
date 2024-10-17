@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewReportDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
@@ -32,4 +33,8 @@ public interface ReviewService {
     List<ReviewDTO> getReviewDTOS(List<Review> sublist);
 
     ReviewDTO getReviewDTO(Review review);
+
+    ReviewReportDTO findReviewReposrt(String loginId);
+
+    List<ReviewDTO> findReviewByMember(String loginId);
 }

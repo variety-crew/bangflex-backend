@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewReportDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
@@ -31,6 +32,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -239,6 +241,23 @@ public class ReviewServiceImpl implements ReviewService {
             reviewDTO.setGenres(genres);
 
         return reviewDTO;
+    }
+
+    @Override
+    @Transactional
+    public ReviewReportDTO findReviewReposrt(String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        int avgScore = reviewRepository.findAvgScoreByMemberCode(member.getMemberCode());
+        Pageable pageable = PageRequest.of(0, 3);
+        List<String> genres = reviewRepository.findTopGenresByMemberCode(member.getMemberCode(), pageable);
+        ReviewReportDTO reviewReportDTO = new ReviewReportDTO(avgScore, genres);
+        return reviewReportDTO;
+    }
+
+    @Override
+    @Transactional
+    public List<ReviewDTO> findReviewByMember(String loginId) {
+        return List.of();
     }
 
     @Override
