@@ -45,7 +45,7 @@ public class JwtUtil {
 
 	public String createAccessToken(Member member) {
 		Date now = new Date();
-		return BEARER_PREFIX + Jwts.builder()
+		return Jwts.builder()
 			.setSubject(member.getId())
 			.claim(AUTHORITIES_KEY, member.getRole())
 			.setIssuedAt(now)

@@ -1,23 +1,19 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDeleteDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,53 +32,47 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     private final ModelMapper modelMapper;
     private final CommunityPostRepository communityPostRepository;
-    private final CommunityMemberRepository communityMemberRepository;
+    private final UserRepository userRepository;
     private final CommunityFileRepository communityFileRepository;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
-                                    CommunityMemberRepository communityMemberRepository,
+                                    UserRepository userRepository,
                                     CommunityFileRepository communityFileRepository) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
-        this.communityMemberRepository = communityMemberRepository;
+        this.userRepository = userRepository;
         this.communityFileRepository = communityFileRepository;
     }
 
     @Transactional
     @Override
-    public CommunityPostDTO createPost(CommunityPostCreateDTO newPost, List<MultipartFile> images) throws IOException {
+    public void createPost(String loginId, CommunityPostCreateDTO newPost, List<MultipartFile> images) throws IOException {
         CommunityPost createdPost = modelMapper.map(newPost, CommunityPost.class);
 
         // 회원이 아니라면 예외 발생
-        CommunityMember author = communityMemberRepository.findById(newPost.getMemberCode()).orElseThrow(
-                () -> new InvalidUserException("게시글 작성 권한이 없습니다.")
-        );
+        Member member = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("회원가입이 필요합니다."));
 
         createdPost.setTitle(newPost.getTitle());
         createdPost.setContent(newPost.getContent());
         createdPost.setCreatedAt(LocalDateTime.now());
         createdPost.setActive(true);
-        createdPost.setCommunityMember(author);
+        createdPost.setMember(member);
 
         // 게시글 저장
-        CommunityPost savedPost = communityPostRepository.save(createdPost);
-
-        CommunityPostDTO postResponse = modelMapper.map(savedPost, CommunityPostDTO.class);
-        postResponse.setMemberCode(savedPost.getCommunityMember().getMemberCode());
+        communityPostRepository.save(createdPost);
 
         // 게시글 첨부파일 있으면 저장
-        if (newPost.getImages() != null) {
-            List<String> imageUrls = saveFiles(images, savedPost);
-            postResponse.setImageUrls(imageUrls);
+        if (images != null) {
+            List<CommunityFile> addedImages = saveFiles(images, createdPost);
+            createdPost.setCommunityFiles(addedImages);
         }
-
-        return postResponse;
     }
 
-    private List<String> saveFiles(List<MultipartFile> images, CommunityPost savedPost) throws IOException {
-        List<String> urls = new ArrayList<>();
+    private List<CommunityFile> saveFiles(List<MultipartFile> images, CommunityPost savedPost) throws IOException {
+        List<CommunityFile> communityFiles = new ArrayList<>();
 
         for (MultipartFile file : images) {
             String fileName = file.getOriginalFilename();
@@ -93,18 +82,16 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             // UUID 생성
             String uuid = UUID.randomUUID().toString();
             // 저장 경로
-            String filePath = "src/main/resources/static/communityFiles" + uuid + fileName;
+            String filePath = "src/main/resources/static/communityFiles/" + uuid + fileName;
             Path path = Paths.get(filePath);
             // DB 저장명
-            String dbUrl = "/communityFiles" + uuid + fileName;
+            String dbUrl = "/communityFiles/" + uuid + fileName;
 
             //저장
-            Files.copy(file.getInputStream(),
-                    path,
-                    StandardCopyOption.REPLACE_EXISTING     // 이미 파일이 존재하면 덮어쓰기
-            );
+            Files.createDirectories(path.getParent());
+            Files.write(path, file.getBytes());
 
-            communityFileRepository.save(CommunityFile.builder()
+            CommunityFile addedImages = communityFileRepository.save(CommunityFile.builder()
                     .url(dbUrl)
                     .createdAt(LocalDateTime.now())
                     .active(true)
@@ -112,19 +99,24 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     .build()
             );
 
-            urls.add(dbUrl);
+            communityFiles.add(addedImages);
         }
-        return urls;
+
+        return communityFiles;
     }
 
     @Transactional
     @Override
-    public void updatePost(Integer communityPostCode, CommunityPostUpdateDTO modifiedPost, List<MultipartFile> images) {
+    public void updatePost(String loginId, int communityPostCode, CommunityPostUpdateDTO modifiedPost, List<MultipartFile> images) {
         CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
                                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        // 현재 사용자가 게시글 작성자인지 체크 후 아니라면 예외 발생
-        if (!foundPost.getCommunityMember().getMemberCode().equals(modifiedPost.getMemberCode())) {
+        // 회원이 아니라면 예외 발생
+        Member author = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("회원가입이 필요합니다."));
+
+        // 게시글 작성자가 아니라면 예외 발생
+        if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
             throw new InvalidUserException("게시글 수정 권한이 없습니다.");
         }
 
@@ -137,16 +129,21 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional
     @Override
-    public void deletePost(Integer communityPostCode, CommunityPostDeleteDTO deletedPost) {
+    public void deletePost(String loginId, int communityPostCode) {
         CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
                                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        // 현재 사용자가 게시글 작성자인지 체크 후 아니라면 예외 발생
-        if (!foundPost.getCommunityMember().getMemberCode().equals(deletedPost.getMemberCode())) {
+        // 회원이 아니라면 예외 발생
+        Member author = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("회원가입이 필요합니다."));
+
+        // 게시글 작성자가 아니라면 예외 발생
+        if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
             throw new InvalidUserException("게시글 삭제 권한이 없습니다.");
         }
 
         foundPost.setActive(false);
+
         communityPostRepository.save(foundPost);
     }
 
@@ -159,15 +156,26 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
 
-        return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
+        List<CommunityPostDTO> posts = postList.getContent().stream()
+                .map(post -> {
+                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+                    dto.setMemberCode(post.getMember().getMemberCode());
+                    return dto;
+                })
+                .toList();
+
+        return new PageImpl<>(posts, pageable, postList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     @Override
-    public CommunityPostDTO findPostByCode(Integer communityPostCode) {
+    public CommunityPostDTO findPostByCode(int communityPostCode) {
         CommunityPost post = communityPostRepository.findById(communityPostCode)
                             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        return modelMapper.map(post, CommunityPostDTO.class);
+        CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
+        selectedPost.setMemberCode(post.getMember().getMemberCode());
+
+        return selectedPost;
     }
 }

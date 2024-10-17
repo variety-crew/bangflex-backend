@@ -1,6 +1,5 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDeleteDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
@@ -13,13 +12,14 @@ import java.util.List;
 
 public interface CommunityPostService {
 
-    CommunityPostDTO createPost(CommunityPostCreateDTO newPost, List<MultipartFile> images) throws IOException;
+    void createPost(String loginId, CommunityPostCreateDTO newPost, List<MultipartFile> images) throws IOException;
 
-    void updatePost(Integer communityPostCode, CommunityPostUpdateDTO modifiedPost, List<MultipartFile> images);
+    void updatePost(String loginId, int communityPostCode,
+                    CommunityPostUpdateDTO modifiedPost, List<MultipartFile> images);
 
-    void deletePost(Integer communityPostCode, CommunityPostDeleteDTO deletedPost);
+    void deletePost(String loginId, int communityPostCode);
 
     Page<CommunityPostDTO> findPostList(Pageable pageable);
 
-    CommunityPostDTO findPostByCode(Integer communityPostCode);
+    CommunityPostDTO findPostByCode(int communityPostCode);
 }

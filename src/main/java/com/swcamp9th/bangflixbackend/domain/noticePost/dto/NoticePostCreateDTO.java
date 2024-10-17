@@ -1,8 +1,8 @@
-package com.swcamp9th.bangflixbackend.domain.community.communityPost.dto;
+package com.swcamp9th.bangflixbackend.domain.noticePost.dto;
 
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class CommunityPostCreateDTO {
+public class NoticePostCreateDTO {
 
     private String title;                   // 제목
     private String content;                 // 게시글 내용

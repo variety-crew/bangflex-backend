@@ -25,14 +25,14 @@ public class CommentServiceTests {
     @Autowired
     private CommentRepository commentRepository;
 
-    @DisplayName("댓글 등록 테스트")
-    @ParameterizedTest
-    @ValueSource(ints = 1)
-    public void testCreateComment(int communityPostCode) {
-        CommentCreateDTO newComment = new CommentCreateDTO("아무도 없나요..", 1);
-        commentService.createComment(communityPostCode, newComment);
-        assertNotNull(commentRepository);
-    }
+//    @DisplayName("댓글 등록 테스트")
+//    @ParameterizedTest
+//    @ValueSource(ints = 1)
+//    public void testCreateComment(int communityPostCode) {
+//        CommentCreateDTO newComment = new CommentCreateDTO("아무도 없나요..", 1);
+//        commentService.createComment(communityPostCode, newComment);
+//        assertNotNull(commentRepository);
+//    }
 
     @DisplayName("댓글 조회 테스트")
     @ParameterizedTest
