@@ -66,17 +66,24 @@ public class CommunityPostController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
     }
 
-    /* 게시글 목록 조회(페이지네이션) */
-    @GetMapping("")
-    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
-                            @PageableDefault(size = 10) Pageable pageable) {
+//    /* 게시글 목록 조회(페이지네이션) */
+//    @GetMapping("")
+//    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
+//                            @PageableDefault(size = 10) Pageable pageable) {
+//
+//        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
+//        if (postList.hasContent()) {
+//            return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
+//        } else {
+//            return ResponseEntity.noContent().build();
+//        }
+//    }
 
-        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
-        if (postList.hasContent()) {
-            return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+    /* 게시글 목록 조회 */
+    @GetMapping("")
+    public ResponseEntity<ResponseMessage<List<CommunityPostDTO>>> getAllPosts() {
+        List<CommunityPostDTO> posts = communityPostService.getAllPosts();
+        return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", posts));
     }
 
     /* 게시글 상세 조회 */

@@ -147,24 +147,40 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         communityPostRepository.save(foundPost);
     }
 
+//    @Transactional(readOnly = true)
+//    @Override
+//    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
+//        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
+//                pageable.getPageSize(),
+//                Sort.by("communityPostCode").descending());
+//
+//        Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
+//
+//        List<CommunityPostDTO> posts = postList.getContent().stream()
+//                .map(post -> {
+//                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+//                    dto.setMemberCode(post.getMember().getMemberCode());
+//                    return dto;
+//                })
+//                .toList();
+//
+//        return new PageImpl<>(posts, pageable, postList.getTotalElements());
+//    }
+
     @Transactional(readOnly = true)
     @Override
-    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
-        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
-                pageable.getPageSize(),
-                Sort.by("communityPostCode").descending());
+    public List<CommunityPostDTO> getAllPosts() {
+        List<CommunityPost> allPosts = communityPostRepository.findByActiveTrue(
+                                                                Sort.by("createdAt").descending());
 
-        Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
+        List<CommunityPostDTO> postList = allPosts.stream()
+                .map(communityPost -> {
+                    CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
+                    postDTO.setMemberCode(communityPost.getMember().getMemberCode());
+                    return postDTO;
+                }).toList();
 
-        List<CommunityPostDTO> posts = postList.getContent().stream()
-                .map(post -> {
-                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
-                    dto.setMemberCode(post.getMember().getMemberCode());
-                    return dto;
-                })
-                .toList();
-
-        return new PageImpl<>(posts, pageable, postList.getTotalElements());
+        return postList;
     }
 
     @Transactional(readOnly = true)
