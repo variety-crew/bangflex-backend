@@ -53,8 +53,8 @@ public class CommunityLikeServiceImpl implements CommunityLikeService {
 
         // 이미 좋아요가 존재하는지 체크 후 존재하면 좋아요 취소(비활성화)
         if (communityLikeRepository.existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
-                                                                            newLike.getMemberCode(),
-                                                                            newLike.getCommunityPostCode())) {
+                                                                            likeMember.getMemberCode(),
+                                                                            likePost.getCommunityPostCode())) {
             addedLike.setActive(false);
         } else {
             addedLike.setActive(true);

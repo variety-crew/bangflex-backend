@@ -11,6 +11,5 @@ import java.time.LocalDateTime;
 @ToString
 public class CommunityLikeCreateDTO {
 
-    private Integer memberCode;             // 회원 코드
     private Integer communityPostCode;      // 게시글 코드
 }
