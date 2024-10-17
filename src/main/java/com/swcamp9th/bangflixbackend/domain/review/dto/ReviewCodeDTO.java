@@ -11,5 +11,4 @@ import lombok.ToString;
 @ToString
 public class ReviewCodeDTO {
     private Integer reviewCode;
-    private Integer memberCode;
 }

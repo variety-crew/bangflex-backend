@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.ranking.service;
 
+import com.swcamp9th.bangflixbackend.domain.ranking.dto.MemberRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDTO;
 import com.swcamp9th.bangflixbackend.domain.ranking.dto.ReviewRankingDateDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
@@ -16,4 +17,6 @@ public interface RankingService {
     List<ReviewRankingDTO> findReviewRanking(String date);
 
     List<ReviewDTO> findAllReviewRanking(Pageable pageable);
+
+    List<MemberRankingDTO> findAllMemberRanking(Pageable pageable);
 }
