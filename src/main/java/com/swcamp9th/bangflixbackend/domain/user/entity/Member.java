@@ -9,40 +9,41 @@ import java.util.Date;
 @Table(name = "member")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Member {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_code", nullable = false)
+    @Column(name = "member_code")
     private Integer memberCode;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "id", nullable = false, length = 255)
     private String id;
 
-    @Column(nullable = false, length = 1024)
+    @Column(name = "password", nullable = false, length = 1024)
     private String password;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "nickname", nullable = false, length = 255)
     private String nickname;
 
-    @Column(nullable = false, length = 512)
+    @Column(name = "email", nullable = false, length = 512)
     private String email;
 
     @Column(name = "is_admin", nullable = false)
     private Boolean isAdmin;
 
-    @Column(nullable = true, length = 1024)
+    @Column(name = "image", length = 1024)
     private String image;
 
-    @Column(nullable = false)
-    private Integer point;
+    @Column(name = "point", nullable = false)
+    private Integer point = 0;
 
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean active;
 
     @Builder

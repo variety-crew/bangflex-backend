@@ -180,7 +180,11 @@ public class UserServiceImpl implements UserService {
         if (id.trim().isEmpty()) {
             return new DuplicateCheckResponseDto(false);
         }
-        return new DuplicateCheckResponseDto(userRepository.existsById(id));
+        log.info("*** UserServiceImpl - id: {}", id);
+        boolean result = userRepository.existsById(id);
+        log.info("*** UserServiceImpl - result: {}", result);
+
+        return new DuplicateCheckResponseDto(result);
     }
 
     @Override

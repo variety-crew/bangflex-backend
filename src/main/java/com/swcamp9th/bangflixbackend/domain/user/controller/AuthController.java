@@ -6,7 +6,9 @@ import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import com.swcamp9th.bangflixbackend.email.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +31,7 @@ public class AuthController {
     private final EmailService emailService;
     @PostMapping(value = "/signup", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "회원가입 API")
-    public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto,
-                                         @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
+    public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto, @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
         if (imgFile == null) {
             log.info("AuthController signup - imgFile is null");
             userService.signupWithoutProfile(signupRequestDto);
@@ -55,21 +56,43 @@ public class AuthController {
 
     @PostMapping("/confirm-id")
     @Operation(summary = "아이디 중복체크 API")
-    public ResponseEntity<ResponseMessage<DuplicateCheckResponseDto>> confirmID(@RequestBody String id) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "아이디 중복체크 성공", userService.findId(id)));
+    public ResponseEntity<ResponseMessage<DuplicateCheckResponseDto>> confirmId(@Valid @RequestBody ConfirmIdRequestDto confirmIdRequestDto) {
+        DuplicateCheckResponseDto result = userService.findId(confirmIdRequestDto.getId());
+        if (!result.isDuplicate()) {
+            return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 아이디입니다", result));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseMessage<>(400, "중복된 아이디입니다", result));
+        }
     }
 
     @PostMapping("/confirm-nickname")
     @Operation(summary = "닉네임 중복체크 API")
-    public ResponseEntity<ResponseMessage<DuplicateCheckResponseDto>> confirmNickname(@RequestBody String nickname) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "닉네임 중복체크 성공", userService.findNickName(nickname)));
+    public ResponseEntity<ResponseMessage<DuplicateCheckResponseDto>> confirmNickname(@Valid @RequestBody ConfirmNicknameRequestDto confirmNicknameRequestDto) {
+        DuplicateCheckResponseDto result = userService.findNickName(confirmNicknameRequestDto.getNickname());
+        if (!result.isDuplicate()) {
+            return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 닉네임입니다", result));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseMessage<>(400, "중복된 아이디입니다", result));
+        }
     }
 
+    @PostMapping("/send-email")
+    @Operation(summary = "인증 이메일 발송 API")
+    public ResponseEntity<ResponseMessage<Object>> sendEmail(@RequestBody String email) throws MessagingException, UnsupportedEncodingException {
+        try {
+            emailService.sendSimpleMessage(email);
+            return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", null));
+        } catch (MailException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseMessage<>(500, "인증 이메일 발송 실패: " + e.getMessage(), null));
+        }
+    }
 
     @PostMapping("/confirm-email")
-    @Operation(summary = "이메일 인증 API")
-    public String confirmEmail (@RequestBody String email) throws MessagingException, UnsupportedEncodingException {
-        String authCode = emailService.sendSimpleMessage(email);
-        return authCode;
+    @Operation(summary = "인증 이메일 검증 API")
+    public ResponseEntity<ResponseMessage<Object>> confirmEmail(@RequestBody EmailCodeRequestDto emailCodeRequestDto) {
+        return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", emailService.findEmailcode(emailCodeRequestDto)));
     }
 }
