@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Activity;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Composition;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Interior;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Level;
+import com.swcamp9th.bangflixbackend.domain.review.enums.Probability;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
@@ -54,6 +59,15 @@ public class ReviewServiceImplTests {
 //        // given
 //        CreateReviewDTO newReviewDTO = new CreateReviewDTO();
 //        newReviewDTO.setThemeCode(1000);
+//        newReviewDTO.setActivity(Activity.ONE);
+//        newReviewDTO.setComposition(Composition.ONE);
+//        newReviewDTO.setContent("test");
+//        newReviewDTO.setInterior(Interior.ONE);
+//        newReviewDTO.setLevel(Level.ONE);
+//        newReviewDTO.setHeadcount(1);
+//        newReviewDTO.setProbability(Probability.FIVE);
+//        newReviewDTO.setLevel(Level.ONE);
+//
 //        String id = UUID.randomUUID().toString();
 //        Review mockReview = new Review();
 //        Theme mockTheme = new Theme();
