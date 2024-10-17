@@ -61,13 +61,7 @@ public class RedisService {
     }
 
     public String getEmailCode(String email) {
-        log.info("*** RedisService getEmailCode - email: {}", email);
-        log.info("*** RedisService getEmailCode - email: {}", email);
-
-        String result = (String) redisTemplate.opsForValue().get(EMAIL_PREFIX + email);
-        log.info("*** RedisService getEmailCode - result: {}", result);
-
-        return result;
+        return (String) redisTemplate.opsForValue().get(EMAIL_PREFIX + email);
     }
 
     public void deleteEmailCode(String email) {

@@ -5,11 +5,13 @@ import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import com.swcamp9th.bangflixbackend.email.service.EmailService;
 import com.swcamp9th.bangflixbackend.exception.DuplicateException;
+import com.swcamp9th.bangflixbackend.exception.InvalidEmailCodeException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -82,16 +84,20 @@ public class AuthController {
     public ResponseEntity<ResponseMessage<Object>> sendEmail(@RequestBody EmailRequestDto emailRequestDto) throws MessagingException, UnsupportedEncodingException {
         try {
             emailService.sendSimpleMessage(emailRequestDto.getEmail());
-            return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", null));
+            return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송에 성공했습니다", null));
         } catch (MailException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseMessage<>(500, "인증 이메일 발송 실패: " + e.getMessage(), null));
+            throw new MailSendException("인증 이메일 발송에 실패했습니다");
         }
     }
 
     @PostMapping("/confirm-email")
     @Operation(summary = "인증 이메일 검증 API")
     public ResponseEntity<ResponseMessage<Object>> confirmEmail(@RequestBody EmailCodeRequestDto emailCodeRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 검증 성공", emailService.findEmailcode(emailCodeRequestDto)));
+        try {
+            emailService.findEmailCode(emailCodeRequestDto);
+            return ResponseEntity.ok(new ResponseMessage<>(200, "이메일 인증에 성공했습니다", null));
+        } catch (MailException e) {
+            throw new InvalidEmailCodeException("이메일 인증에 실패했습니다");
+        }
     }
 }
