@@ -142,14 +142,15 @@ public class ReviewController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "유저 리뷰 report 조회 성공", reviewReportDTO));
     }
 
-    @GetMapping("/user/report")
+    @GetMapping("/user")
     @SecurityRequirement(name = "Authorization")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewByMember(
-        @RequestAttribute("loginId") String loginId
+        @RequestAttribute("loginId") String loginId,
+        @PageableDefault(size = 10) Pageable pageable
     ) {
 
         // 서비스에서 필터를 사용해 조회
-        List<ReviewDTO> reviews = reviewService.findReviewByMember(loginId);
+        List<ReviewDTO> reviews = reviewService.findReviewByMember(loginId, pageable);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "유저가 작성한 리뷰 조회 성공", reviews));
     }

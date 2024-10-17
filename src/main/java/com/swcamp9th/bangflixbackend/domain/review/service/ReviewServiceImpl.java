@@ -256,8 +256,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public List<ReviewDTO> findReviewByMember(String loginId) {
-        return List.of();
+    public List<ReviewDTO> findReviewByMember(String loginId, Pageable pageable) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        List<Review> review = reviewRepository.findByMemberCode(member.getMemberCode(), pageable);
+        return getReviewDTOS(review);
     }
 
     @Override

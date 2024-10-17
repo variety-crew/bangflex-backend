@@ -36,5 +36,5 @@ public interface ReviewService {
 
     ReviewReportDTO findReviewReposrt(String loginId);
 
-    List<ReviewDTO> findReviewByMember(String loginId);
+    List<ReviewDTO> findReviewByMember(String loginId, Pageable pageable);
 }
