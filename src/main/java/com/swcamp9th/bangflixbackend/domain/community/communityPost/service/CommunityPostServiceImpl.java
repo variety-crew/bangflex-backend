@@ -2,7 +2,6 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
@@ -14,10 +13,7 @@ import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -153,14 +149,22 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommunityPostResponseDTO> findPostList(Pageable pageable) {
+    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
         pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
                 pageable.getPageSize(),
                 Sort.by("communityPostCode").descending());
 
         Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
 
-        return postList.map(post -> modelMapper.map(post, CommunityPostResponseDTO.class));
+        List<CommunityPostDTO> posts = postList.getContent().stream()
+                .map(post -> {
+                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+                    dto.setMemberCode(post.getMember().getMemberCode());
+                    return dto;
+                })
+                .toList();
+
+        return new PageImpl<>(posts, pageable, postList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
@@ -169,6 +173,9 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         CommunityPost post = communityPostRepository.findById(communityPostCode)
                             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        return modelMapper.map(post, CommunityPostDTO.class);
+        CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
+        selectedPost.setMemberCode(post.getMember().getMemberCode());
+
+        return selectedPost;
     }
 }
