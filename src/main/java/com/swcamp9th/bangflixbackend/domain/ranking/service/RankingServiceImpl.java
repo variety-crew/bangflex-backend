@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -54,6 +55,7 @@ public class RankingServiceImpl implements RankingService {
 
     @Scheduled(cron = "0 0 1 * * SUN")
     @Override
+    @Transactional
     public void createReviewRanking() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneWeekAgo = now.minusWeeks(1);  // 현재로부터 1주일 이전
@@ -78,11 +80,13 @@ public class RankingServiceImpl implements RankingService {
     }
 
     @Override
+    @Transactional
     public ReviewRankingDateDTO findReviewRankingDate(Integer year) {
         return ReviewRankingDateDTO.builder().ReviewRankingDates(reviewRankingRepository.findDistinctDatesByYear(year)).build();
     }
 
     @Override
+    @Transactional
     public List<ReviewRankingDTO> findReviewRanking(String date) {
 
         if(date == null)
@@ -109,6 +113,7 @@ public class RankingServiceImpl implements RankingService {
     }
 
     @Override
+    @Transactional
     public List<ReviewDTO> findAllReviewRanking(Pageable pageable) {
 
         Page<ReviewLike> reviewLikes = reviewLikeRepository.findReviewByReviewLikes(pageable);
@@ -124,6 +129,7 @@ public class RankingServiceImpl implements RankingService {
     }
 
     @Override
+    @Transactional
     public List<MemberRankingDTO> findAllMemberRanking(Pageable pageable) {
         List<Member> members = reviewRankingRepository.findTopRankingMember(pageable);
 

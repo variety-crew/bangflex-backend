@@ -207,6 +207,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @Transactional
     public void deleteThemeReaction(String loginId, ThemeReactionDTO themeReactionDTO) {
         Member member = userRepository.findById(loginId).orElseThrow();
         ThemeReaction themeReaction = themeReactionRepository.findByIds(
@@ -236,6 +237,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @Transactional
     public List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction) {
         Member member = userRepository.findById(loginId).orElseThrow();
         List<ThemeReaction> themeReactions = new ArrayList<>();
