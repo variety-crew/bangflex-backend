@@ -18,8 +18,13 @@ public class RedisService {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    private static final String EMAIL_PREFIX = "REGISTER:";
+
     @Value("${refresh-token.expiration_time}")
-    private Long expireTime;
+    private Long refreshTokenExpireTime;
+
+    @Value("${mail.expiration_time}")
+    private Long emailCodeExpireTime;
 
     public String getRedis(RedisDto param) {
         ValueOperations<String, String> operations = redisTemplate.opsForValue();
@@ -32,8 +37,7 @@ public class RedisService {
     }
 
     public void saveRefreshToken(String id, String refreshToken) {
-
-        redisTemplate.opsForValue().set(id, refreshToken, expireTime, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(id, refreshToken, refreshTokenExpireTime, TimeUnit.MILLISECONDS);
     }
 
     public String getRefreshToken(String id) {
@@ -49,4 +53,25 @@ public class RedisService {
         String storedRefreshToken = (String) redisTemplate.opsForValue().get(id);
         return refreshToken != null && refreshToken.equals(storedRefreshToken);
     }
+
+    // 이메일 인증번호 저장
+    public void saveEmailCode(String email, String number) {
+        String key = EMAIL_PREFIX + email;
+        redisTemplate.opsForValue().set(key, number, emailCodeExpireTime, TimeUnit.MILLISECONDS);
+    }
+
+    public String getEmailCode(String email) {
+        log.info("*** RedisService getEmailCode - email: {}", email);
+        log.info("*** RedisService getEmailCode - email: {}", email);
+
+        String result = (String) redisTemplate.opsForValue().get(EMAIL_PREFIX + email);
+        log.info("*** RedisService getEmailCode - result: {}", result);
+
+        return result;
+    }
+
+    public void deleteEmailCode(String email) {
+        redisTemplate.delete(email);
+    }
+
 }
