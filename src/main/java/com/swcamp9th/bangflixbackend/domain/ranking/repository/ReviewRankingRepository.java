@@ -2,7 +2,9 @@ package com.swcamp9th.bangflixbackend.domain.ranking.repository;
 
 import com.swcamp9th.bangflixbackend.domain.ranking.entity.ReviewRanking;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,6 @@ public interface ReviewRankingRepository extends JpaRepository<ReviewRanking, In
     List<ReviewRanking> findReviewByCreatedAtDate(@Param("date") String date);
 
 
+    @Query(value = "SELECT m FROM Member m WHERE m.active = true ORDER BY m.point desc")
+    List<Member> findTopRankingMember(Pageable pageable);
 }

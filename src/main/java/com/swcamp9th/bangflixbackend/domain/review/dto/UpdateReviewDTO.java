@@ -27,5 +27,4 @@ public class UpdateReviewDTO {
     private Interior interior;
     private Probability probability;
     private String content;
-    private Integer memberCode;
 }

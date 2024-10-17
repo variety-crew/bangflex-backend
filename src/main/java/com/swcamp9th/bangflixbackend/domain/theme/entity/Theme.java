@@ -1,9 +1,10 @@
-package com.swcamp9th.bangflixbackend.domain.review.entity;
+package com.swcamp9th.bangflixbackend.domain.theme.entity;
 
 import com.swcamp9th.bangflixbackend.domain.store.entity.Store;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewTheme {
+@Builder
+public class Theme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

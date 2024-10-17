@@ -1,7 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.ranking.entity;
 
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
 import jakarta.persistence.*;
 import lombok.*;
 

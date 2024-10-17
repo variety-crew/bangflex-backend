@@ -1,4 +1,4 @@
-package com.swcamp9th.bangflixbackend.domain.review.entity;
+package com.swcamp9th.bangflixbackend.domain.theme.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewGenre {
+public class Genre {
 
     @Id
     @Column(name = "genre_code", nullable = false)
