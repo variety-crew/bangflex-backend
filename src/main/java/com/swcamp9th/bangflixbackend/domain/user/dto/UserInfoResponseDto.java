@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserInfoResponseDto {
     private final String id;
-    private final String email;
     private final String nickname;
+    private final boolean isAdmin;
     private final String image;
 }

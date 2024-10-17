@@ -168,8 +168,8 @@ public class UserServiceImpl implements UserService {
 
         return new UserInfoResponseDto(
                 user.getId(),
-                user.getEmail(),
                 user.getNickname(),
+                user.getIsAdmin(),
                 user.getImage()
         );
     }
