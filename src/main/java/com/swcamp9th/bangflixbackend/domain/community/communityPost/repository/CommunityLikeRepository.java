@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommunityLikeRepository extends JpaRepository<CommunityLike, CommunityLikeId> {
 
-    boolean existsByMemberCodeAndCommunityPostCode(Integer memberCode, Integer communityPostCode);
+    boolean existsByMemberCodeAndCommunityPostCodeAndActiveTrue(Integer memberCode, Integer communityPostCode);
 }

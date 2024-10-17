@@ -68,10 +68,10 @@ public class CommunityPostController {
 
     /* 게시글 목록 조회(페이지네이션) */
     @GetMapping("")
-    public ResponseEntity<ResponseMessage<Page<CommunityPostResponseDTO>>> findPostList(
+    public ResponseEntity<ResponseMessage<Page<CommunityPostDTO>>> findPostList(
                             @PageableDefault(size = 10) Pageable pageable) {
 
-        Page<CommunityPostResponseDTO> postList = communityPostService.findPostList(pageable);
+        Page<CommunityPostDTO> postList = communityPostService.findPostList(pageable);
         if (postList.hasContent()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", postList));
         } else {

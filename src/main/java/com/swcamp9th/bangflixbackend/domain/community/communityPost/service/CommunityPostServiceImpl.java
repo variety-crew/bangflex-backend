@@ -2,7 +2,6 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
@@ -153,14 +152,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommunityPostResponseDTO> findPostList(Pageable pageable) {
+    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
         pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
                 pageable.getPageSize(),
                 Sort.by("communityPostCode").descending());
 
         Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
 
-        return postList.map(post -> modelMapper.map(post, CommunityPostResponseDTO.class));
+        return postList.map(post -> modelMapper.map(post, CommunityPostDTO.class));
     }
 
     @Transactional(readOnly = true)
