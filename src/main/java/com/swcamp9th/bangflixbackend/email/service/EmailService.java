@@ -81,12 +81,8 @@ public class EmailService {
     @Transactional
     public boolean findEmailcode(EmailCodeRequestDto emailCodeRequestDto) {
         // redis에 저장된 email 조회
-        log.info("*** EmailService findEmailcode - emailCodeRequestDto.getEmail(): {}", emailCodeRequestDto.getEmail());
-
         String redisEmailCode = redisService.getEmailCode(emailCodeRequestDto.getEmail());
 
-        log.info("*** EmailService findEmailcode - emailCodeRequestDtogetCode(): {}", emailCodeRequestDto.getCode());
-        log.info("*** EmailService findEmailcode - redisEmailCode: {}", redisEmailCode);
         // redis에 저장된 email, code 삭제
         redisService.deleteEmailCode(emailCodeRequestDto.getEmail());
 

@@ -4,6 +4,7 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import com.swcamp9th.bangflixbackend.email.service.EmailService;
+import com.swcamp9th.bangflixbackend.exception.DuplicateException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
@@ -61,8 +62,7 @@ public class AuthController {
         if (!result.isDuplicate()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 아이디입니다", result));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage<>(400, "중복된 아이디입니다", result));
+            throw new DuplicateException("중복된 아이디입니다");
         }
     }
 
@@ -73,16 +73,15 @@ public class AuthController {
         if (!result.isDuplicate()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 닉네임입니다", result));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage<>(400, "중복된 아이디입니다", result));
+            throw new DuplicateException("중복된 닉네임입니다");
         }
     }
 
     @PostMapping("/send-email")
     @Operation(summary = "인증 이메일 발송 API")
-    public ResponseEntity<ResponseMessage<Object>> sendEmail(@RequestBody String email) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<ResponseMessage<Object>> sendEmail(@RequestBody EmailRequestDto emailRequestDto) throws MessagingException, UnsupportedEncodingException {
         try {
-            emailService.sendSimpleMessage(email);
+            emailService.sendSimpleMessage(emailRequestDto.getEmail());
             return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", null));
         } catch (MailException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -93,6 +92,6 @@ public class AuthController {
     @PostMapping("/confirm-email")
     @Operation(summary = "인증 이메일 검증 API")
     public ResponseEntity<ResponseMessage<Object>> confirmEmail(@RequestBody EmailCodeRequestDto emailCodeRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", emailService.findEmailcode(emailCodeRequestDto)));
+        return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 검증 성공", emailService.findEmailcode(emailCodeRequestDto)));
     }
 }

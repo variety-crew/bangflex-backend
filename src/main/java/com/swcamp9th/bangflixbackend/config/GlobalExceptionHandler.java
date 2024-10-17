@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.config;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
+import com.swcamp9th.bangflixbackend.exception.DuplicateException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,8 @@ public class GlobalExceptionHandler {
     // 400: 잘못된 요청 예외 처리
     @ExceptionHandler({
         AlreadyLikedException.class,
-        LikeNotFoundException.class
+        LikeNotFoundException.class,
+        DuplicateException.class
     })
     public ResponseEntity<ResponseMessage<Object>> handleBadRequestException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -30,6 +32,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(new ResponseMessage<>(401, e.getMessage(), null));
     }
-
-
 }
