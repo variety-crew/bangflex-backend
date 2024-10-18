@@ -22,4 +22,6 @@ public interface ThemeService {
     void deleteThemeReaction(String loginId, ThemeReactionDTO themeReactionDTO);
 
     List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction);
+
+    List<ThemeDTO> findThemeByWeek();
 }

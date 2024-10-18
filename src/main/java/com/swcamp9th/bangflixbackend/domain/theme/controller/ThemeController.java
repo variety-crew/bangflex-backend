@@ -130,4 +130,13 @@ public class ThemeController {
             "유저 별 " + reaction + " 테마 조회 성공", themes));
     }
 
+    @GetMapping("/week")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "사용자가 조회한 날 부터 과거 1주일 전 데이터를 확인해 좋아요 수가 가장 많은 theme 5개 반환하는 API.")
+    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByWeek() {
+
+        List<ThemeDTO> themes = themeService.findThemeByWeek();
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "이번 주 베스트 테마 조회 성공", themes));
+    }
 }

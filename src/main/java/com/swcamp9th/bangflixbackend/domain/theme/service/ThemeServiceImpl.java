@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -260,6 +261,17 @@ public class ThemeServiceImpl implements ThemeService {
         }).toList();
     }
 
+    @Override
+    public List<ThemeDTO> findThemeByWeek() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneWeekAgo = now.minusWeeks(1);  // 현재로부터 1주일 이전
+        Pageable pageable = PageRequest.of(0,5);
+
+        List<Theme> themes = themeRepository.findByWeekOrderByLikes(oneWeekAgo, pageable);
+
+        return createThemeDTOs(themes);
+    }
+
     private ThemeDTO createThemeDTO(Theme theme) {
         ThemeDTO themeDto = modelMapper.map(theme, ThemeDTO.class);
         themeDto.setStoreCode(theme.getStore().getStoreCode());
@@ -268,5 +280,22 @@ public class ThemeServiceImpl implements ThemeService {
         themeDto.setReviewCount(themeRepository.countReviewsByThemeCode(theme.getThemeCode()));
 
         return themeDto;
+    }
+
+    private List<ThemeDTO> createThemeDTOs(List<Theme> themes) {
+
+        List<ThemeDTO> themeDTOs = new ArrayList<>();
+
+        for(Theme theme : themes) {
+            ThemeDTO themeDto = modelMapper.map(theme, ThemeDTO.class);
+            themeDto.setStoreCode(theme.getStore().getStoreCode());
+            themeDto.setLikeCount(themeRepository.countLikesByThemeCode(theme.getThemeCode()));
+            themeDto.setScrapCount(themeRepository.countScrapsByThemeCode(theme.getThemeCode()));
+            themeDto.setReviewCount(themeRepository.countReviewsByThemeCode(theme.getThemeCode()));
+
+            themeDTOs.add(themeDto);
+        }
+
+        return themeDTOs;
     }
 }
