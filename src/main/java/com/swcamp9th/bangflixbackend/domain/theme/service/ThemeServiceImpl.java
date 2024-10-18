@@ -79,7 +79,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         List<Theme> themes = new ArrayList<>();
 
-        if(!genres.isEmpty()){
+        if(genres != null){
             if(content != null)
                 themes = themeRepository.findThemesByAllGenresAndSearch(genres, content);
             else
