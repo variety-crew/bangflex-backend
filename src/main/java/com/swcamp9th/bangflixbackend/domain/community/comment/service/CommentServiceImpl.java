@@ -7,9 +7,9 @@ import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentUpdateD
 import com.swcamp9th.bangflixbackend.domain.community.comment.entity.Comment;
 import com.swcamp9th.bangflixbackend.domain.community.comment.repository.CommentRepository;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityMemberRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -19,34 +19,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service("commentService")
 public class CommentServiceImpl implements CommentService {
 
     private final ModelMapper modelMapper;
     private final CommentRepository commentRepository;
-    private final CommunityMemberRepository communityMemberRepository;
+    private final UserRepository userRepository;
     private final CommunityPostRepository communityPostRepository;
 
     @Autowired
     public CommentServiceImpl(CommentRepository commentRepository,
                               ModelMapper modelMapper,
-                              CommunityMemberRepository communityMemberRepository,
+                              UserRepository userRepository,
                               CommunityPostRepository communityPostRepository) {
         this.commentRepository = commentRepository;
         this.modelMapper = modelMapper;
-        this.communityMemberRepository = communityMemberRepository;
+        this.userRepository = userRepository;
         this.communityPostRepository = communityPostRepository;
     }
 
     @Transactional
     @Override
-    public CommentDTO createComment(Integer communityPostCode, CommentCreateDTO newComment) {
-        Comment comment = modelMapper.map(newComment, Comment.class);
+    public void createComment(String loginId, Integer communityPostCode, CommentCreateDTO newComment) {
+        Comment comment = new Comment();
 
         // 회원이 아니면 예외 발생
-        CommunityMember author = communityMemberRepository.findById(newComment.getMemberCode())
+        Member author = userRepository.findById(loginId)
                 .orElseThrow(() -> new InvalidUserException("댓글 작성 권한이 없습니다."));
 
         CommunityPost post = communityPostRepository.findById(communityPostCode)
@@ -55,30 +54,30 @@ public class CommentServiceImpl implements CommentService {
         comment.setActive(true);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setContent(newComment.getContent());
-        comment.setCommunityMember(author);
+        comment.setMember(author);
         comment.setCommunityPost(post);
 
         // 댓글 저장
-        Comment savedComment = commentRepository.save(comment);
-
-        CommentDTO commentResponse = modelMapper.map(savedComment, CommentDTO.class);
-        commentResponse.setMemberCode(savedComment.getCommunityMember().getMemberCode());
-        commentResponse.setCommunityPostCode(savedComment.getCommunityPost().getCommunityPostCode());
-
-        return commentResponse;
+        commentRepository.save(comment);
     }
 
     @Transactional
     @Override
-    public CommentDTO updateComment(Integer communityPostCode, Integer commentCode, CommentUpdateDTO modifiedComment) {
+    public void updateComment(String loginId, Integer communityPostCode,
+                              Integer commentCode, CommentUpdateDTO modifiedComment) {
+
         Comment originalComment = commentRepository.findById(commentCode)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
 
         CommunityPost post = communityPostRepository.findById(communityPostCode)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
-        // 현재 사용자가 댓글 작성자가 아니라면 예외 발생
-        if (!originalComment.getCommunityMember().getMemberCode().equals(modifiedComment.getMemberCode())) {
+        // 회원이 아니라면 예외 발생
+        Member author = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("로그인이 필요합니다."));
+
+        // 게시글 작성자가 아니라면 예외 발생
+        if (!originalComment.getMember().getMemberCode().equals(author.getMemberCode())) {
             throw new InvalidUserException("댓글 수정 권한이 없습니다.");
         }
 
@@ -86,23 +85,23 @@ public class CommentServiceImpl implements CommentService {
         originalComment.setCommunityPost(post);
 
         // 수정된 댓글 저장
-        Comment updatedComment = commentRepository.save(originalComment);
-
-        CommentDTO commentResponse = modelMapper.map(updatedComment, CommentDTO.class);
-        commentResponse.setMemberCode(updatedComment.getCommunityMember().getMemberCode());
-        commentResponse.setCommunityPostCode(updatedComment.getCommunityPost().getCommunityPostCode());
-
-        return commentResponse;
+        commentRepository.save(originalComment);
     }
 
     @Transactional
     @Override
-    public void deleteComment(Integer communityPostCode, Integer commentCode, CommentDeleteDTO deletedComment) {
+    public void deleteComment(String loginId, Integer communityPostCode,
+                              Integer commentCode, CommentDeleteDTO deletedComment) {
+
         Comment foundComment = commentRepository.findById(commentCode)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
 
-        // 현재 사용자가 댓글 작성자가 아니라면 예외 발생
-        if (!foundComment.getCommunityMember().getMemberCode().equals(deletedComment.getMemberCode())) {
+        // 회원이 아니라면 예외 발생
+        Member author = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("로그인이 필요합니다."));
+
+        // 게시글 작성자가 아니라면 예외 발생
+        if (!foundComment.getMember().getMemberCode().equals(author.getMemberCode())) {
             throw new InvalidUserException("댓글 삭제 권한이 없습니다.");
         }
 
