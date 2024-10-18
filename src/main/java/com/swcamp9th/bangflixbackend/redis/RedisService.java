@@ -65,7 +65,7 @@ public class RedisService {
     }
 
     public void deleteEmailCode(String email) {
-        redisTemplate.delete(email);
+        redisTemplate.delete(EMAIL_PREFIX + email);
     }
 
 }
