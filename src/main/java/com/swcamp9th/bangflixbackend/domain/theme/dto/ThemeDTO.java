@@ -24,6 +24,7 @@ public class ThemeDTO {
     private String posterImage;
     private String headcount;
     private Integer storeCode;
+    private String storeName;
     private Integer likeCount;
     private Integer scrapCount;
     private Integer reviewCount;
