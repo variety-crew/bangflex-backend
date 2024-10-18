@@ -73,7 +73,7 @@ public class EventPostController {
 
     /* 할인테마/신규테마 이벤트 게시글 목록 조회 */
     @GetMapping("")
-    @Operation(summary = "이벤트 게시글 목록 조회 API (해당 테마 정보 조회)")
+    @Operation(summary = "이벤트 게시글 목록 조회 API (discount/newTheme 각 최신순 상위 5개 조회)")
     public ResponseEntity<ResponseMessage<List<EventListDTO>>> getEventList() {
 
         List<EventListDTO> categoryAndEventList = eventPostService.getEventList();

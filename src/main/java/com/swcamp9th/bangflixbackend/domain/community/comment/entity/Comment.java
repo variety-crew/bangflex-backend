@@ -1,7 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.community.comment.entity;
 
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityMember;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -34,7 +34,7 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)
-    private CommunityMember communityMember;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_post_code", nullable = false)

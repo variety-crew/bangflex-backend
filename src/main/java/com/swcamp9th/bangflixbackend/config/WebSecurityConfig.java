@@ -74,6 +74,9 @@ public class WebSecurityConfig {
 						.requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/themes/week").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/themes").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/community/").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/event/").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/notice/").permitAll()
 						.anyRequest().authenticated()
 		);
 

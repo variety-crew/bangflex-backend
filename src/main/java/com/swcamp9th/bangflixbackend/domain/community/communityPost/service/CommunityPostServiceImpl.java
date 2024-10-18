@@ -113,7 +113,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         // 회원이 아니라면 예외 발생
         Member author = userRepository.findById(loginId).orElseThrow(
-                () -> new InvalidUserException("회원가입이 필요합니다."));
+                () -> new InvalidUserException("로그인이 필요합니다."));
 
         // 게시글 작성자가 아니라면 예외 발생
         if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
@@ -135,7 +135,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         // 회원이 아니라면 예외 발생
         Member author = userRepository.findById(loginId).orElseThrow(
-                () -> new InvalidUserException("회원가입이 필요합니다."));
+                () -> new InvalidUserException("로그인이 필요합니다."));
 
         // 게시글 작성자가 아니라면 예외 발생
         if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
