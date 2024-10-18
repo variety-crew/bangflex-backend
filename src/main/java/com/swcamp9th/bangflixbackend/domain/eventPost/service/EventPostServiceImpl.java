@@ -1,7 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.eventPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostUpdateDTO;
+import com.swcamp9th.bangflixbackend.domain.eventPost.dto.*;
 import com.swcamp9th.bangflixbackend.domain.eventPost.entity.EventFile;
 import com.swcamp9th.bangflixbackend.domain.eventPost.entity.EventPost;
 import com.swcamp9th.bangflixbackend.domain.eventPost.repository.EventFileRepository;
@@ -23,9 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service("eventPostService")
 public class EventPostServiceImpl implements EventPostService {
@@ -157,5 +154,74 @@ public class EventPostServiceImpl implements EventPostService {
 
         foundPost.setActive(false);
         eventPostRepository.save(foundPost);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<EventListDTO> getEventList() {
+        List<EventPost> discountEvents = eventPostRepository
+                .findTop5ByActiveTrueAndCategoryEqualsOrderByCreatedAtDesc("discount").stream().toList();
+        List<EventPost> newThemeEvents = eventPostRepository
+                .findTop5ByActiveTrueAndCategoryEqualsOrderByCreatedAtDesc("newTheme").stream().toList();
+
+        // 할인 테마 이벤트 게시글 목록
+        List<EventPostDTO> discountPosts = discountEvents.stream().map(
+                eventPost -> {
+                    EventPostDTO discountPost = modelMapper.map(eventPost, EventPostDTO.class);
+
+                    Theme theme = themeRepository.findById(eventPost.getTheme().getThemeCode())
+                            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 테마입니다."));
+                    EventThemeDTO eventTheme = modelMapper.map(theme, EventThemeDTO.class);
+                    eventTheme.setStoreCode(theme.getStore().getStoreCode());
+
+                    discountPost.setEventTheme(eventTheme);
+                    return discountPost;
+                }).toList();
+
+        // 신규 테마 이벤트 게시글 목록
+        List<EventPostDTO> newThemePosts = newThemeEvents.stream().map(
+                eventPost -> {
+                    EventPostDTO newThemePost = modelMapper.map(eventPost, EventPostDTO.class);
+
+                    Theme theme = themeRepository.findById(eventPost.getTheme().getThemeCode())
+                            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 테마입니다."));
+                    EventThemeDTO eventTheme = modelMapper.map(theme, EventThemeDTO.class);
+                    eventTheme.setStoreCode(theme.getStore().getStoreCode());
+
+                    newThemePost.setEventTheme(eventTheme);
+                    return newThemePost;
+                }).toList();
+
+        EventListDTO discountListDTO = new EventListDTO("discount", discountPosts);
+        EventListDTO newThemeListDTO = new EventListDTO("newTheme", newThemePosts);
+        List<EventListDTO> eventList = new ArrayList<>();
+        eventList.add(discountListDTO);
+        eventList.add(newThemeListDTO);
+
+        return eventList;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public EventPostDTO findEventByCode(int eventPostCode) {
+        EventPost foundEvent = eventPostRepository.findById(eventPostCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        EventPostDTO selectedEvent = modelMapper.map(foundEvent, EventPostDTO.class);
+        selectedEvent.setMemberCode(foundEvent.getMember().getMemberCode());
+
+        // 게시글의 첨부파일
+        List<EventFile> images = eventFileRepository.findByEventPost(foundEvent).stream().toList();
+        List<String> urls = images.stream().map(EventFile::getUrl).toList();
+        selectedEvent.setImageUrls(urls);
+
+        // 해당 테마
+        Theme theme = themeRepository.findById(foundEvent.getTheme().getThemeCode())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 테마입니다."));
+        EventThemeDTO selectedTheme = modelMapper.map(theme, EventThemeDTO.class);
+        selectedTheme.setStoreCode(theme.getStore().getStoreCode());
+        selectedEvent.setEventTheme(selectedTheme);
+
+        return selectedEvent;
     }
 }

@@ -1,6 +1,8 @@
 package com.swcamp9th.bangflixbackend.domain.eventPost.service;
 
+import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventListDTO;
 import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostDTO;
 import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,4 +18,7 @@ public interface EventPostService {
 
     void deleteEventPost(String loginId, int eventPostCode);
 
+    List<EventListDTO> getEventList();
+
+    EventPostDTO findEventByCode(int eventPostCode);
 }

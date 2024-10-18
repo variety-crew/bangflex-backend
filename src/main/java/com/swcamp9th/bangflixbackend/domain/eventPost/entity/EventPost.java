@@ -38,7 +38,7 @@ public class EventPost {
     private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theme_code")
+    @JoinColumn(name = "theme_code", nullable = false)
     private Theme theme;
 
     @ManyToOne(fetch = FetchType.LAZY)
