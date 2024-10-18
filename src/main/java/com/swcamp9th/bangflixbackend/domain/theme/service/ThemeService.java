@@ -24,4 +24,6 @@ public interface ThemeService {
     List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction);
 
     List<ThemeDTO> findThemeByWeek(String loginId);
+
+    List<ThemeDTO> recommendTheme(List<Integer> themeCodes);
 }

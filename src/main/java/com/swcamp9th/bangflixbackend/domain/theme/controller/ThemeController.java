@@ -143,4 +143,14 @@ public class ThemeController {
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "이번 주 베스트 테마 조회 성공", themes));
     }
+
+    @GetMapping("/recommend")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "유저 별로 스크랩이나 좋아요한 테마 조회 API. 해당 API로 좋아요, 스크랩을 동시에 지원합니다. reaction 값으로는 String으로 like or scrap 입력해주시면 됩니다. ")
+    public ResponseEntity<ResponseMessage<Object>> recommendTheme(@RequestParam(required = false) List<Integer> themeCodes) {
+
+        List<ThemeDTO> themes = themeService.recommendTheme(themeCodes);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "추천 테마 조회 성공", themes));
+    }
 }
