@@ -40,9 +40,10 @@ public class ThemeController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "특정 테마를 조회하는 API.")
     public ResponseEntity<ResponseMessage<ThemeDTO>> findTheme(
-        @PathVariable("themeCode") Integer themeCode) {
+        @PathVariable("themeCode") Integer themeCode,
+        @RequestAttribute(value = "loginId", required = false) String loginId) {
 
-        ThemeDTO theme = themeService.findTheme(themeCode);
+        ThemeDTO theme = themeService.findTheme(themeCode, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, themeCode + "번 테마 조회 성공", theme));
     }
@@ -66,10 +67,11 @@ public class ThemeController {
         @PageableDefault(size = 10, page = 0) Pageable pageable,
         @RequestParam(required = false) String filter,
         @RequestParam(required = false) List<String> genres,
-        @RequestParam(required = false) String content
+        @RequestParam(required = false) String content,
+        @RequestAttribute(value = "loginId", required = false) String loginId
     ) {
 
-        List<ThemeDTO> themes = themeService.findThemeByGenresAndSearchOrderBySort(pageable, filter, genres, content);
+        List<ThemeDTO> themes = themeService.findThemeByGenresAndSearchOrderBySort(pageable, filter, genres, content, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
@@ -80,9 +82,10 @@ public class ThemeController {
     public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByStoreOrderBySort(
         @PathVariable("storeCode") Integer storeCode,
         @PageableDefault(size = 10) Pageable pageable,
-        @RequestParam(required = false) String filter
+        @RequestParam(required = false) String filter,
+        @RequestAttribute("loginId") String loginId
     ) {
-        List<ThemeDTO> themes = themeService.findThemeByStoreOrderBySort(pageable, filter, storeCode);
+        List<ThemeDTO> themes = themeService.findThemeByStoreOrderBySort(pageable, filter, storeCode,loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "테마 조회 성공", themes));
     }
@@ -133,9 +136,10 @@ public class ThemeController {
     @GetMapping("/week")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "사용자가 조회한 날 부터 과거 1주일 전 데이터를 확인해 좋아요 수가 가장 많은 theme 5개 반환하는 API.")
-    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByWeek() {
+    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> findThemeByWeek(
+        @RequestAttribute(value = "loginId", required = false) String loginId) {
 
-        List<ThemeDTO> themes = themeService.findThemeByWeek();
+        List<ThemeDTO> themes = themeService.findThemeByWeek(loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "이번 주 베스트 테마 조회 성공", themes));
     }

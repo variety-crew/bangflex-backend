@@ -64,6 +64,7 @@ public class ThemeServiceImplTests {
         mockThemeDTO.setScrapCount(5);
         mockThemeDTO.setReviewCount(20);
 
+
         // ThemeRepository가 호출될 때 Optional로 감싼 mockTheme를 반환하도록 설정
         Mockito.when(themeRepository.findById(themeCode)).thenReturn(Optional.of(mockTheme));
         // ModelMapper가 호출될 때 mockTheme을 mockThemeDTO로 매핑하여 반환하도록 설정
@@ -74,7 +75,7 @@ public class ThemeServiceImplTests {
         Mockito.when(themeRepository.countReviewsByThemeCode(mockTheme.getThemeCode())).thenReturn(20);
 
         // when
-        ThemeDTO foundTheme = themeService.findTheme(themeCode);
+        ThemeDTO foundTheme = themeService.findTheme(themeCode, null);
 
         // then
         assertNotNull(foundTheme); // 반환된 ThemeDTO가 null이 아님을 검증

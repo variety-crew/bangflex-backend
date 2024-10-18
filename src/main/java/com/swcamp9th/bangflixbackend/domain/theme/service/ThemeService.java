@@ -9,13 +9,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface ThemeService {
 
-    ThemeDTO findTheme(Integer themeCode);
+    ThemeDTO findTheme(Integer themeCode, String loginId);
 
     List<GenreDTO> findGenres();
 
-    List<ThemeDTO> findThemeByGenresAndSearchOrderBySort(Pageable pageable, String filter, List<String> genres, String content);
+    List<ThemeDTO> findThemeByGenresAndSearchOrderBySort(Pageable pageable, String filter, List<String> genres, String content, String loginId);
 
-    List<ThemeDTO> findThemeByStoreOrderBySort(Pageable pageable, String filter, Integer storeCode);
+    List<ThemeDTO> findThemeByStoreOrderBySort(Pageable pageable, String filter, Integer storeCode, String loginId);
 
     void createThemeReaction(String userId, ThemeReactionDTO themeReactionDTO);
 
@@ -23,5 +23,5 @@ public interface ThemeService {
 
     List<FindThemeByReactionDTO> findThemeByMemberReaction(Pageable pageable, String loginId, String reaction);
 
-    List<ThemeDTO> findThemeByWeek();
+    List<ThemeDTO> findThemeByWeek(String loginId);
 }
