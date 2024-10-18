@@ -4,9 +4,12 @@ import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewReportDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,37 +45,48 @@ public class ReviewController {
 
 
     @PostMapping("")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "리뷰를 생성하는 API. form-data 형태로 2가지의 키 값을 가집니다. review (DTO 값으로 리뷰 작성 필요 데이터 묶음), images (multiaprt 데이터로 images이름을 키값으로 중복해 여러장의 파일을 첨부 할 수 있습니다)")
     public ResponseEntity<ResponseMessage<Object>> createReview(
         @RequestPart("review") CreateReviewDTO newReview,
-        @RequestPart(value = "images", required = false) List<MultipartFile> images)
+        @RequestPart(value = "images", required = false) List<MultipartFile> images,
+        @RequestAttribute("loginId") String loginId)
         throws IOException, URISyntaxException {
 
-        reviewService.createReview(newReview, images);
+        reviewService.createReview(newReview, images, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 작성 성공", null));
     }
 
     @PutMapping("")
-    public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview)
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "리뷰 업데이트 API. request 값 중 null이 아닌 값들만 체크해 기존 리뷰를 수정합니다")
+    public ResponseEntity<ResponseMessage<Object>> updateReview(@RequestBody UpdateReviewDTO updateReview,
+        @RequestAttribute("loginId") String loginId)
         throws IOException {
         
-        reviewService.updateReview(updateReview);
+        reviewService.updateReview(updateReview, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "리뷰 삭제 API.")
+    public ResponseEntity<ResponseMessage<Object>> deleteReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.deleteReview(reviewCodeDTO);
+        reviewService.deleteReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 삭제 성공", null));
     }
 
     @GetMapping("/{themeCode}")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 별 리뷰 검색 API. filter 값에는 highScore, lowScore를 넣어주시면 됩니다. 만약 filter 값을 첨부하지 않으면 최신순 정렬입니다")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
-        @PageableDefault Pageable pageable,
+        @PageableDefault(size = 10, page = 0) Pageable pageable,
         @RequestParam(required = false) String filter) {
         /*
             필터 값은 필수 X.
@@ -90,6 +105,8 @@ public class ReviewController {
     }
 
     @GetMapping("/statistics/{themeCode}")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 별 리뷰 통계 반환 API. response에 필드값이 많습니다. 맵핑해서 사용해야 할 거에요... ONE이 화면 상 가장 좌측 항목(ex. 재미 없어요~)")
     public ResponseEntity<ResponseMessage<StatisticsReviewDTO>> findReviewStatistics(
         @PathVariable("themeCode") Integer themeCode) {
 
@@ -100,19 +117,51 @@ public class ReviewController {
     }
 
     @PostMapping("/likes")
-    public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "리뷰 별 좋아요 APi.")
+    public ResponseEntity<ResponseMessage<Object>> likeReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.likeReview(reviewCodeDTO);
+        reviewService.likeReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 성공", null));
     }
 
     @DeleteMapping("/likes")
-    public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO) {
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "리뷰 별 좋아요 취소 API.")
+    public ResponseEntity<ResponseMessage<Object>> deleteLikeReview(@RequestBody ReviewCodeDTO reviewCodeDTO,
+        @RequestAttribute("loginId") String loginId) {
 
-        reviewService.deleteLikeReview(reviewCodeDTO);
+        reviewService.deleteLikeReview(reviewCodeDTO, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 좋아요 취소 성공", null));
     }
 
+    @GetMapping("/user/report")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "유저 별 review의 report를 생성하는 API.")
+    public ResponseEntity<ResponseMessage<ReviewReportDTO>> findReviewReport(
+        @RequestAttribute("loginId") String loginId
+    ) {
+
+        // 서비스에서 필터를 사용해 조회
+        ReviewReportDTO reviewReportDTO = reviewService.findReviewReposrt(loginId);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "유저 리뷰 report 조회 성공", reviewReportDTO));
+    }
+
+    @GetMapping("/user")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "유저 별 작성한 리뷰를 반환하는 API. 최근 작성한 리뷰순으로 정렬해서 보내줍니다")
+    public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewByMember(
+        @RequestAttribute("loginId") String loginId,
+        @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+
+        // 서비스에서 필터를 사용해 조회
+        List<ReviewDTO> reviews = reviewService.findReviewByMember(loginId, pageable);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "유저가 작성한 리뷰 조회 성공", reviews));
+    }
 }

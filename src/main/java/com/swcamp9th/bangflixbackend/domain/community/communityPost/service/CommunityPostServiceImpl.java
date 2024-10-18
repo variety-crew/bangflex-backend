@@ -113,7 +113,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         // 회원이 아니라면 예외 발생
         Member author = userRepository.findById(loginId).orElseThrow(
-                () -> new InvalidUserException("회원가입이 필요합니다."));
+                () -> new InvalidUserException("로그인이 필요합니다."));
 
         // 게시글 작성자가 아니라면 예외 발생
         if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
@@ -135,7 +135,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         // 회원이 아니라면 예외 발생
         Member author = userRepository.findById(loginId).orElseThrow(
-                () -> new InvalidUserException("회원가입이 필요합니다."));
+                () -> new InvalidUserException("로그인이 필요합니다."));
 
         // 게시글 작성자가 아니라면 예외 발생
         if (!foundPost.getMember().getMemberCode().equals(author.getMemberCode())) {
@@ -147,24 +147,45 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         communityPostRepository.save(foundPost);
     }
 
+//    @Transactional(readOnly = true)
+//    @Override
+//    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
+//        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
+//                pageable.getPageSize(),
+//                Sort.by("communityPostCode").descending());
+//
+//        Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
+//
+//        List<CommunityPostDTO> posts = postList.getContent().stream()
+//                .map(post -> {
+//                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+//                    dto.setMemberCode(post.getMember().getMemberCode());
+//                    return dto;
+//                })
+//                .toList();
+//
+//        return new PageImpl<>(posts, pageable, postList.getTotalElements());
+//    }
+
     @Transactional(readOnly = true)
     @Override
-    public Page<CommunityPostDTO> findPostList(Pageable pageable) {
-        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() - 1,
-                pageable.getPageSize(),
-                Sort.by("communityPostCode").descending());
+    public List<CommunityPostDTO> getAllPosts() {
+        List<CommunityPost> allPosts = communityPostRepository.findByActiveTrue(
+                                                                Sort.by("createdAt").descending());
 
-        Page<CommunityPost> postList = communityPostRepository.findByActiveTrue(pageable);
+        List<CommunityPostDTO> postList = allPosts.stream()
+                .map(communityPost -> {
+                    CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
 
-        List<CommunityPostDTO> posts = postList.getContent().stream()
-                .map(post -> {
-                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
-                    dto.setMemberCode(post.getMember().getMemberCode());
-                    return dto;
-                })
-                .toList();
+                    List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+                    List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
 
-        return new PageImpl<>(posts, pageable, postList.getTotalElements());
+                    postDTO.setMemberCode(communityPost.getMember().getMemberCode());
+                    postDTO.setImageUrls(urls);
+                    return postDTO;
+                }).toList();
+
+        return postList;
     }
 
     @Transactional(readOnly = true)
@@ -175,6 +196,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
         selectedPost.setMemberCode(post.getMember().getMemberCode());
+
+        List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
+        List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+        selectedPost.setImageUrls(urls);
 
         return selectedPost;
     }

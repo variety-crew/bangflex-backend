@@ -3,39 +3,36 @@ package com.swcamp9th.bangflixbackend.domain.review.service;
 import com.swcamp9th.bangflixbackend.domain.review.dto.CreateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewCodeDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewDTO;
+import com.swcamp9th.bangflixbackend.domain.review.dto.ReviewReportDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.dto.UpdateReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewFile;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewMember;
-import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewTheme;
+import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewFileRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewLikeRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewMemberRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewRepository;
 import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewTendencyGenreRepository;
-import com.swcamp9th.bangflixbackend.domain.review.repository.ReviewThemeRepository;
+import com.swcamp9th.bangflixbackend.domain.theme.repository.ThemeRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.AlreadyLikedException;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
 import com.swcamp9th.bangflixbackend.exception.LikeNotFoundException;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,42 +45,39 @@ public class ReviewServiceImpl implements ReviewService {
     private final ModelMapper modelMapper;
     private final ReviewRepository reviewRepository;
     private final ReviewFileRepository reviewFileRepository;
-    private final ReviewThemeRepository reviewThemeRepository;
-    private final ReviewMemberRepository reviewMemberRepository;
+    private final ThemeRepository themeRepository;
+    private final UserRepository userRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final ReviewTendencyGenreRepository reviewTendencyGenreRepository;
-    private ResourceLoader resourceLoader;
 
     @Autowired
     public ReviewServiceImpl(ModelMapper modelMapper
                            , ReviewRepository reviewRepository
                            , ReviewFileRepository reviewFileRepository
-                           , ReviewThemeRepository reviewThemeRepository
-                           , ReviewMemberRepository reviewMemberRepository
+                           , ThemeRepository themeRepository
+                           , UserRepository userRepository
                            , ReviewLikeRepository reviewLikeRepository
-                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository
-                           , ResourceLoader resourceLoader) {
+                           , ReviewTendencyGenreRepository reviewTendencyGenreRepository) {
         this.modelMapper = modelMapper;
         this.reviewRepository = reviewRepository;
         this.reviewFileRepository = reviewFileRepository;
-        this.reviewThemeRepository = reviewThemeRepository;
-        this.reviewMemberRepository = reviewMemberRepository;
+        this.themeRepository = themeRepository;
+        this.userRepository = userRepository;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewTendencyGenreRepository = reviewTendencyGenreRepository;
-        this.resourceLoader = resourceLoader;
     }
 
     @Override
     @Transactional
-    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images)
+    public void createReview(CreateReviewDTO newReview, List<MultipartFile> images, String loginId)
         throws IOException, URISyntaxException {
 
         // 리뷰 저장
         Review review = modelMapper.map(newReview, Review.class);
-        ReviewTheme reviewTheme = reviewThemeRepository.findById(newReview.getThemeCode()).orElse(null);
-        ReviewMember reviewMember = reviewMemberRepository.findById(newReview.getMemberCode()).orElse(null);
-        review.setTheme(reviewTheme);
-        review.setMember(reviewMember);
+        Theme theme = themeRepository.findById(newReview.getThemeCode()).orElse(null);
+        Member member = userRepository.findById(loginId).orElse(null);
+        review.setTheme(theme);
+        review.setMember(member);
         review.setActive(true);
         review.setCreatedAt(LocalDateTime.now());
         Review insertReview = reviewRepository.save(review);
@@ -93,19 +87,22 @@ public class ReviewServiceImpl implements ReviewService {
             saveReviewFile(images, insertReview);
 
         // 멤버 포인트 올리기
-        reviewMember.setPoint(reviewMember.getPoint()+5);
-        reviewMemberRepository.save(reviewMember);
+        member.setPoint(member.getPoint()+5);
+        userRepository.save(member);
 
     }
 
     @Override
     @Transactional
-    public void updateReview(UpdateReviewDTO updateReview) {
+    public void updateReview(UpdateReviewDTO updateReview, String loginId) {
 
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(updateReview.getReviewCode()).orElse(null);
 
-        if(updateReview.getMemberCode().equals(existingReview.getMember().getMemberCode())){
+        if(existingReview == null)
+            throw new RuntimeException("Review not found");
+
+        if(loginId.equals(existingReview.getMember().getId())){
 
             // DTO에서 null이 아닌 값만 업데이트
             if (updateReview.getHeadcount() != null) {
@@ -147,12 +144,15 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void deleteReview(ReviewCodeDTO reviewCodeDTO) {
+    public void deleteReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
 
         // 기존 리뷰 조회
         Review existingReview = reviewRepository.findById(reviewCodeDTO.getReviewCode()).orElse(null);
 
-        if(reviewCodeDTO.getMemberCode().equals(existingReview.getMember().getMemberCode())) {
+        if(existingReview == null)
+            throw new RuntimeException("Review not found");
+
+        if(loginId.equals(existingReview.getMember().getId())) {
             existingReview.setActive(false);
             reviewRepository.save(existingReview);
         }
@@ -245,21 +245,40 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
+    public ReviewReportDTO findReviewReposrt(String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        int avgScore = reviewRepository.findAvgScoreByMemberCode(member.getMemberCode());
+        Pageable pageable = PageRequest.of(0, 3);
+        List<String> genres = reviewRepository.findTopGenresByMemberCode(member.getMemberCode(), pageable);
+        ReviewReportDTO reviewReportDTO = new ReviewReportDTO(avgScore, genres);
+        return reviewReportDTO;
+    }
+
+    @Override
+    @Transactional
+    public List<ReviewDTO> findReviewByMember(String loginId, Pageable pageable) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        List<Review> review = reviewRepository.findByMemberCode(member.getMemberCode(), pageable);
+        return getReviewDTOS(review);
+    }
+
+    @Override
+    @Transactional
     public StatisticsReviewDTO findReviewStatistics(Integer themeCode) {
         return reviewRepository.findStatisticsByThemeCode(themeCode);
     }
 
     @Override
     @Transactional
-    public void likeReview(ReviewCodeDTO reviewCodeDTO) {
-
+    public void likeReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
-            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+            member.getMemberCode(), reviewCodeDTO.getReviewCode());
 
         if (reviewLike == null) {
 
             ReviewLike newReviewLike = new ReviewLike();
-            newReviewLike.setMemberCode(reviewCodeDTO.getMemberCode());
+            newReviewLike.setMemberCode(member.getMemberCode());
             newReviewLike.setReviewCode(reviewCodeDTO.getReviewCode());
             newReviewLike.setCreatedAt(LocalDateTime.now());
             newReviewLike.setActive(true);
@@ -277,9 +296,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO) {
+    public void deleteLikeReview(ReviewCodeDTO reviewCodeDTO, String loginId) {
+        Member member = userRepository.findById(loginId).orElseThrow();
         ReviewLike reviewLike = reviewLikeRepository.findByMemberCodeAndReviewCode(
-            reviewCodeDTO.getMemberCode(), reviewCodeDTO.getReviewCode());
+            member.getMemberCode(), reviewCodeDTO.getReviewCode());
 
         if (reviewLike == null) {
             throw new LikeNotFoundException("좋아요가 존재하지 않습니다.");
@@ -291,16 +311,6 @@ public class ReviewServiceImpl implements ReviewService {
                 throw new LikeNotFoundException("좋아요가 존재하지 않습니다.");
             }
         }
-    }
-
-    // 리뷰 리스트에서 lastReviewCode에 해당하는 리뷰의 인덱스를 찾는 메서드
-    private int findReviewIndex(List<Review> reviews, Integer lastReviewCode) {
-        for (int i = 0; i < reviews.size(); i++) {
-            if (reviews.get(i).getReviewCode().equals(lastReviewCode)) {
-                return i + 1; // 찾은 인덱스 바로 다음부터 시작
-            }
-        }
-        return 0; // 못 찾으면 처음부터
     }
 
 

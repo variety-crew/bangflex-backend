@@ -3,6 +3,8 @@ package com.swcamp9th.bangflixbackend.domain.user.service;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
+import com.swcamp9th.bangflixbackend.exception.DuplicateException;
+import com.swcamp9th.bangflixbackend.exception.ExpiredTokenExcepiton;
 import com.swcamp9th.bangflixbackend.redis.RedisService;
 import com.swcamp9th.bangflixbackend.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -33,15 +35,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignupResponseDto signupWithoutProfile(SignupRequestDto signupRequestDto) {
         if (userRepository.existsById(signupRequestDto.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다.");
+            throw new DuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.existsByNickname(signupRequestDto.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateException("이미 존재하는 닉네임입니다.");
         }
 
         if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateException("이미 존재하는 이메일입니다.");
         }
 
 //        String uploadsDir = "src/main/resources/static/uploadFiles/DefaultProfileFile";
@@ -68,15 +70,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignupResponseDto signup(SignupRequestDto signupRequestDto, MultipartFile imgFile) throws IOException {
         if (userRepository.existsById(signupRequestDto.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 이름입니다.");
+            throw new DuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (userRepository.existsByNickname(signupRequestDto.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateException("이미 존재하는 닉네임입니다.");
         }
 
         if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new DuplicateException("이미 존재하는 이메일입니다.");
         }
 
         String uploadsDir = "src/main/resources/static/uploadFiles/profileFile";
@@ -125,18 +127,18 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ReissueTokenResponseDto refreshTokens(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new ExpiredTokenExcepiton("유효하지 않은 리프레시 토큰입니다.");
         }
 
         Claims claims = jwtUtil.getRefreshTokenClaims(refreshToken);
         String id = claims.getSubject();
 
         Member user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ExpiredTokenExcepiton("사용자를 찾을 수 없습니다."));
 
         // Redis에서 리프레시 토큰 조회
         if (!redisService.isRefreshTokenValid(id, refreshToken)) {
-            throw new IllegalArgumentException("리프레시 토큰이 일치하지 않습니다.");
+            throw new ExpiredTokenExcepiton("리프레시 토큰이 일치하지 않습니다.");
         }
 
         String newAccessToken = jwtUtil.createAccessToken(user);
@@ -147,7 +149,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void logout(String refreshToken) {
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new ExpiredTokenExcepiton("유효하지 않은 리프레시 토큰입니다.");
         }
 
         Claims claims = jwtUtil.getRefreshTokenClaims(refreshToken);
@@ -240,4 +242,14 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    public MyPageResponseDto findMyPageInfoById(String id) {
+        Member user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return new MyPageResponseDto(
+                user.getNickname(),
+                user.getPoint(),
+                user.getImage()
+        );
+    }
 }

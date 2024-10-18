@@ -22,11 +22,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
         "AVG(r.totalScore), " +
 
         // Score 비율 계산
-        "CAST(COUNT(CASE WHEN r.totalScore = 10 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
-        "CAST(COUNT(CASE WHEN r.totalScore = 8 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
-        "CAST(COUNT(CASE WHEN r.totalScore = 6 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 5 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
         "CAST(COUNT(CASE WHEN r.totalScore = 4 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 3 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
         "CAST(COUNT(CASE WHEN r.totalScore = 2 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 1 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
 
         // Level 비율 계산
         "CAST(COUNT(CASE WHEN r.level = 'ONE' THEN 1  END) / COUNT(r) * 100 AS int), " +
@@ -73,4 +73,21 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
         "FROM Review r WHERE r.theme.themeCode = :themeCode AND r.active = true"
     )
     StatisticsReviewDTO findStatisticsByThemeCode(@Param("themeCode") Integer themeCode);
+
+    @Query("SELECT AVG(r.totalScore) FROM Review r INNER JOIN r.member WHERE r.member.memberCode = :memberCode")
+    Integer findAvgScoreByMemberCode(@Param("memberCode") Integer memberCode);
+
+    @Query("SELECT g.name " +
+        "FROM Review r " +
+        "INNER JOIN r.theme t " +
+        "INNER JOIN ThemeGenre tg ON t.themeCode = tg.theme.themeCode " +  // 중간 테이블과 조인
+        "INNER JOIN Genre g ON tg.genre.genreCode = g.genreCode " +  // 장르 테이블과 조인
+        "WHERE r.member.memberCode = :memberCode AND t.active = true " +
+        "GROUP BY g.name " +
+        "ORDER BY COUNT(g) DESC")
+    List<String> findTopGenresByMemberCode(@Param("memberCode") int memberCode, Pageable pageable);
+
+    @Query("SELECT r FROM Review r JOIN FETCH r.member WHERE r.member.memberCode = :memberCode "
+        + "ORDER BY r.createdAt DESC ")
+    List<Review> findByMemberCode(@Param("memberCode") Integer memberCode, Pageable pageable);
 }

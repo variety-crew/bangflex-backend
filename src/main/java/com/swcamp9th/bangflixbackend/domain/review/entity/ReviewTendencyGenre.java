@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.review.entity;
 
+import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,7 +9,6 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,5 +37,5 @@ public class ReviewTendencyGenre {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_code", insertable = false, updatable = false)
-    private ReviewGenre genre;
+    private Genre genre;
 }

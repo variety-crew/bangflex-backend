@@ -5,7 +5,7 @@ import com.swcamp9th.bangflixbackend.domain.store.dto.StoreDTO;
 
 public interface StoreService {
 
-    StoreDTO findStroe(Integer storeCode);
+    StoreDTO findStore(Integer storeCode);
 
-    ReviewDTO findBestReviewByStroe(Integer storeCode);
+    ReviewDTO findBestReviewByStore(Integer storeCode);
 }

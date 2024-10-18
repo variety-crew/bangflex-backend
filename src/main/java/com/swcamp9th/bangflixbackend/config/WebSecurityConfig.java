@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.config;
 
+import com.swcamp9th.bangflixbackend.common.filter.JwtExceptionFilter;
 import com.swcamp9th.bangflixbackend.security.config.CorsConfig;
 import com.swcamp9th.bangflixbackend.security.jwt.JwtAuthorizationFilter;
 import com.swcamp9th.bangflixbackend.common.util.JwtUtil;
@@ -7,6 +8,7 @@ import com.swcamp9th.bangflixbackend.security.user.UserDetailsServiceImpl;
 import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -50,6 +52,10 @@ public class WebSecurityConfig {
 		return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
 	}
 
+	public Filter jwtExceptionFilter() {
+		return new JwtExceptionFilter();
+	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable);
@@ -59,17 +65,24 @@ public class WebSecurityConfig {
 		http.formLogin(AbstractHttpConfigurer::disable);
 
 		http.sessionManagement(sessionManagement ->
-			sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		);
 
 		http.authorizeHttpRequests(authorize ->
-			authorize
-				.requestMatchers("/api/v1/auth/**").permitAll()
-				.requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
-				.anyRequest().authenticated()
+				authorize
+						.requestMatchers("/api/v1/auth/**").permitAll()
+						.requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/themes/week").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/themes").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/community").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/event").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/v1/notice").permitAll()
+						.requestMatchers("/uploadFiles/**").permitAll()
+						.anyRequest().authenticated()
 		);
 
 		http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtExceptionFilter(), jwtAuthorizationFilter().getClass());
 
 		return http.build();
 	}

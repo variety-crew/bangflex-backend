@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentDTO createComment(Integer communityPostCode, CommentCreateDTO newComment);
+    void createComment(String loginId, Integer communityPostCode, CommentCreateDTO newComment);
 
-    CommentDTO updateComment(Integer communityPostCode, Integer commentCode, CommentUpdateDTO modifiedComment);
+    void updateComment(String loginId, Integer communityPostCode, Integer commentCode, CommentUpdateDTO modifiedComment);
 
-    void deleteComment(Integer communityPostCode, Integer commentCode, CommentDeleteDTO deletedComment);
+    void deleteComment(String loginId, Integer communityPostCode, Integer commentCode, CommentDeleteDTO deletedComment);
 
     List<CommentDTO> getAllCommentsOfPost(Integer communityPostCode);
 }

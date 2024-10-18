@@ -14,11 +14,11 @@ import lombok.ToString;
 @ToString
 public class StatisticsReviewDTO {
     private Double avgTotalScore;
-    private int tenScorePercent;
-    private int eightScorePercent;
-    private int sixScorePercent;
+    private int fiveScorePercent;
     private int fourScorePercent;
+    private int threeScorePercent;
     private int twoScorePercent;
+    private int oneScorePercent;
 
     private int oneLevelPercent;
     private int twoLevelPercent;
