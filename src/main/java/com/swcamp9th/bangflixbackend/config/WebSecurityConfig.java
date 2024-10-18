@@ -77,6 +77,7 @@ public class WebSecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/api/v1/community/").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/event/").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/v1/notice/").permitAll()
+						.requestMatchers("/uploadFiles/**").permitAll()
 						.anyRequest().authenticated()
 		);
 
