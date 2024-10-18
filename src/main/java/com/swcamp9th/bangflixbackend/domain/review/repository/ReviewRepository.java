@@ -22,11 +22,11 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
         "AVG(r.totalScore), " +
 
         // Score 비율 계산
-        "CAST(COUNT(CASE WHEN r.totalScore = 10 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
-        "CAST(COUNT(CASE WHEN r.totalScore = 8 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
-        "CAST(COUNT(CASE WHEN r.totalScore = 6 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 5 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
         "CAST(COUNT(CASE WHEN r.totalScore = 4 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 3 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
         "CAST(COUNT(CASE WHEN r.totalScore = 2 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
+        "CAST(COUNT(CASE WHEN r.totalScore = 1 THEN 1 END) / COUNT(r.totalScore) * 100 AS int), " +
 
         // Level 비율 계산
         "CAST(COUNT(CASE WHEN r.level = 'ONE' THEN 1  END) / COUNT(r) * 100 AS int), " +
