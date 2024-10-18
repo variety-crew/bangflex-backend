@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.theme.repository;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Genre;
 import com.swcamp9th.bangflixbackend.domain.theme.entity.Theme;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,5 +50,10 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         "WHERE s.storeCode = :storeCode AND t.active = true")
     List<Theme> findByStoreCode(int storeCode);
 
-
+    @Query("SELECT t FROM Theme t "
+        + "INNER JOIN ThemeReaction tr ON t.themeCode = tr.themeCode "
+        + "WHERE tr.createdAt > :oneWeekAgo AND tr.active = true AND t.active = true "
+        + "GROUP BY t.themeCode "
+        + "ORDER BY COUNT(tr) DESC, t.createdAt DESC")
+    List<Theme> findByWeekOrderByLikes(@Param("oneWeekAgo") LocalDateTime oneWeekAgo, Pageable pageable);
 }
