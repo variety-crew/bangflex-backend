@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.common.util;
 
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.exception.ExpiredTokenExcepiton;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -69,16 +70,26 @@ public class JwtUtil {
 	}
 
 	public boolean validateAcessToken(String token) {
-		log.debug("token in jwtUtil: {}", token);
 		try {
 			Jwts.parserBuilder().setSigningKey(accessTokenKey).build().parseClaimsJws(token);
 			return true;
-		} catch (SecurityException | MalformedJwtException | UnsupportedJwtException e) {
-			throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
+		} catch (SecurityException e) {
+			log.info("Invalid JWT signature.");
+			throw new JwtException("잘못된 JWT 시그니처입니다.");
+		} catch (MalformedJwtException e) {
+			log.info("Invalid JWT token.");
+			throw new JwtException("유효하지 않은 JWT 토큰입니다.");
 		} catch (ExpiredJwtException e) {
-			throw new RuntimeException("토큰이 만료되었습니다.", e);
+			log.info("Expired JWT token.");
+			throw new JwtException("엑세스 토큰이 만료되었습니다.");
+		} catch (UnsupportedJwtException e) {
+			log.info("Unsupported JWT token.");
+			throw new JwtException("지원되지 않는 JWT 토큰입니다.");
 		} catch (IllegalArgumentException e) {
-			throw new RuntimeException("JWT 클레임이 비어있습니다.", e);
+			log.info("JWT token compact of handler are invalid.");
+			throw new JwtException("핸들러의 JWT 토큰 컴팩트가 잘못되었습니다.");
+		} catch (SignatureException e) {
+			throw new JwtException("잘못된 JWT 토큰이 입력되었습니다.");
 		}
 	}
 
@@ -86,14 +97,25 @@ public class JwtUtil {
 		try {
 			Jwts.parserBuilder().setSigningKey(refreshTokenKey).build().parseClaimsJws(token);
 			return true;
-		} catch (SecurityException | MalformedJwtException | UnsupportedJwtException e) {
-			throw new RuntimeException("JWT 서명이 유효하지 않습니다.", e);
+		} catch (SecurityException e) {
+			log.info("Invalid JWT signature.");
+			throw new JwtException("잘못된 JWT 시그니처입니다.");
+		} catch (MalformedJwtException e) {
+			log.info("Invalid JWT token.");
+			throw new JwtException("유효하지 않은 JWT 토큰입니다.");
 		} catch (ExpiredJwtException e) {
-			throw new RuntimeException("토큰이 만료되었습니다.", e);
+			log.info("Expired JWT token.");
+			throw new JwtException("리프레시 토큰이 만료되었습니다.");
+		} catch (UnsupportedJwtException e) {
+			log.info("Unsupported JWT token.");
+			throw new JwtException("지원되지 않는 JWT 토큰입니다.");
 		} catch (IllegalArgumentException e) {
-			throw new RuntimeException("JWT 클레임이 비어있습니다.", e);
+			log.info("JWT token compact of handler are invalid.");
+			throw new JwtException("핸들러의 JWT 토큰 컴팩트가 잘못되었습니다.");
+		} catch (SignatureException e) {
+			throw new JwtException("잘못된 JWT 토큰이 입력되었습니다.");
 		}
-	}
+    }
 
 	public Claims getAccessTokenClaims(String token) {
 		return Jwts.parserBuilder().setSigningKey(accessTokenKey).build().parseClaimsJws(token).getBody();

@@ -5,11 +5,15 @@ import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import com.swcamp9th.bangflixbackend.email.service.EmailService;
 import com.swcamp9th.bangflixbackend.exception.DuplicateException;
+import com.swcamp9th.bangflixbackend.exception.ExpiredTokenExcepiton;
+import com.swcamp9th.bangflixbackend.exception.InvalidEmailCodeException;
+import com.swcamp9th.bangflixbackend.exception.LoginException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.web.bind.annotation.RequestPart;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,26 +37,39 @@ public class AuthController {
     @PostMapping(value = "/signup", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "회원가입 API")
     public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto, @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
-        if (imgFile == null) {
-            log.info("AuthController signup - imgFile is null");
-            userService.signupWithoutProfile(signupRequestDto);
-        } else {
-            log.info("AuthController signup - imgFile is NOT null");
-            userService.signup(signupRequestDto, imgFile);
+        try {
+            if (imgFile == null) {
+                userService.signupWithoutProfile(signupRequestDto);
+            } else {
+                userService.signup(signupRequestDto, imgFile);
+            }
+        } catch (DuplicateException e) {
+            throw new DuplicateException(e.getMessage());
+        } catch (IOException e) {
+            throw new IOException("파일 처리 오류가 발생했습니다. " + e.getMessage());
         }
+
         return ResponseEntity.ok(new ResponseMessage<>(200, "회원 가입 성공", null));
     }
 
     @PostMapping("/login")
     @Operation(summary = "로그인 API")
     public ResponseEntity<ResponseMessage<SignResponseDto>> login(@Valid @RequestBody SignRequestDto signRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "로그인 성공", userService.login(signRequestDto)));
+        try {
+            return ResponseEntity.ok(new ResponseMessage<>(200, "로그인 성공", userService.login(signRequestDto)));
+        } catch (IllegalArgumentException e) {
+            throw new LoginException(e.getMessage());
+        }
     }
 
     @PostMapping("/refresh")
     @Operation(summary = "엑세스 토큰 재발급 API")
     public ResponseEntity<ResponseMessage<ReissueTokenResponseDto>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "엑세스 토큰 재발급 성공", userService.refreshTokens(refreshTokenRequestDto.getRefreshToken())));
+        try {
+            return ResponseEntity.ok(new ResponseMessage<>(200, "엑세스 토큰 재발급 성공", userService.refreshTokens(refreshTokenRequestDto.getRefreshToken())));
+        } catch (ExpiredTokenExcepiton e) {
+            throw new ExpiredTokenExcepiton(e.getMessage());
+        }
     }
 
     @PostMapping("/confirm-id")
@@ -62,7 +79,7 @@ public class AuthController {
         if (!result.isDuplicate()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 아이디입니다", result));
         } else {
-            throw new DuplicateException("중복된 아이디입니다");
+            throw new DuplicateException("중복된 아이디입니다.");
         }
     }
 
@@ -73,7 +90,7 @@ public class AuthController {
         if (!result.isDuplicate()) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "사용 가능한 닉네임입니다", result));
         } else {
-            throw new DuplicateException("중복된 닉네임입니다");
+            throw new DuplicateException("중복된 닉네임입니다.");
         }
     }
 
@@ -82,16 +99,20 @@ public class AuthController {
     public ResponseEntity<ResponseMessage<Object>> sendEmail(@RequestBody EmailRequestDto emailRequestDto) throws MessagingException, UnsupportedEncodingException {
         try {
             emailService.sendSimpleMessage(emailRequestDto.getEmail());
-            return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송 성공", null));
+            return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 발송에 성공했습니다", null));
         } catch (MailException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ResponseMessage<>(500, "인증 이메일 발송 실패: " + e.getMessage(), null));
+            throw new MailSendException("인증 이메일 발송에 실패했습니다.");
         }
     }
 
     @PostMapping("/confirm-email")
     @Operation(summary = "인증 이메일 검증 API")
     public ResponseEntity<ResponseMessage<Object>> confirmEmail(@RequestBody EmailCodeRequestDto emailCodeRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "인증 이메일 검증 성공", emailService.findEmailcode(emailCodeRequestDto)));
+        try {
+            emailService.findEmailCode(emailCodeRequestDto);
+            return ResponseEntity.ok(new ResponseMessage<>(200, "이메일 인증에 성공했습니다", null));
+        } catch (MailException e) {
+            throw new InvalidEmailCodeException("이메일 인증에 실패했습니다");
+        }
     }
 }

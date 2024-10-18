@@ -1,7 +1,9 @@
 package com.swcamp9th.bangflixbackend.email.service;
 
 import com.swcamp9th.bangflixbackend.domain.user.dto.EmailCodeRequestDto;
+import com.swcamp9th.bangflixbackend.exception.InvalidEmailCodeException;
 import com.swcamp9th.bangflixbackend.redis.RedisService;
+import io.lettuce.core.RedisException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -79,13 +81,27 @@ public class EmailService {
     }
 
     @Transactional
-    public boolean findEmailcode(EmailCodeRequestDto emailCodeRequestDto) {
-        // redis에 저장된 email 조회
-        String redisEmailCode = redisService.getEmailCode(emailCodeRequestDto.getEmail());
+    public boolean findEmailCode(EmailCodeRequestDto emailCodeRequestDto) {
+        String redisEmailCode;
+        try {
+            // Redis에서 이메일 코드 조회
+            redisEmailCode = redisService.getEmailCode(emailCodeRequestDto.getEmail());
 
-        // redis에 저장된 email, code 삭제
-        redisService.deleteEmailCode(emailCodeRequestDto.getEmail());
+            if (redisEmailCode == null) {
+                throw new InvalidEmailCodeException("이메일 인증 코드가 존재하지 않거나 만료되었습니다");
+            }
 
-        return Objects.equals(redisEmailCode, emailCodeRequestDto.getCode());
+            // Redis에서 해당 이메일 코드 삭제
+            redisService.deleteEmailCode(emailCodeRequestDto.getEmail());
+        } catch (RedisException e) {
+            throw new InvalidEmailCodeException("Redis에서 이메일 코드가 정상적으로 삭제되지 않았습니다");
+        } catch (Exception e) {
+            // 일반적인 예외 처리
+            throw new InvalidEmailCodeException("이메일 인증 과정에서 문제가 발생했습니다");
+        }
+
+        // 입력받은 코드와 Redis에서 조회된 코드를 비교
+        return redisEmailCode.equals(emailCodeRequestDto.getCode());
     }
+
 }
