@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.config;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.exception.*;
+import io.jsonwebtoken.JwtException;
 import io.lettuce.core.RedisException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,9 @@ public class GlobalExceptionHandler {
     // 401: 지정한 리소스에 대한 권한이 없다
     @ExceptionHandler({
         InvalidUserException.class,
-        LoginException.class
+        LoginException.class,
+        ExpiredTokenExcepiton.class,
+        JwtException.class
     })
     public ResponseEntity<ResponseMessage<Object>> handleInvalidUserException(Exception e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
