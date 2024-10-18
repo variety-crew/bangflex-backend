@@ -24,5 +24,7 @@ public class FindThemeByReactionDTO {
     private String headcount;
     private Integer storeCode;
     private String storeName;
+    private Boolean isLike;
+    private Boolean isScrap;
 
 }
