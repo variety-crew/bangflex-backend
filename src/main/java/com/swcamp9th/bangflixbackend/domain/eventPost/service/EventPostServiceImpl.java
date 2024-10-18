@@ -208,7 +208,7 @@ public class EventPostServiceImpl implements EventPostService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         EventPostDTO selectedEvent = modelMapper.map(foundEvent, EventPostDTO.class);
-        selectedEvent.setMemberCode(foundEvent.getMember().getMemberCode());
+        selectedEvent.setNickname(foundEvent.getMember().getNickname());
 
         // 게시글의 첨부파일
         List<EventFile> images = eventFileRepository.findByEventPost(foundEvent).stream().toList();
