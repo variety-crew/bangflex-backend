@@ -22,5 +22,7 @@ public class FindThemeByReactionDTO {
     private Integer price;
     private String posterImage;
     private String headcount;
+    private Integer storeCode;
+    private String storeName;
 
 }

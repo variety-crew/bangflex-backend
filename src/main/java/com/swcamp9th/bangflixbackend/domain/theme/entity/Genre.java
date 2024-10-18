@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class Genre {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "genre_code", nullable = false)
     private Integer genreCode;
 
