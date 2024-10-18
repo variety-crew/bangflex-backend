@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.user.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
+import com.swcamp9th.bangflixbackend.exception.ExpiredTokenExcepiton;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,12 @@ public class UserController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "로그아웃 API")
     public ResponseEntity<ResponseMessage<Object>> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
-        userService.logout(refreshTokenRequestDto.getRefreshToken());
-        return ResponseEntity.ok(new ResponseMessage<>(200, "로그아웃 성공", null));
+        try {
+            userService.logout(refreshTokenRequestDto.getRefreshToken());
+            return ResponseEntity.ok(new ResponseMessage<>(200, "로그아웃 성공", null));
+        } catch (ExpiredTokenExcepiton e) {
+            throw new ExpiredTokenExcepiton(e.getMessage());
+        }
     }
 
     @GetMapping("")

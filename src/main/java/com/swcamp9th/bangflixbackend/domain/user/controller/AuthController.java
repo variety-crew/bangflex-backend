@@ -5,6 +5,7 @@ import com.swcamp9th.bangflixbackend.domain.user.dto.*;
 import com.swcamp9th.bangflixbackend.domain.user.service.UserServiceImpl;
 import com.swcamp9th.bangflixbackend.email.service.EmailService;
 import com.swcamp9th.bangflixbackend.exception.DuplicateException;
+import com.swcamp9th.bangflixbackend.exception.ExpiredTokenExcepiton;
 import com.swcamp9th.bangflixbackend.exception.InvalidEmailCodeException;
 import com.swcamp9th.bangflixbackend.exception.LoginException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,7 +65,11 @@ public class AuthController {
     @PostMapping("/refresh")
     @Operation(summary = "엑세스 토큰 재발급 API")
     public ResponseEntity<ResponseMessage<ReissueTokenResponseDto>> refresh(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
-        return ResponseEntity.ok(new ResponseMessage<>(200, "엑세스 토큰 재발급 성공", userService.refreshTokens(refreshTokenRequestDto.getRefreshToken())));
+        try {
+            return ResponseEntity.ok(new ResponseMessage<>(200, "엑세스 토큰 재발급 성공", userService.refreshTokens(refreshTokenRequestDto.getRefreshToken())));
+        } catch (ExpiredTokenExcepiton e) {
+            throw new ExpiredTokenExcepiton(e.getMessage());
+        }
     }
 
     @PostMapping("/confirm-id")
