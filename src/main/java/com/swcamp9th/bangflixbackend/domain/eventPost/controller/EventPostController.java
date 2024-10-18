@@ -1,7 +1,9 @@
 package com.swcamp9th.bangflixbackend.domain.eventPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
+import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventListDTO;
 import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostDTO;
 import com.swcamp9th.bangflixbackend.domain.eventPost.dto.EventPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.eventPost.service.EventPostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController("eventPostController")
 @Slf4j
@@ -68,8 +71,21 @@ public class EventPostController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 삭제 성공", null));
     }
 
-    /* 이벤트 게시글 목록 조회 */
+    /* 할인테마/신규테마 이벤트 게시글 목록 조회 */
+    @GetMapping("")
+    @Operation(summary = "이벤트 게시글 목록 조회 API (해당 테마 정보 조회)")
+    public ResponseEntity<ResponseMessage<List<EventListDTO>>> getEventList() {
 
+        List<EventListDTO> categoryAndEventList = eventPostService.getEventList();
+        return ResponseEntity.ok(new ResponseMessage<>(200, "이벤트 게시글 목록 조회 성공", categoryAndEventList));
+    }
 
     /* 이벤트 게시글 상세 조회 */
+    @GetMapping("/post/{eventPostCode}")
+    @Operation(summary = "이벤트 게시글 상세 조회 API")
+    public ResponseEntity<ResponseMessage<EventPostDTO>> getEventPost(@PathVariable int eventPostCode) {
+
+        EventPostDTO eventPost = eventPostService.findEventByCode(eventPostCode);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "이벤트 게시글 상세 조회 성공", eventPost));
+    }
 }
