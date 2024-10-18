@@ -170,7 +170,7 @@ public class NoticePostServiceImpl implements NoticePostService {
                     List<NoticeFile> images = noticeFileRepository.findByNoticePost(noticePost).stream().toList();
                     List<String> urls = images.stream().map(NoticeFile::getUrl).toList();
 
-                    noticeDTO.setMemberCode(noticePost.getMember().getMemberCode());
+                    noticeDTO.setNickname(noticePost.getMember().getNickname());
                     noticeDTO.setImageUrls(urls);
                     return noticeDTO;
                 }).toList();
@@ -191,7 +191,7 @@ public class NoticePostServiceImpl implements NoticePostService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         NoticePostDTO selectedNotice = modelMapper.map(foundNotice, NoticePostDTO.class);
-        selectedNotice.setMemberCode(foundNotice.getMember().getMemberCode());
+        selectedNotice.setNickname(foundNotice.getMember().getNickname());
 
         List<NoticeFile> images = noticeFileRepository.findByNoticePost(foundNotice).stream().toList();
         List<String> urls = images.stream().map(NoticeFile::getUrl).toList();

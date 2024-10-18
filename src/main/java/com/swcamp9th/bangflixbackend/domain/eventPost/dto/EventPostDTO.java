@@ -18,7 +18,7 @@ public class EventPostDTO {
     private String title;                   // 제목
     private String content;                 // 게시글 내용
     private String category;                // 카테고리(할인테마/신규테마)
-    private Integer memberCode;             // 회원 코드(작성자)
+    private String nickname;                // 회원 닉네임(작성자)
 
     // 첨부파일 URL 리스트
     private List<String> imageUrls;         // 첨부파일들

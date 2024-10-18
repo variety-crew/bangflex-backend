@@ -116,6 +116,15 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         List<Comment> commentList = commentRepository.findByCommunityPostAndActiveTrue(foundPost);
-        return commentList.stream().map(comment -> modelMapper.map(comment, CommentDTO.class)).toList();
+        List<CommentDTO> allComments = commentList.stream()
+                .map(comment -> {
+                    CommentDTO commentDTO = modelMapper.map(comment, CommentDTO.class);
+                    commentDTO.setNickname(comment.getMember().getNickname());
+                    commentDTO.setCommunityPostCode(comment.getCommunityPost().getCommunityPostCode());
+
+                    return commentDTO;
+                }).toList();
+
+        return allComments;
     }
 }

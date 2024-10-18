@@ -180,7 +180,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
 
-                    postDTO.setMemberCode(communityPost.getMember().getMemberCode());
+                    postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setImageUrls(urls);
                     return postDTO;
                 }).toList();
@@ -195,7 +195,7 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
-        selectedPost.setMemberCode(post.getMember().getMemberCode());
+        selectedPost.setNickname(post.getMember().getNickname());
 
         List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
         List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
