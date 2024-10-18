@@ -1,7 +1,9 @@
 package com.swcamp9th.bangflixbackend.domain.review.entity;
 
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ReviewLike {
 
     @Id
@@ -33,7 +36,7 @@ public class ReviewLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", insertable = false, updatable = false)
-    private ReviewMember member;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_code", insertable = false, updatable = false)

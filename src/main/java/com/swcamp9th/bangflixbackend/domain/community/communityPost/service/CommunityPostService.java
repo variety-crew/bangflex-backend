@@ -2,7 +2,6 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostResponseDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,9 @@ public interface CommunityPostService {
 
     void deletePost(String loginId, int communityPostCode);
 
-    Page<CommunityPostResponseDTO> findPostList(Pageable pageable);
+//    Page<CommunityPostDTO> findPostList(Pageable pageable);
 
     CommunityPostDTO findPostByCode(int communityPostCode);
+
+    List<CommunityPostDTO> getAllPosts();
 }
