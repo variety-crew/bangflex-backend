@@ -37,17 +37,7 @@ public class UserController {
     @GetMapping("")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 조회(아이디, 닉네임, 이메일, 프로필 이미지) API")
-    public ResponseEntity<ResponseMessage<UserInfoResponseDto>> findUserInfoById() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String userId;
-
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            userId = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-        } else {
-            // principal이 UserDetails가 아닌 경우 (ex: 익명 사용자)
-            return ResponseEntity.ok(new ResponseMessage<>(401, "인증되지 않은 사용자입니다.", null));
-        }
+    public ResponseEntity<ResponseMessage<UserInfoResponseDto>> findUserInfoById(@RequestAttribute("loginId") String userId) {
         UserInfoResponseDto userInfo = userService.findUserInfoById(userId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "회원 정보 조회 성공", userInfo));
@@ -57,18 +47,8 @@ public class UserController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 수정(닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<ResponseMessage<Object>> updateUserInfo(@Valid @RequestPart UpdateUserInfoRequestDto updateUserInfoRequestDto,
-                                                                  @RequestPart(value = "imgFile", required = false) MultipartFile imgFile)  throws IOException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String userId;
-
-        if (principal instanceof org.springframework.security.core.userdetails.UserDetails) {
-            userId = ((org.springframework.security.core.userdetails.UserDetails) principal).getUsername();
-        } else {
-            // principal이 UserDetails가 아닌 경우 (ex: 익명 사용자)
-            return ResponseEntity.ok(new ResponseMessage<>(401, "인증되지 않은 사용자입니다.", null));
-        }
-
+                                                                  @RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
+                                                                  @RequestAttribute("loginId") String userId)  throws IOException {
         userService.updateUserInfo(userId, updateUserInfoRequestDto, imgFile);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
