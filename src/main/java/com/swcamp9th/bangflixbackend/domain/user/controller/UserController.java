@@ -39,7 +39,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("/info")
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 조회(아이디, 닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<ResponseMessage<UserInfoResponseDto>> findUserInfoById(@RequestAttribute("loginId") String userId) {
@@ -48,7 +48,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "회원 정보 조회 성공", userInfo));
     }
 
-    @PutMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PutMapping(value = "/info", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "회원 정보 수정(닉네임, 이메일, 프로필 이미지) API")
     public ResponseEntity<ResponseMessage<Object>> updateUserInfo(@Valid @RequestPart UpdateUserInfoRequestDto updateUserInfoRequestDto,
@@ -59,4 +59,10 @@ public class UserController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 수정 성공", null));
     }
 
+    @GetMapping("mypage")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "마이페이지 회원 정보 조회(닉네임, 포인트, 프로필 이미지) API")
+    public ResponseEntity<ResponseMessage<MyPageResponseDto>> findMyPageInfoById(@RequestAttribute("loginId") String userId) {
+        return ResponseEntity.ok(new ResponseMessage<>(200, "회원 정보 조회 성공", userService.findMyPageInfoById(userId)));
+    }
 }

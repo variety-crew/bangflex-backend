@@ -15,4 +15,5 @@ public interface UserService {
     DuplicateCheckResponseDto findId(String id);
     DuplicateCheckResponseDto findNickName(String nickname);
     void updateUserInfo(String id, UpdateUserInfoRequestDto updateUserInfoRequestDto, MultipartFile imgFile) throws IOException;
+    MyPageResponseDto findMyPageInfoById(String userId);
 }
