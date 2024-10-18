@@ -1,5 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.theme.service;
 
+import com.swcamp9th.bangflixbackend.domain.store.entity.Store;
+import com.swcamp9th.bangflixbackend.domain.store.repository.StoreRepository;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.FindThemeByReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.ThemeReactionDTO;
 import com.swcamp9th.bangflixbackend.domain.theme.dto.GenreDTO;
@@ -35,18 +37,21 @@ public class ThemeServiceImpl implements ThemeService {
     private final GenreRepository genreRepository;
     private final ThemeReactionRepository themeReactionRepository;
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
 
     @Autowired
     public ThemeServiceImpl(ThemeRepository themeRepository
                           , ModelMapper modelMapper
                           , GenreRepository genreRepository
                           , ThemeReactionRepository themeReactionRepository
-                          , UserRepository userRepository) {
+                          , UserRepository userRepository
+                          , StoreRepository storeRepository) {
         this.themeRepository = themeRepository;
         this.modelMapper = modelMapper;
         this.genreRepository = genreRepository;
         this.themeReactionRepository = themeReactionRepository;
         this.userRepository = userRepository;
+        this.storeRepository = storeRepository;
     }
 
     @Override
@@ -254,11 +259,19 @@ public class ThemeServiceImpl implements ThemeService {
         else
             throw new RuntimeException();
 
-        log.info("테마 리액션" + themeReactions.isEmpty() + "memberCode" + member.getMemberCode());
 
-        return themeReactions.stream().map(themeReaction -> {
-            return modelMapper.map(themeReaction.getTheme(), FindThemeByReactionDTO.class);
-        }).toList();
+        List<FindThemeByReactionDTO> result = new ArrayList<>();
+
+        for(ThemeReaction themeReaction : themeReactions){
+            FindThemeByReactionDTO findThemeByReaction = modelMapper.map(themeReaction.getTheme(), FindThemeByReactionDTO.class);
+            Store store = storeRepository.findByThemeCode(themeReaction.getTheme().getThemeCode());
+            findThemeByReaction.setStoreCode(store.getStoreCode());
+            findThemeByReaction.setStoreName(store.getName());
+            result.add(findThemeByReaction);
+        }
+
+
+        return result;
     }
 
     @Override
@@ -278,7 +291,7 @@ public class ThemeServiceImpl implements ThemeService {
         themeDto.setLikeCount(themeRepository.countLikesByThemeCode(theme.getThemeCode()));
         themeDto.setScrapCount(themeRepository.countScrapsByThemeCode(theme.getThemeCode()));
         themeDto.setReviewCount(themeRepository.countReviewsByThemeCode(theme.getThemeCode()));
-
+        themeDto.setStoreName(theme.getStore().getName());
         return themeDto;
     }
 
@@ -292,6 +305,7 @@ public class ThemeServiceImpl implements ThemeService {
             themeDto.setLikeCount(themeRepository.countLikesByThemeCode(theme.getThemeCode()));
             themeDto.setScrapCount(themeRepository.countScrapsByThemeCode(theme.getThemeCode()));
             themeDto.setReviewCount(themeRepository.countReviewsByThemeCode(theme.getThemeCode()));
+            themeDto.setStoreName(theme.getStore().getName());
 
             themeDTOs.add(themeDto);
         }
