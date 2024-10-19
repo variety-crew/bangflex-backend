@@ -3,6 +3,7 @@ package com.swcamp9th.bangflixbackend.domain.review.repository;
 import com.swcamp9th.bangflixbackend.domain.review.dto.StatisticsReviewDTO;
 import com.swcamp9th.bangflixbackend.domain.review.entity.Review;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -72,7 +73,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
         "FROM Review r WHERE r.theme.themeCode = :themeCode AND r.active = true"
     )
-    StatisticsReviewDTO findStatisticsByThemeCode(@Param("themeCode") Integer themeCode);
+    Optional<StatisticsReviewDTO> findStatisticsByThemeCode(@Param("themeCode") Integer themeCode);
 
     @Query("SELECT AVG(r.totalScore) FROM Review r INNER JOIN r.member WHERE r.member.memberCode = :memberCode")
     Integer findAvgScoreByMemberCode(@Param("memberCode") Integer memberCode);

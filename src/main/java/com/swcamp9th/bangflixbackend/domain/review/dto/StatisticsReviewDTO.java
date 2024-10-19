@@ -14,45 +14,45 @@ import lombok.ToString;
 @ToString
 public class StatisticsReviewDTO {
     private Double avgTotalScore;
-    private int fiveScorePercent;
-    private int fourScorePercent;
-    private int threeScorePercent;
-    private int twoScorePercent;
-    private int oneScorePercent;
+    private Integer fiveScorePercent;
+    private Integer fourScorePercent;
+    private Integer threeScorePercent;
+    private Integer twoScorePercent;
+    private Integer oneScorePercent;
 
-    private int oneLevelPercent;
-    private int twoLevelPercent;
-    private int threeLevelPercent;
-    private int fourLevelPercent;
-    private int fiveLevelPercent;
+    private Integer oneLevelPercent;
+    private Integer twoLevelPercent;
+    private Integer threeLevelPercent;
+    private Integer fourLevelPercent;
+    private Integer fiveLevelPercent;
 
-    private int oneHorrorLevelPercent;
-    private int twoHorrorLevelPercent;
-    private int threeHorrorLevelPercent;
-    private int fourHorrorLevelPercent;
-    private int fiveHorrorLevelPercent;
+    private Integer oneHorrorLevelPercent;
+    private Integer twoHorrorLevelPercent;
+    private Integer threeHorrorLevelPercent;
+    private Integer fourHorrorLevelPercent;
+    private Integer fiveHorrorLevelPercent;
 
-    private int oneActivePercent;
-    private int twoActivePercent;
-    private int threeActivePercent;
-    private int fourActivePercent;
-    private int fiveActivePercent;
+    private Integer oneActivePercent;
+    private Integer twoActivePercent;
+    private Integer threeActivePercent;
+    private Integer fourActivePercent;
+    private Integer fiveActivePercent;
 
-    private int oneInteriorPercent;
-    private int twoInteriorPercent;
-    private int threeInteriorPercent;
-    private int fourInteriorPercent;
-    private int fiveInteriorPercent;
+    private Integer oneInteriorPercent;
+    private Integer twoInteriorPercent;
+    private Integer threeInteriorPercent;
+    private Integer fourInteriorPercent;
+    private Integer fiveInteriorPercent;
 
-    private int oneProbabilityPercent;
-    private int twoProbabilityPercent;
-    private int threeProbabilityPercent;
-    private int fourProbabilityPercent;
-    private int fiveProbabilityPercent;
+    private Integer oneProbabilityPercent;
+    private Integer twoProbabilityPercent;
+    private Integer threeProbabilityPercent;
+    private Integer fourProbabilityPercent;
+    private Integer fiveProbabilityPercent;
 
-    private int oneCompositionPercent;
-    private int twoCompositionPercent;
-    private int threeCompositionPercent;
-    private int fourCompositionPercent;
-    private int fiveCompositionPercent;
+    private Integer oneCompositionPercent;
+    private Integer twoCompositionPercent;
+    private Integer threeCompositionPercent;
+    private Integer fourCompositionPercent;
+    private Integer fiveCompositionPercent;
 }
