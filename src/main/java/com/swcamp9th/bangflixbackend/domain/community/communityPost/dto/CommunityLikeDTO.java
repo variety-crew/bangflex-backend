@@ -13,6 +13,4 @@ public class CommunityLikeDTO {
 
     private Integer memberCode;             // 회원 코드
     private Integer communityPostCode;      // 게시글 코드
-    private LocalDateTime createdAt;        // 생성일시
-    private Boolean active;                 // 활성화 여부
 }

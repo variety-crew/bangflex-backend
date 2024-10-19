@@ -2,6 +2,7 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,6 +36,6 @@ public class CommunityLikeController {
 
     /* 좋아요 개수 조회 */
 //    @GetMapping("")
-//    @Operation
-//    개발중
+//    @Operation(summary = "좋아요 개수 조회 API")
+//    public ResponseEntity<ResponseMessage<CommunityLikeDTO>>
 }
