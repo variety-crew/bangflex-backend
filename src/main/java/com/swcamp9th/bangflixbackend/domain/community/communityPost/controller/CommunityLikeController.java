@@ -2,7 +2,8 @@ package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeCountDTO;
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityPostDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,7 +36,11 @@ public class CommunityLikeController {
     }
 
     /* 좋아요 개수 조회 */
-//    @GetMapping("")
-//    @Operation(summary = "좋아요 개수 조회 API")
-//    public ResponseEntity<ResponseMessage<CommunityLikeDTO>>
+    @GetMapping("")
+    @Operation(summary = "좋아요 개수 조회 API")
+    public ResponseEntity<ResponseMessage<CommunityLikeCountDTO>> countLike(@RequestBody CommunityLikeCreateDTO post) {
+
+        CommunityLikeCountDTO count = communityLikeService.countLike(post);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 개수 조회 성공", count));
+    }
 }

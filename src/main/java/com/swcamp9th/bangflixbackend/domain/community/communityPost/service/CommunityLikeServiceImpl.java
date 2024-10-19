@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
 
+import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeCountDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.dto.CommunityLikeCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityLike;
 import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service("communityLikeService")
 public class CommunityLikeServiceImpl implements CommunityLikeService {
@@ -61,5 +63,26 @@ public class CommunityLikeServiceImpl implements CommunityLikeService {
         }
 
         communityLikeRepository.save(addedLike);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public CommunityLikeCountDTO countLike(CommunityLikeCreateDTO postLike) {
+        CommunityPost post = communityPostRepository.findById(postLike.getCommunityPostCode())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        CommunityLikeCountDTO count = new CommunityLikeCountDTO();
+        Long likeCount = 0L;
+        List<CommunityLike> likes = communityLikeRepository
+                                    .findByCommunityPostCodeAndActiveTrue(postLike.getCommunityPostCode());
+
+        for (int i = 0; i < likes.size(); i++) {
+            likeCount++;
+        }
+
+        count.setCommunityPostCode(post.getCommunityPostCode());
+        count.setLikeCount(likeCount);
+
+        return count;
     }
 }
