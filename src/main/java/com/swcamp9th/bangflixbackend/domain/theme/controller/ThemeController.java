@@ -143,4 +143,14 @@ public class ThemeController {
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "이번 주 베스트 테마 조회 성공", themes));
     }
+
+    @GetMapping("/recommend")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "테마 추천 API.")
+    public ResponseEntity<ResponseMessage<Object>> recommendTheme(@RequestParam(required = false) List<Integer> themeCodes) {
+
+        List<ThemeDTO> themes = themeService.recommendTheme(themeCodes);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "추천 테마 조회 성공", themes));
+    }
 }

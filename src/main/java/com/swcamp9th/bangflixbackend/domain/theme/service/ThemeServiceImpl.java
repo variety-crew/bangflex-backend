@@ -18,7 +18,9 @@ import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -298,6 +300,43 @@ public class ThemeServiceImpl implements ThemeService {
             return createThemeDTOs(themes, null);
 
         return createThemeDTOs(themes, member.getMemberCode());
+    }
+
+    @Override
+    @Transactional
+    public List<ThemeDTO> recommendTheme(List<Integer> themeCodes) {
+        Pageable pageable = PageRequest.of(0,5);
+
+        if (themeCodes == null)
+            return findThemeByGenresAndSearchOrderBySort(pageable, "like",
+                null, null, null);
+
+        List<Integer> genres = new ArrayList<>(themeRepository.findGenresByThemeCode(themeCodes));
+
+        HashMap<Integer, Integer> countMap = new HashMap<>();
+        for (int number : genres) {
+            countMap.put(number, countMap.getOrDefault(number, 0) + 1);
+        }
+
+        // 가장 많이 등장한 횟수 찾기
+        int maxCount = 0;
+        for (int count : countMap.values()) {
+            if (count > maxCount) {
+                maxCount = count;
+            }
+        }
+
+        // 가장 많이 등장한 숫자들을 리스트에 저장
+        List<Integer> mostFrequentNumbers = new ArrayList<>();
+        for (int number : countMap.keySet()) {
+            if (countMap.get(number) == maxCount)
+                mostFrequentNumbers.add(number);
+        }
+
+        List<String> genreNames = genreRepository.findGenreNames(mostFrequentNumbers);
+
+        return findThemeByGenresAndSearchOrderBySort(pageable, "like",
+            genreNames, null, null);
     }
 
     private ThemeDTO createThemeDTO(Theme theme, Integer memberCode) {
