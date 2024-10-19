@@ -36,4 +36,5 @@ public class CommunityLikeController {
     /* 좋아요 개수 조회 */
 //    @GetMapping("")
 //    @Operation
+//    개발중
 }
