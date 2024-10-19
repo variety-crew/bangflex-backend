@@ -1,20 +1,9 @@
 package com.swcamp9th.bangflixbackend.community;
 
-import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.community.comment.dto.CommentDTO;
-import com.swcamp9th.bangflixbackend.domain.community.comment.entity.Comment;
-import com.swcamp9th.bangflixbackend.domain.community.comment.repository.CommentRepository;
-import com.swcamp9th.bangflixbackend.domain.community.comment.service.CommentService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import com.swcamp9th.bangflixbackend.domain.comment.repository.CommentRepository;
+import com.swcamp9th.bangflixbackend.domain.comment.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class CommentServiceTests {
