@@ -32,4 +32,8 @@ public class CommunityLikeController {
         communityLikeService.addLike(loginId, newLike);
         return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 또는 좋아요 취소 성공", null));
     }
+
+    /* 좋아요 개수 조회 */
+//    @GetMapping("")
+//    @Operation
 }
