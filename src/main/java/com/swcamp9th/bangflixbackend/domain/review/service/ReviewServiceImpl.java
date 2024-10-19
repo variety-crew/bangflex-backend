@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -265,7 +266,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public StatisticsReviewDTO findReviewStatistics(Integer themeCode) {
-        return reviewRepository.findStatisticsByThemeCode(themeCode);
+
+        StatisticsReviewDTO statisticsReviewDTO = reviewRepository.findStatisticsByThemeCode(themeCode).orElse(null);
+
+        if (statisticsReviewDTO == null || statisticsReviewDTO.getAvgTotalScore() == null)
+            return null;
+
+        return statisticsReviewDTO;
     }
 
     @Override
