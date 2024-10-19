@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("prod") // application-{}.yml 에 맞게 설정
+@ActiveProfiles("local") // application-{}.yml 에 맞게 설정
 class BangflixBackendApplicationTests {
 
     @Test
