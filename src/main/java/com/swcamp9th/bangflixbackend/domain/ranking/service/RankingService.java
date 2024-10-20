@@ -14,9 +14,9 @@ public interface RankingService {
 
     ReviewRankingDateDTO findReviewRankingDate(Integer year);
 
-    List<ReviewRankingDTO> findReviewRanking(String date);
+    List<ReviewRankingDTO> findReviewRanking(String date, String loginId);
 
-    List<ReviewDTO> findAllReviewRanking(Pageable pageable);
+    List<ReviewDTO> findAllReviewRanking(Pageable pageable, String loginId);
 
     List<MemberRankingDTO> findAllMemberRanking(Pageable pageable);
 }

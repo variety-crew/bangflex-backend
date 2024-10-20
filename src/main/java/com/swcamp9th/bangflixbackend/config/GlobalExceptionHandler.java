@@ -19,7 +19,8 @@ public class GlobalExceptionHandler {
         AlreadyLikedException.class,
         LikeNotFoundException.class,
         DuplicateException.class,
-        InvalidEmailCodeException.class
+        InvalidEmailCodeException.class,
+        LoginException.class,
     })
     public ResponseEntity<ResponseMessage<Object>> handleBadRequestException(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -29,7 +30,6 @@ public class GlobalExceptionHandler {
     // 401: 지정한 리소스에 대한 권한이 없다
     @ExceptionHandler({
         InvalidUserException.class,
-        LoginException.class,
         ExpiredTokenExcepiton.class,
         JwtException.class
     })

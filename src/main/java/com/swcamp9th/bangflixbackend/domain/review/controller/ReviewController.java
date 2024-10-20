@@ -87,7 +87,8 @@ public class ReviewController {
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewList(
         @PathVariable("themeCode") Integer themeCode,
         @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(required = false) String filter) {
+        @RequestParam(required = false) String filter,
+        @RequestAttribute("loginId") String loginId) {
         /*
             필터 값은 필수 X.
             필터 값이 없다면 기본 최신순 리뷰 정렬
@@ -99,7 +100,7 @@ public class ReviewController {
         */
 
         // 서비스에서 필터를 사용해 조회
-        List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, pageable);
+        List<ReviewDTO> reviews = reviewService.findReviewsWithFilters(themeCode, filter, pageable, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 조회 성공", reviews));
     }
