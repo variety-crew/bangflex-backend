@@ -34,6 +34,7 @@ public class AuthController {
 
     private final UserServiceImpl userService;
     private final EmailService emailService;
+
     @PostMapping(value = "/signup", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "회원가입 API")
     public ResponseEntity<ResponseMessage<SignupResponseDto>> signup(@Valid @RequestPart(value = "signupDto") SignupRequestDto signupRequestDto, @RequestPart(value = "imgFile", required = false) MultipartFile imgFile) throws IOException {
@@ -108,10 +109,10 @@ public class AuthController {
     @PostMapping("/confirm-email")
     @Operation(summary = "인증 이메일 검증 API")
     public ResponseEntity<ResponseMessage<Object>> confirmEmail(@RequestBody EmailCodeRequestDto emailCodeRequestDto) {
-        try {
-            emailService.findEmailCode(emailCodeRequestDto);
+        boolean result = emailService.findEmailCode(emailCodeRequestDto);
+        if (result) {
             return ResponseEntity.ok(new ResponseMessage<>(200, "이메일 인증에 성공했습니다", null));
-        } catch (MailException e) {
+        } else {
             throw new InvalidEmailCodeException("이메일 인증에 실패했습니다");
         }
     }
