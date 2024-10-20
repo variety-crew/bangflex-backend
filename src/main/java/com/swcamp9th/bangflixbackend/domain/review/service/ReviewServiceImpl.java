@@ -264,7 +264,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public ReviewReportDTO findReviewReposrt(String loginId) {
         Member member = userRepository.findById(loginId).orElseThrow();
-        int avgScore = reviewRepository.findAvgScoreByMemberCode(member.getMemberCode());
+        Integer avgScore = reviewRepository.findAvgScoreByMemberCode(member.getMemberCode());
+
+        if(avgScore == null)
+            return null;
+
         Pageable pageable = PageRequest.of(0, 3);
         List<String> genres = reviewRepository.findTopGenresByMemberCode(member.getMemberCode(), pageable);
         ReviewReportDTO reviewReportDTO = new ReviewReportDTO(avgScore, genres);
@@ -276,6 +280,9 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewDTO> findReviewByMember(String loginId, Pageable pageable) {
         Member member = userRepository.findById(loginId).orElseThrow();
         List<Review> review = reviewRepository.findByMemberCode(member.getMemberCode(), pageable);
+
+        if(review == null || review.isEmpty())
+            return null;
         return getReviewDTOS(review, member.getMemberCode());
     }
 
