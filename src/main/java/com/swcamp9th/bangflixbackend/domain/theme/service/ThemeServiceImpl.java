@@ -21,6 +21,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -338,6 +340,28 @@ public class ThemeServiceImpl implements ThemeService {
         return findThemeByGenresAndSearchOrderBySort(pageable, "like",
             genreNames, null, null);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ThemeDTO> getScrapedTheme(String loginId) {
+        List<ThemeReaction> themeReactions = themeReactionRepository.findThemeByMemberScrap(
+                userRepository.findById(loginId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."))
+                        .getMemberCode()
+        );
+
+        List<Theme> themes = themeRepository.findByThemeCodes(
+                themeReactions.stream().map(
+                        ThemeReaction::getThemeCode
+                ).toList()
+        );
+
+        return themes.stream().map(
+                theme -> modelMapper.map(theme, ThemeDTO.class)
+        ).toList();
+
+    }
+
+
 
     private ThemeDTO createThemeDTO(Theme theme, Integer memberCode) {
         ThemeDTO themeDto = modelMapper.map(theme, ThemeDTO.class);

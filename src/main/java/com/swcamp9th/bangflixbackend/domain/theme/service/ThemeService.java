@@ -26,4 +26,6 @@ public interface ThemeService {
     List<ThemeDTO> findThemeByWeek(String loginId);
 
     List<ThemeDTO> recommendTheme(List<Integer> themeCodes);
+
+    List<ThemeDTO> getScrapedTheme(String loginId);
 }
