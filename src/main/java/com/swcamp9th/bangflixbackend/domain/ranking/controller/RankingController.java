@@ -58,9 +58,10 @@ public class RankingController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "선정일 입력하면 해당 일에 해당하는 베스트 리뷰 반환 API. 최대 5개의 리뷰가 반환됨. (만약 date값이 없다면 가장 최신 선정된 베스트 리뷰를 반환합니다)")
     public ResponseEntity<ResponseMessage<List<ReviewRankingDTO>>> findReviewRanking(
-        @RequestParam(required = false) String date) {
+        @RequestParam(required = false) String date,
+        @RequestAttribute("loginId") String loginId) {
 
-        List<ReviewRankingDTO> reviews = rankingService.findReviewRanking(date);
+        List<ReviewRankingDTO> reviews = rankingService.findReviewRanking(date, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, reviews.get(0).getRankingDate() + " 리뷰 랭킹 조회 성공", reviews));
     }
@@ -69,10 +70,11 @@ public class RankingController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "좋아요가 많은 순으로 리뷰를 정렬해 반환하는 API.")
     public ResponseEntity<ResponseMessage<List<ReviewDTO>>> findReviewRanking(
-        @PageableDefault(size = 10, page = 0) Pageable pageable
+        @PageableDefault(size = 10, page = 0) Pageable pageable,
+        @RequestAttribute("loginId") String loginId
     ) {
 
-        List<ReviewDTO> reviews = rankingService.findAllReviewRanking(pageable);
+        List<ReviewDTO> reviews = rankingService.findAllReviewRanking(pageable, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "실시간 리뷰 랭킹 조회 성공", reviews));
     }

@@ -6,6 +6,7 @@ import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLike;
 import com.swcamp9th.bangflixbackend.domain.review.entity.ReviewLikeId;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -43,4 +44,8 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, ReviewLi
         + "GROUP BY rl.reviewCode "
         + "ORDER BY COUNT(rl) DESC, rl.review.createdAt DESC")
     List<ReviewLike> findBestReviewByStoreCode(@Param("storeCode")Integer storeCode);
+
+    @Query("SELECT r FROM ReviewLike r JOIN FETCH r.review JOIN FETCH r.member "
+        + "WHERE r.review.reviewCode = :reviewCode AND r.member.memberCode = :memberCode AND r.active = true")
+    Optional<ReviewLike> findByReviewCodeAndMemberCode(@Param("reviewCode") Integer reviewCode, @Param("memberCode") Integer memberCode);
 }
