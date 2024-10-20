@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,13 +26,13 @@ public class TempCommentController {
     }
 
     /* 사용자별 댓글 목록 조회 */
-    @GetMapping("/{memberCode}")
+    @GetMapping
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "특정 사용자가 작성한 댓글 리스트 조회")
-    public ResponseEntity<ResponseMessage<List<CommentDTO>>> getCommentsByMe(@PathVariable("memberCode") Long memberCode) {
-        System.out.println("memberCode = " + memberCode);
-        log.debug("memberCode: {}", memberCode);
-        List<CommentDTO> foundComments = commentService.getCommentsById(memberCode);
+    public ResponseEntity<ResponseMessage<List<CommentDTO>>> getCommentsByMe(
+            @RequestAttribute("loginId") String loginId
+    ) {
+        List<CommentDTO> foundComments = commentService.getCommentsById(loginId);
 
         if (foundComments.isEmpty()) foundComments = null;
 

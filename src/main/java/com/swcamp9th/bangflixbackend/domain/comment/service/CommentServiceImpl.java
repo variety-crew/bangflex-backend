@@ -151,9 +151,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentDTO> getCommentsById(Long memberCode) {
+    public List<CommentDTO> getCommentsById(String loginId) {
 
-        Member member = userRepository.findById(memberCode)
+        Member member = userRepository.findById(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
         return commentRepository.findByMember(member).stream()

@@ -20,5 +20,5 @@ public interface CommentService {
 
     CommentCountDTO getCommentCount(Integer communityPostCode);
 
-    List<CommentDTO> getCommentsById(Long memberCode);
+    List<CommentDTO> getCommentsById(String loginId);
 }
