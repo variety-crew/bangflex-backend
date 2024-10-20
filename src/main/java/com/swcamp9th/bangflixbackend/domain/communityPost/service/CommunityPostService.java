@@ -22,4 +22,6 @@ public interface CommunityPostService {
     CommunityPostDTO findPostByCode(int communityPostCode);
 
     List<CommunityPostDTO> getAllPosts();
+
+    List<CommunityPostDTO> getMyPosts(String loginId);
 }

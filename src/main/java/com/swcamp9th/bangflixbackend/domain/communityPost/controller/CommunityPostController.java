@@ -111,4 +111,15 @@ public class CommunityPostController {
                 new ResponseMessage<>(200, "구독 완료", "helloworld")
         );
     }
+
+    /* 내가 작성한 게시글 목록 조회 */
+    @GetMapping("/my")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "내가 작성한 커뮤니티 게시글 목록 조회 API")
+    public ResponseEntity<ResponseMessage<List<CommunityPostDTO>>> getMyPosts(
+            @RequestAttribute("loginId") String loginId) {
+
+        List<CommunityPostDTO> myPostList = communityPostService.getMyPosts(loginId);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "내가 작성한 게시글 목록 조회 성공", myPostList));
+    }
 }

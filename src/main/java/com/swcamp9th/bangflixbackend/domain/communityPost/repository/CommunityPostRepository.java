@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.communityPost.repository;
 
 import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityPost;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,4 +16,6 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, In
     Page<CommunityPost> findByActiveTrue(Pageable pageable);
 
     List<CommunityPost> findByActiveTrue(Sort createdAt);
+
+    List<CommunityPost> findByMemberAndActiveTrueOrderByCreatedAtDesc(Member author);
 }
