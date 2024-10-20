@@ -63,7 +63,10 @@ public class RankingController {
 
         List<ReviewRankingDTO> reviews = rankingService.findReviewRanking(date, loginId);
 
-        return ResponseEntity.ok(new ResponseMessage<>(200, reviews.get(0).getRankingDate() + " 리뷰 랭킹 조회 성공", reviews));
+        if(reviews == null)
+            return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 랭킹이 없습니다", null));
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "리뷰 랭킹 조회 성공", reviews));
     }
 
     @GetMapping("/reviews")

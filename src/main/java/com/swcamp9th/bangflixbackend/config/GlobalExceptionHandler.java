@@ -38,20 +38,20 @@ public class GlobalExceptionHandler {
             .body(new ResponseMessage<>(401, e.getMessage(), null));
     }
 
-    // 500: 내부 서버 에러
-    @ExceptionHandler({
-        MailSendException.class,
-        RedisException.class,
-        IOException.class,
-        NullPointerException.class,
-        IllegalArgumentException.class,
-        IndexOutOfBoundsException.class,
-        UnsupportedOperationException.class,
-        IllegalStateException.class,
-        ArithmeticException.class
-    })
-    public ResponseEntity<ResponseMessage<Object>> handleInternalServerErrorException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ResponseMessage<>(500, e.getMessage(), null));
-    }
+//    // 500: 내부 서버 에러
+//    @ExceptionHandler({
+//        MailSendException.class,
+//        RedisException.class,
+//        IOException.class,
+//        NullPointerException.class,
+//        IllegalArgumentException.class,
+//        IndexOutOfBoundsException.class,
+//        UnsupportedOperationException.class,
+//        IllegalStateException.class,
+//        ArithmeticException.class
+//    })
+//    public ResponseEntity<ResponseMessage<Object>> handleInternalServerErrorException(Exception e) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(new ResponseMessage<>(500, e.getMessage(), null));
+//    }
 }
