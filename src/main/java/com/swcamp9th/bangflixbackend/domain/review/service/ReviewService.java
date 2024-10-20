@@ -22,7 +22,7 @@ public interface ReviewService {
 
     void deleteReview(ReviewCodeDTO reviewCodeDTO, String loginId);
 
-    List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable);
+    List<ReviewDTO> findReviewsWithFilters(Integer themeCode, String filter, Pageable pageable, String loginId);
 
     void likeReview(ReviewCodeDTO reviewCodeDTO, String loginId);
 
@@ -30,9 +30,9 @@ public interface ReviewService {
 
     StatisticsReviewDTO findReviewStatistics(Integer themeCode);
 
-    List<ReviewDTO> getReviewDTOS(List<Review> sublist);
+    List<ReviewDTO> getReviewDTOS(List<Review> sublist, Integer memberCode);
 
-    ReviewDTO getReviewDTO(Review review);
+    ReviewDTO getReviewDTO(Review review, Integer memberCode);
 
     ReviewReportDTO findReviewReposrt(String loginId);
 

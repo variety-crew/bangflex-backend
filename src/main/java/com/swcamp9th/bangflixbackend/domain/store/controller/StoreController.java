@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,10 +41,11 @@ public class StoreController {
     @SecurityRequirement(name = "Authorization")
     @Operation(summary = "특정 업체에서 가장 좋아요 수가 많은 리뷰를 반환하는 API.")
     public ResponseEntity<ResponseMessage<ReviewDTO>> findBestReviewByStore(
-        @PathVariable("storeCode") Integer storeCode) {
+        @PathVariable("storeCode") Integer storeCode,
+        @RequestAttribute("loginId") String loginId) {
 
         // 서비스에서 필터를 사용해 조회
-        ReviewDTO storeBestReview  = storeService.findBestReviewByStore(storeCode);
+        ReviewDTO storeBestReview  = storeService.findBestReviewByStore(storeCode, loginId);
 
         return ResponseEntity.ok(new ResponseMessage<>(200, storeCode + "번 업체 베스트 리뷰 조회 성공", storeBestReview));
     }

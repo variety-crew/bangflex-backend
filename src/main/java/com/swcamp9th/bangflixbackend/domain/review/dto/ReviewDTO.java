@@ -35,4 +35,5 @@ public class ReviewDTO {
     private String memberNickname;
     private String memberImage;
     private List<String> genres;
+    private Boolean isLike;
 }

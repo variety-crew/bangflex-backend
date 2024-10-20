@@ -9,6 +9,8 @@ import com.swcamp9th.bangflixbackend.domain.review.service.ReviewService;
 import com.swcamp9th.bangflixbackend.domain.store.dto.StoreDTO;
 import com.swcamp9th.bangflixbackend.domain.store.entity.Store;
 import com.swcamp9th.bangflixbackend.domain.store.repository.StoreRepository;
+import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
+import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +20,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StoreServiceImpl implements StoreService {
 
-    private StoreRepository storeRepository;
-    private ModelMapper modelMapper;
-    private ReviewLikeRepository reviewLikeRepository;
-    private ReviewRepository reviewRepository;
-    private ReviewService reviewService;
+    private final StoreRepository storeRepository;
+    private final ModelMapper modelMapper;
+    private final ReviewLikeRepository reviewLikeRepository;
+    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
+    private final UserRepository userRepository;
 
     @Autowired
     public StoreServiceImpl(StoreRepository storeRepository
                           , ModelMapper modelMapper
                           , ReviewLikeRepository reviewLikeRepository
                           , ReviewRepository reviewRepository
-                          , ReviewService reviewService) {
+                          , ReviewService reviewService
+                          , UserRepository userRepository) {
         this.storeRepository = storeRepository;
         this.modelMapper = modelMapper;
         this.reviewLikeRepository = reviewLikeRepository;
         this.reviewRepository = reviewRepository;
         this.reviewService = reviewService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -46,14 +51,15 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     @Transactional
-    public ReviewDTO findBestReviewByStore(Integer storeCode) {
+    public ReviewDTO findBestReviewByStore(Integer storeCode, String loginId) {
         List<ReviewLike> reviewLike = reviewLikeRepository.findBestReviewByStoreCode(storeCode);
+        Member member = userRepository.findById(loginId).orElseThrow();
 
         if(reviewLike.isEmpty())
             return null;
 
         Review review = reviewRepository.findById(reviewLike.get(0).getReviewCode()).orElse(null);
 
-        return reviewService.getReviewDTO(review);
+        return reviewService.getReviewDTO(review, member.getMemberCode());
     }
 }
