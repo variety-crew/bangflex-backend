@@ -67,20 +67,20 @@ public class CommunityLikeServiceImpl implements CommunityLikeService {
 
     @Transactional(readOnly = true)
     @Override
-    public CommunityLikeCountDTO countLike(CommunityLikeCreateDTO postLike) {
-        CommunityPost post = communityPostRepository.findById(postLike.getCommunityPostCode())
+    public CommunityLikeCountDTO countLike(int communityPostCode) {
+        CommunityPost likePost = communityPostRepository.findById(communityPostCode)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         CommunityLikeCountDTO count = new CommunityLikeCountDTO();
         Long likeCount = 0L;
         List<CommunityLike> likes = communityLikeRepository
-                                    .findByCommunityPostCodeAndActiveTrue(postLike.getCommunityPostCode());
+                                    .findByCommunityPostCodeAndActiveTrue(communityPostCode);
 
         for (int i = 0; i < likes.size(); i++) {
             likeCount++;
         }
 
-        count.setCommunityPostCode(post.getCommunityPostCode());
+        count.setCommunityPostCode(likePost.getCommunityPostCode());
         count.setLikeCount(likeCount);
 
         return count;

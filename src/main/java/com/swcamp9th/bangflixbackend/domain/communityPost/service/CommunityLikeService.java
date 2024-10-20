@@ -7,5 +7,5 @@ public interface CommunityLikeService {
 
     void addLike(String loginId, CommunityLikeCreateDTO newLike);
 
-    CommunityLikeCountDTO countLike(CommunityLikeCreateDTO postLike);
+    CommunityLikeCountDTO countLike(int communityPostCode);
 }

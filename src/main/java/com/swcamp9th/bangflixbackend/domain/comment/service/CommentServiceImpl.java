@@ -4,7 +4,6 @@ import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.entity.Comment;
 import com.swcamp9th.bangflixbackend.domain.comment.repository.CommentRepository;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDeleteDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityPost;
 import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityPostRepository;
@@ -82,6 +81,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         originalComment.setContent(modifiedComment.getContent());
+        originalComment.setMember(author);
         originalComment.setCommunityPost(post);
 
         // 수정된 댓글 저장
@@ -90,8 +90,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public void deleteComment(String loginId, Integer communityPostCode,
-                              Integer commentCode, CommentDeleteDTO deletedComment) {
+    public void deleteComment(String loginId, Integer communityPostCode, Integer commentCode) {
 
         Comment foundComment = commentRepository.findById(commentCode)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 댓글입니다."));
@@ -116,11 +115,18 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
 
         List<Comment> commentList = commentRepository.findByCommunityPostAndActiveTrue(foundPost);
+
         List<CommentDTO> allComments = commentList.stream()
                 .map(comment -> {
                     CommentDTO commentDTO = modelMapper.map(comment, CommentDTO.class);
+
+                    Long commentCount = 0L;
+                    for (int i = 0; i < commentList.size(); i++) {
+                        commentCount++;
+                    }
                     commentDTO.setNickname(comment.getMember().getNickname());
                     commentDTO.setCommunityPostCode(comment.getCommunityPost().getCommunityPostCode());
+                    commentDTO.setCommentCount(commentCount);
 
                     return commentDTO;
                 }).toList();

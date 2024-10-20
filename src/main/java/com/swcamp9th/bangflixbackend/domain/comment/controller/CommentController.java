@@ -3,7 +3,6 @@ package com.swcamp9th.bangflixbackend.domain.comment.controller;
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDeleteDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,10 +60,9 @@ public class CommentController {
     public ResponseEntity<ResponseMessage<Object>> deleteComment(
                                             @RequestAttribute("loginId") String loginId,
                                             @PathVariable("communityPostCode") Integer communityPostCode,
-                                            @PathVariable("commentCode") Integer commentCode,
-                                            @RequestBody CommentDeleteDTO deletedComment) {
+                                            @PathVariable("commentCode") Integer commentCode) {
 
-        commentService.deleteComment(loginId, communityPostCode, commentCode, deletedComment);
+        commentService.deleteComment(loginId, communityPostCode, commentCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 삭제 성공", null));
     }
 

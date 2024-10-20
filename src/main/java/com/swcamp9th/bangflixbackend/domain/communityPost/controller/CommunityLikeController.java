@@ -35,11 +35,11 @@ public class CommunityLikeController {
     }
 
     /* 좋아요 개수 조회 */
-    @GetMapping("")
+    @GetMapping("/{communityPostCode}")
     @Operation(summary = "좋아요 개수 조회 API")
-    public ResponseEntity<ResponseMessage<CommunityLikeCountDTO>> countLike(@RequestBody CommunityLikeCreateDTO post) {
+    public ResponseEntity<ResponseMessage<CommunityLikeCountDTO>> countLike(@PathVariable int communityPostCode) {
 
-        CommunityLikeCountDTO count = communityLikeService.countLike(post);
+        CommunityLikeCountDTO count = communityLikeService.countLike(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 개수 조회 성공", count));
     }
 }
