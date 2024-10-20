@@ -1,6 +1,7 @@
 package com.swcamp9th.bangflixbackend.domain.comment.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
+import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCountDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentUpdateDTO;
@@ -68,10 +69,21 @@ public class CommentController {
 
     /* 게시글의 댓글 목록 조회 */
     @GetMapping("")
+    @Operation(summary = "커뮤니티 게시글의 댓글 목록 조회 API")
     public ResponseEntity<ResponseMessage<List<CommentDTO>>> getAllComments(
                                             @PathVariable("communityPostCode") Integer communityPostCode) {
 
         List<CommentDTO> commentsOfPost = commentService.getAllCommentsOfPost(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 조회 성공", commentsOfPost));
+    }
+
+    /* 게시글의 댓글 개수 조회 */
+    @GetMapping("/count")
+    @Operation(summary = "커뮤니티 게시글의 댓글 개수 조회 API")
+    public ResponseEntity<ResponseMessage<CommentCountDTO>> getCommentCount(
+                            @PathVariable("communityPostCode") Integer communityPostCode) {
+
+        CommentCountDTO commentCount = commentService.getCommentCount(communityPostCode);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 개수 조회 성공", commentCount));
     }
 }
