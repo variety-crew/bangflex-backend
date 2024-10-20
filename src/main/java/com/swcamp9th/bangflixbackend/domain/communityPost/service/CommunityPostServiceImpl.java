@@ -82,10 +82,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
             // UUID 생성
             String uuid = UUID.randomUUID().toString();
             // 저장 경로
-            String filePath = "src/main/resources/static/communityFiles/" + uuid + fileName;
+            String filePath = "src/main/resources/static/uploadFiles/communityFiles/" + uuid + fileName;
             Path path = Paths.get(filePath);
             // DB 저장명
-            String dbUrl = "/communityFiles/" + uuid + fileName;
+            String dbUrl = "/uploadFiles/communityFiles/" + uuid + fileName;
 
             //저장
             Files.createDirectories(path.getParent());
