@@ -148,4 +148,19 @@ public class CommentServiceImpl implements CommentService {
 
         return count;
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CommentDTO> getCommentsById(Long memberCode) {
+
+        Member member = userRepository.findById(memberCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
+
+        return commentRepository.findByMember(member).stream()
+                .map(
+                        comment -> modelMapper.map(comment, CommentDTO.class)
+                ).toList();
+    }
+
+
 }
