@@ -4,6 +4,7 @@ import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCountDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCreateDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentUpdateDTO;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface CommentService {
     List<CommentDTO> getAllCommentsOfPost(Integer communityPostCode);
 
     CommentCountDTO getCommentCount(Integer communityPostCode);
+
+    List<CommentDTO> getCommentsById(Long memberCode);
 }
