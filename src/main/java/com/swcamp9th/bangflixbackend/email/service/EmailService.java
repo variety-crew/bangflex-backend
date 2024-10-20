@@ -92,7 +92,7 @@ public class EmailService {
             }
 
             // Redis에서 해당 이메일 코드 삭제
-            redisService.deleteEmailCode(emailCodeRequestDto.getEmail());
+//            redisService.deleteEmailCode(emailCodeRequestDto.getEmail());
         } catch (RedisException e) {
             throw new InvalidEmailCodeException("Redis에서 이메일 코드가 정상적으로 삭제되지 않았습니다");
         } catch (Exception e) {
