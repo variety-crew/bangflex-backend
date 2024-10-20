@@ -87,10 +87,10 @@ public class NoticePostServiceImpl implements NoticePostService {
             // UUID 생성
             String uuid = UUID.randomUUID().toString();
             // 저장 경로
-            String filePath = "src/main/resources/static/noticeFiles/" + uuid + fileName;
+            String filePath = "src/main/resources/static/uploadFiles/noticeFiles/" + uuid + fileName;
             Path path = Paths.get(filePath);
             // DB 저장명
-            String dbUrl = "/noticeFiles/" + uuid + fileName;
+            String dbUrl = "/uploadFiles/noticeFiles/" + uuid + fileName;
 
             //저장
             Files.createDirectories(path.getParent());

@@ -86,10 +86,10 @@ public class EventPostServiceImpl implements EventPostService {
             // UUID 생성
             String uuid = UUID.randomUUID().toString();
             // 저장 경로
-            String filePath = "src/main/resources/static/eventFiles/" + uuid + fileName;
+            String filePath = "src/main/resources/static/uploadFiles/eventFiles/" + uuid + fileName;
             Path path = Paths.get(filePath);
             // DB 저장명
-            String dbUrl = "/eventFiles/" + uuid + fileName;
+            String dbUrl = "/uploadFiles/eventFiles/" + uuid + fileName;
 
             //저장
             Files.createDirectories(path.getParent());

@@ -12,5 +12,5 @@ import lombok.ToString;
 @ToString
 public class ReviewLikeCountDTO {
     private Integer reviewCode;
-    private long count;
+    private Long count;
 }

@@ -122,6 +122,7 @@ public class CommentServiceImpl implements CommentService {
                     CommentDTO commentDTO = modelMapper.map(comment, CommentDTO.class);
                     commentDTO.setNickname(comment.getMember().getNickname());
                     commentDTO.setCommunityPostCode(comment.getCommunityPost().getCommunityPostCode());
+                    commentDTO.setProfile(comment.getMember().getImage());
 
                     return commentDTO;
                 }).toList();
