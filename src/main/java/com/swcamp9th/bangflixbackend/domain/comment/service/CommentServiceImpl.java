@@ -1,5 +1,6 @@
 package com.swcamp9th.bangflixbackend.domain.comment.service;
 
+import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentCountDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.dto.CommentDTO;
 import com.swcamp9th.bangflixbackend.domain.comment.entity.Comment;
 import com.swcamp9th.bangflixbackend.domain.comment.repository.CommentRepository;
@@ -119,18 +120,31 @@ public class CommentServiceImpl implements CommentService {
         List<CommentDTO> allComments = commentList.stream()
                 .map(comment -> {
                     CommentDTO commentDTO = modelMapper.map(comment, CommentDTO.class);
-
-                    Long commentCount = 0L;
-                    for (int i = 0; i < commentList.size(); i++) {
-                        commentCount++;
-                    }
                     commentDTO.setNickname(comment.getMember().getNickname());
                     commentDTO.setCommunityPostCode(comment.getCommunityPost().getCommunityPostCode());
-                    commentDTO.setCommentCount(commentCount);
 
                     return commentDTO;
                 }).toList();
 
         return allComments;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public CommentCountDTO getCommentCount(Integer communityPostCode) {
+        CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        List<Comment> comments = commentRepository.findByCommunityPostAndActiveTrue(foundPost);
+        Long commentCount = 0L;
+        for (int i = 0; i < comments.size(); i++) {
+            commentCount++;
+        }
+
+        CommentCountDTO count = new CommentCountDTO();
+        count.setCommunityPostCode(communityPostCode);
+        count.setCommentCount(commentCount);
+
+        return count;
     }
 }
