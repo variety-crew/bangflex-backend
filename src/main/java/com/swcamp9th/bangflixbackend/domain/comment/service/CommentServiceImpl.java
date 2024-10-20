@@ -156,7 +156,7 @@ public class CommentServiceImpl implements CommentService {
         Member member = userRepository.findById(loginId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
 
-        return commentRepository.findByMember(member).stream()
+        return commentRepository.findByMemberAndActiveTrue(member).stream()
                 .map(
                         comment -> modelMapper.map(comment, CommentDTO.class)
                 ).toList();

@@ -11,5 +11,5 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     List<Comment> findByCommunityPostAndActiveTrue(CommunityPost foundPost);
 
-    List<Object> findByMember(Member member);
+    List<Object> findByMemberAndActiveTrue(Member member);
 }
