@@ -205,4 +205,28 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         return selectedPost;
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<CommunityPostDTO> getMyPosts(String loginId) {
+        Member author = userRepository.findById(loginId)
+                .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
+
+        List<CommunityPost> myPosts = communityPostRepository.findByMemberAndActiveTrueOrderByCreatedAtDesc(author);
+
+        List<CommunityPostDTO> myPostList = myPosts.stream()
+                .map(communityPost -> {
+                    CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
+
+                    List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+                    List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
+                    postDTO.setNickname(communityPost.getMember().getNickname());
+                    postDTO.setProfile(communityPost.getMember().getImage());
+                    postDTO.setImageUrls(urls);
+                    return postDTO;
+                }).toList();
+
+        return myPostList;
+    }
 }
