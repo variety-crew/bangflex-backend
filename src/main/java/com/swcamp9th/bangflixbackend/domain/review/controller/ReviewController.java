@@ -165,4 +165,18 @@ public class ReviewController {
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "유저가 작성한 리뷰 조회 성공", reviews));
     }
+
+    @GetMapping("/detail")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "하나의 리뷰에 대해 조회하는 API.")
+    public ResponseEntity<ResponseMessage<ReviewDTO>> findReviewDetail(
+        @RequestAttribute("loginId") String loginId,
+        @RequestParam Integer reviewCode
+    ) {
+
+        // 서비스에서 필터를 사용해 조회
+        ReviewDTO reviewDTO = reviewService.findReviewDetail(loginId, reviewCode);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "하나의 리뷰에 대해 조회 성공", reviewDTO));
+    }
 }
