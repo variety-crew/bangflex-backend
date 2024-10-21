@@ -14,7 +14,7 @@ public class EventPostDTO {
 
     private Integer eventPostCode;          // 이벤트 게시글 코드
     private Boolean active;                 // 활성화 여부
-    private LocalDateTime createdAt;        // 생성일시(작성일시)
+    private String createdAt;               // 생성일시(작성일시)
     private String title;                   // 제목
     private String content;                 // 게시글 내용
     private String category;                // 카테고리(할인테마/신규테마)
