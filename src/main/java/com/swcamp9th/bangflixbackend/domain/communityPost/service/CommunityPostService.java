@@ -19,9 +19,9 @@ public interface CommunityPostService {
 
 //    Page<CommunityPostDTO> findPostList(Pageable pageable);
 
-    CommunityPostDTO findPostByCode(int communityPostCode);
+    CommunityPostDTO findPostByCode(String loginId, int communityPostCode);
 
-    List<CommunityPostDTO> getAllPosts();
+    List<CommunityPostDTO> getAllPosts(String loginId);
 
     List<CommunityPostDTO> getMyPosts(String loginId);
 }

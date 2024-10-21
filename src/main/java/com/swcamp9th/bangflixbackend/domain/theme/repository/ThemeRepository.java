@@ -58,7 +58,7 @@ public interface ThemeRepository extends JpaRepository<Theme, Integer> {
         + "INNER JOIN ThemeReaction tr ON t.themeCode = tr.themeCode "
         + "WHERE tr.createdAt > :oneWeekAgo AND tr.active = true AND t.active = true "
         + "GROUP BY t.themeCode "
-        + "ORDER BY COUNT(tr) DESC, t.createdAt DESC")
+        + "ORDER BY COUNT(tr) DESC, t.themeCode DESC")
     List<Theme> findByWeekOrderByLikes(@Param("oneWeekAgo") LocalDateTime oneWeekAgo, Pageable pageable);
 
     @Query("SELECT tg.genreCode FROM ThemeGenre tg "

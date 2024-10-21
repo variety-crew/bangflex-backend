@@ -13,7 +13,7 @@ public class CommunityFileDTO {
 
     private Integer communityFileCode;
     private String url;
-    private LocalDateTime createdAt;
+    private String createdAt;
     private Boolean active;
     private Integer communityPostCode;
 }
