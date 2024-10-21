@@ -153,4 +153,15 @@ public class ThemeController {
 
         return ResponseEntity.ok(new ResponseMessage<>(200, "추천 테마 조회 성공", themes));
     }
+
+    @GetMapping("scraped")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "사용자가 스크랩한 테마 목록")
+    public ResponseEntity<ResponseMessage<List<ThemeDTO>>> scrapTheme(
+            @RequestAttribute("loginId") String loginId
+    ) {
+        List<ThemeDTO> themeDTOs = themeService.getScrapedTheme(loginId);
+
+        return ResponseEntity.ok(new ResponseMessage<>(200, "사용자 스크랩 테마 목록 조회 성공", themeDTOs));
+    }
 }

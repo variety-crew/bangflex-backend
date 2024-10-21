@@ -38,4 +38,12 @@ public interface ThemeReactionRepository extends JpaRepository<ThemeReaction, Th
         + "OR tr.reaction = com.swcamp9th.bangflixbackend.domain.theme.entity.ReactionType.SCRAPLIKE) "
         + "ORDER BY tr.createdAt desc")
     List<ThemeReaction> findThemeByMemberScrap(Pageable pageable, @Param("memberCode") int memberCode);
+
+
+    @Query("SELECT tr FROM ThemeReaction tr JOIN FETCH tr.member JOIN FETCH tr.theme "
+            + "WHERE tr.memberCode = :memberCode "
+            + "AND tr.theme.active = true "
+            + "AND tr.reaction = com.swcamp9th.bangflixbackend.domain.theme.entity.ReactionType.SCRAP "
+            + "ORDER BY tr.createdAt desc")
+    List<ThemeReaction> findThemeByMemberScrap(@Param("memberCode") int memberCode);
 }
