@@ -188,7 +188,7 @@ public class ThemeServiceImpl implements ThemeService {
         Member member = userRepository.findById(userId).orElseThrow();
         Theme theme = themeRepository.findById(themeReactionDTO.getThemeCode()).orElseThrow();
         ThemeReaction themeReaction = themeReactionRepository.findByIds(
-            themeReactionDTO.getThemeCode(), member.getMemberCode());
+            themeReactionDTO.getThemeCode(), member.getMemberCode()).orElse(null);
 
         if(themeReaction == null){
             themeReaction = new ThemeReaction();
