@@ -84,18 +84,23 @@ public class CommunityPostController {
 
     /* 게시글 목록 조회 */
     @GetMapping("")
+    @SecurityRequirement(name = "Authorization")
     @Operation(summary = "커뮤니티 게시글 목록 조회 API")
-    public ResponseEntity<ResponseMessage<List<CommunityPostDTO>>> getAllPosts() {
-        List<CommunityPostDTO> posts = communityPostService.getAllPosts();
+    public ResponseEntity<ResponseMessage<List<CommunityPostDTO>>> getAllPosts(
+            @RequestAttribute("loginId") String loginId) {
+
+        List<CommunityPostDTO> posts = communityPostService.getAllPosts(loginId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 목록 조회 성공", posts));
     }
 
     /* 게시글 상세 조회 */
     @GetMapping("/post/{communityPostCode}")
+    @SecurityRequirement(name = "Authorization")
     @Operation(summary = "커뮤니티 게시글 상세 조회 API")
-    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@PathVariable int communityPostCode) {
+    public ResponseEntity<ResponseMessage<CommunityPostDTO>> findPost(@RequestAttribute("loginId") String loginId,
+                                                                      @PathVariable int communityPostCode) {
 
-        CommunityPostDTO post = communityPostService.findPostByCode(communityPostCode);
+        CommunityPostDTO post = communityPostService.findPostByCode(loginId, communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
 

@@ -217,6 +217,8 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewDTO.setMemberImage(review.getMember().getImage());
                 List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
                 reviewDTO.setThemeCode(review.getTheme().getThemeCode());
+                reviewDTO.setThemeImage(review.getTheme().getPosterImage());
+                reviewDTO.setThemeName(review.getTheme().getName());
                 ReviewLike reviewLike = reviewLikeRepository.findByReviewCodeAndMemberCode(review.getReviewCode(), memberCode).orElse(null);
 
                 if (reviewLike != null)
@@ -248,6 +250,8 @@ public class ReviewServiceImpl implements ReviewService {
         reviewDTO.setMemberImage(review.getMember().getImage());
         List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
         reviewDTO.setThemeCode(review.getTheme().getThemeCode());
+        reviewDTO.setThemeImage(review.getTheme().getPosterImage());
+        reviewDTO.setThemeName(review.getTheme().getName());
 
         ReviewLike reviewLike = reviewLikeRepository.findByReviewCodeAndMemberCode(review.getReviewCode(), memberCode).orElse(null);
 

@@ -46,5 +46,5 @@ public interface ThemeReactionRepository extends JpaRepository<ThemeReaction, Th
             + "AND tr.theme.active = true "
             + "AND tr.reaction = com.swcamp9th.bangflixbackend.domain.theme.entity.ReactionType.SCRAP "
             + "ORDER BY tr.createdAt desc")
-    List<ThemeReaction> findThemeByMemberScrap(@Param("memberCode") int memberCode);
+    List<ThemeReaction> findThemeByMemberCode(@Param("memberCode") int memberCode);
 }

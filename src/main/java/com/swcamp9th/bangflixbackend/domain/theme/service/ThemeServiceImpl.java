@@ -344,10 +344,9 @@ public class ThemeServiceImpl implements ThemeService {
     @Transactional(readOnly = true)
     @Override
     public List<ThemeDTO> getScrapedTheme(String loginId) {
-        List<ThemeReaction> themeReactions = themeReactionRepository.findThemeByMemberScrap(
-                userRepository.findById(loginId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."))
-                        .getMemberCode()
-        );
+        Integer memberCode = userRepository.findById(loginId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."))
+                .getMemberCode();
+        List<ThemeReaction> themeReactions = themeReactionRepository.findThemeByMemberCode(memberCode);
 
         List<Theme> themes = themeRepository.findByThemeCodes(
                 themeReactions.stream().map(
@@ -356,7 +355,7 @@ public class ThemeServiceImpl implements ThemeService {
         );
 
         return themes.stream().map(
-                theme -> modelMapper.map(theme, ThemeDTO.class)
+                theme -> createThemeDTO(theme, memberCode)
         ).toList();
 
     }
