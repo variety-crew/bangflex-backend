@@ -216,6 +216,7 @@ public class ReviewServiceImpl implements ReviewService {
                 reviewDTO.setMemberCode(review.getMember().getMemberCode());
                 reviewDTO.setMemberImage(review.getMember().getImage());
                 List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+                reviewDTO.setThemeCode(review.getTheme().getThemeCode());
                 ReviewLike reviewLike = reviewLikeRepository.findByReviewCodeAndMemberCode(review.getReviewCode(), memberCode).orElse(null);
 
                 if (reviewLike != null)
@@ -246,6 +247,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewDTO.setMemberCode(review.getMember().getMemberCode());
         reviewDTO.setMemberImage(review.getMember().getImage());
         List<String> genres = findMemberTendencyGenre(review.getMember().getMemberCode());
+        reviewDTO.setThemeCode(review.getTheme().getThemeCode());
 
         ReviewLike reviewLike = reviewLikeRepository.findByReviewCodeAndMemberCode(review.getReviewCode(), memberCode).orElse(null);
 
@@ -284,6 +286,18 @@ public class ReviewServiceImpl implements ReviewService {
         if(review == null || review.isEmpty())
             return null;
         return getReviewDTOS(review, member.getMemberCode());
+    }
+
+    @Override
+    @Transactional
+    public ReviewDTO findReviewDetail(String loginId, Integer reviewCode) {
+        Member member = userRepository.findById(loginId).orElseThrow();
+        Review review = reviewRepository.findById(reviewCode).orElseThrow();
+
+        if(!review.getMember().getMemberCode().equals(member.getMemberCode()))
+            throw new InvalidUserException("리뷰 수정 권한이 없습니다");
+
+        return getReviewDTO(review, member.getMemberCode());
     }
 
     @Override
