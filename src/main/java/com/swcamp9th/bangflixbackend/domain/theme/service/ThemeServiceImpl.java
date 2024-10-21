@@ -230,7 +230,7 @@ public class ThemeServiceImpl implements ThemeService {
     public void deleteThemeReaction(String loginId, ThemeReactionDTO themeReactionDTO) {
         Member member = userRepository.findById(loginId).orElseThrow();
         ThemeReaction themeReaction = themeReactionRepository.findByIds(
-            themeReactionDTO.getThemeCode(), member.getMemberCode());
+            themeReactionDTO.getThemeCode(), member.getMemberCode()).orElse(null);
 
         if(themeReaction != null) {
             if (themeReactionDTO.getReaction().equals("like")) {
@@ -371,7 +371,7 @@ public class ThemeServiceImpl implements ThemeService {
         themeDto.setStoreName(theme.getStore().getName());
 
         if(memberCode != null){
-            ThemeReaction themeReaction = themeReactionRepository.findByIds(theme.getThemeCode(), memberCode);
+            ThemeReaction themeReaction = themeReactionRepository.findByIds(theme.getThemeCode(), memberCode).orElse(null);
 
             if(themeReaction != null){
                 themeDto.setIsLike(true);
@@ -402,7 +402,7 @@ public class ThemeServiceImpl implements ThemeService {
             themeDto.setStoreName(theme.getStore().getName());
 
             if(memberCode != null){
-                ThemeReaction themeReaction = themeReactionRepository.findByIds(theme.getThemeCode(), memberCode);
+                ThemeReaction themeReaction = themeReactionRepository.findByIds(theme.getThemeCode(), memberCode).orElse(null);
 
                 if(themeReaction != null){
                     themeDto.setIsLike(true);
