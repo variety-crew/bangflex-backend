@@ -5,6 +5,7 @@ import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostDTO;
 import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostUpdateDTO;
 import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityFile;
 import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityFileRepository;
+import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityPostRepository;
 import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityPost;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
@@ -34,16 +35,18 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     private final CommunityPostRepository communityPostRepository;
     private final UserRepository userRepository;
     private final CommunityFileRepository communityFileRepository;
+    private final CommunityLikeRepository communityLikeRepository;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
                                     UserRepository userRepository,
-                                    CommunityFileRepository communityFileRepository) {
+                                    CommunityFileRepository communityFileRepository, CommunityLikeRepository communityLikeRepository) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
         this.userRepository = userRepository;
         this.communityFileRepository = communityFileRepository;
+        this.communityLikeRepository = communityLikeRepository;
     }
 
     @Transactional
@@ -169,9 +172,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommunityPostDTO> getAllPosts() {
+    public List<CommunityPostDTO> getAllPosts(String loginId) {
         List<CommunityPost> allPosts = communityPostRepository.findByActiveTrue(
                                                                 Sort.by("createdAt").descending());
+
+        Member loginMember = userRepository.findById(loginId)
+                .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
 
         List<CommunityPostDTO> postList = allPosts.stream()
                 .map(communityPost -> {
@@ -179,10 +185,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+                    boolean isLike = communityLikeRepository
+                            .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
+                                    loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
+                    postDTO.setIsLike(isLike);
                     return postDTO;
                 }).toList();
 
@@ -191,9 +201,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
     @Transactional(readOnly = true)
     @Override
-    public CommunityPostDTO findPostByCode(int communityPostCode) {
+    public CommunityPostDTO findPostByCode(String loginId, int communityPostCode) {
         CommunityPost post = communityPostRepository.findById(communityPostCode)
                             .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        Member loginMember = userRepository.findById(loginId)
+                .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
 
         CommunityPostDTO selectedPost = modelMapper.map(post, CommunityPostDTO.class);
         selectedPost.setNickname(post.getMember().getNickname());
@@ -201,7 +214,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
         List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
         List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+        boolean isLike = communityLikeRepository
+                .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
+                        loginMember.getMemberCode(), post.getCommunityPostCode());
+
         selectedPost.setImageUrls(urls);
+        selectedPost.setIsLike(isLike);
 
         return selectedPost;
     }
@@ -209,10 +227,10 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     @Transactional(readOnly = true)
     @Override
     public List<CommunityPostDTO> getMyPosts(String loginId) {
-        Member author = userRepository.findById(loginId)
+        Member loginMember = userRepository.findById(loginId)
                 .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
 
-        List<CommunityPost> myPosts = communityPostRepository.findByMemberAndActiveTrueOrderByCreatedAtDesc(author);
+        List<CommunityPost> myPosts = communityPostRepository.findByMemberAndActiveTrueOrderByCreatedAtDesc(loginMember);
 
         List<CommunityPostDTO> myPostList = myPosts.stream()
                 .map(communityPost -> {
@@ -220,10 +238,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+                    boolean isLike = communityLikeRepository
+                            .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
+                                    loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
+                    postDTO.setIsLike(isLike);
                     return postDTO;
                 }).toList();
 
