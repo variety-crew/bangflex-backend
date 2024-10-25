@@ -1,10 +1,10 @@
-package com.swcamp9th.bangflixbackend.domain.communityPost.controller;
+package com.swcamp9th.bangflixbackend.domain.communityPost.command.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
-import com.swcamp9th.bangflixbackend.domain.communityPost.service.CommunityPostService;
-import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostUpdateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostUpdateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.command.service.CommunityPostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;

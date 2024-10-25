@@ -1,4 +1,4 @@
-package com.swcamp9th.bangflixbackend.domain.communityPost.dto;
+package com.swcamp9th.bangflixbackend.domain.communityPost.command.dto;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
