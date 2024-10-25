@@ -1,8 +1,8 @@
-package com.swcamp9th.bangflixbackend.domain.communityPost.command.service;
+package com.swcamp9th.bangflixbackend.domain.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityPostUpdateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityPostUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

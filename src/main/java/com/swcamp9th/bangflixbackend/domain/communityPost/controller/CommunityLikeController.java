@@ -1,9 +1,9 @@
-package com.swcamp9th.bangflixbackend.domain.communityPost.command.controller;
+package com.swcamp9th.bangflixbackend.domain.communityPost.controller;
 
 import com.swcamp9th.bangflixbackend.common.ResponseMessage;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityLikeCountDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityLikeCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.service.CommunityLikeService;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityLikeCountDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityLikeCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.service.CommunityLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;

@@ -1,11 +1,11 @@
-package com.swcamp9th.bangflixbackend.domain.communityPost.command.service;
+package com.swcamp9th.bangflixbackend.domain.communityPost.service;
 
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityLikeCountDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.entity.CommunityLike;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.repository.CommunityPostRepository;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.dto.CommunityLikeCreateDTO;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.entity.CommunityPost;
-import com.swcamp9th.bangflixbackend.domain.communityPost.command.repository.CommunityLikeRepository;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityLikeCountDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityLike;
+import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityPostRepository;
+import com.swcamp9th.bangflixbackend.domain.communityPost.dto.CommunityLikeCreateDTO;
+import com.swcamp9th.bangflixbackend.domain.communityPost.entity.CommunityPost;
+import com.swcamp9th.bangflixbackend.domain.communityPost.repository.CommunityLikeRepository;
 import com.swcamp9th.bangflixbackend.domain.user.entity.Member;
 import com.swcamp9th.bangflixbackend.domain.user.repository.UserRepository;
 import com.swcamp9th.bangflixbackend.exception.InvalidUserException;
