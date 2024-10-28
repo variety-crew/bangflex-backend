@@ -1,7 +1,7 @@
-//package com.swcamp9th.bangflixbackend.domain.community.communityPost.controller;
+//package com.varc.bangflex.domain.community.communityPost.controller;
 //
-//import com.swcamp9th.bangflixbackend.common.ResponseMessage;
-//import com.swcamp9th.bangflixbackend.domain.community.communityPost.service.CommunityFileService;
+//import com.varc.bangflex.common.ResponseMessage;
+//import com.varc.bangflex.domain.community.communityPost.service.CommunityFileService;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.ResponseEntity;

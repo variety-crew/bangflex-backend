@@ -1,4 +1,4 @@
-//package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
+//package com.varc.bangflex.domain.community.communityPost.service;
 //
 //import org.springframework.web.multipart.MultipartFile;
 //

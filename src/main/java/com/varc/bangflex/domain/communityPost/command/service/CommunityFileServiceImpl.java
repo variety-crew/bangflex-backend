@@ -1,9 +1,9 @@
-//package com.swcamp9th.bangflixbackend.domain.community.communityPost.service;
+//package com.varc.bangflex.domain.community.communityPost.service;
 //
-//import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityFile;
-//import com.swcamp9th.bangflixbackend.domain.community.communityPost.entity.CommunityPost;
-//import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityFileRepository;
-//import com.swcamp9th.bangflixbackend.domain.community.communityPost.repository.CommunityPostRepository;
+//import com.varc.bangflex.domain.community.communityPost.entity.CommunityFile;
+//import com.varc.bangflex.domain.community.communityPost.entity.CommunityPost;
+//import com.varc.bangflex.domain.community.communityPost.repository.CommunityFileRepository;
+//import com.varc.bangflex.domain.community.communityPost.repository.CommunityPostRepository;
 //import jakarta.persistence.EntityNotFoundException;
 //import org.modelmapper.ModelMapper;
 //import org.springframework.beans.factory.annotation.Autowired;
